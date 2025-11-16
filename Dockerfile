@@ -8,16 +8,17 @@ RUN apt-get update && apt-get install -y \
     gawk \
     git \
     python3 \
+    python3-distutils \
     unzip \
+    zstd \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /builder
 
-RUN wget https://downloads.openwrt.org/releases/24.10.0/targets/mediatek/filogic/openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.xz && \
-    tar -xf openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.xz && \
-    rm openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.xz
+COPY downloads/openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.zst .
+RUN tar --zstd -xf openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.zst && \
+    rm openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.zst
 
 WORKDIR /builder/openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64
 
 CMD ["/bin/bash"]
-

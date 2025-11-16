@@ -9,3 +9,16 @@ Create a Dockerfile and use Imagebuilder
 # To run
 
 docker build -t openwrt-builder .
+
+
+# ImageBuilder
+
+The imagebuilder file is in /downloads
+
+This is so 
+
+# run and make the glinet_gl
+
+make image PROFILE="glinet_gl-mt3000" PACKAGES="kmod-batman-adv batctl-default" 2>/dev/null
+
+

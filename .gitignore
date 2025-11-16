@@ -1,0 +1,11 @@
+# Downloaded ImageBuilder
+downloads/
+
+# Generated configs
+files-gateway/
+files-ap/
+
+# Built firmware images
+*.bin
+*.itb
+firmware/
