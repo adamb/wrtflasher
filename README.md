@@ -27,7 +27,7 @@ make image PROFILE="glinet_gl-mt3000" PACKAGES="kmod-batman-adv batctl-default" 
 ### Download ImageBuilder
 
 Before building, download the OpenWRT ImageBuilder:
-mkdir -p downloads cd downloads wget https://downloads.openwrt.org/releases/24.10.0/targets/mediatek/filogic/openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.zst cd ..
+mkdir -p downloads; cd downloads;  wget https://downloads.openwrt.org/releases/24.10.0/targets/mediatek/filogic/openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64.tar.zst ; cd ..
 
 Copied!
 This file is ~500MB and is cached locally for future builds.
