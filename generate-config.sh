@@ -2,6 +2,7 @@
 set -e  # Exit on error
 
 # Source the user's config
+source .env # don't forget to put passwords here!
 source config.sh
 
 echo "=== Generating OpenWRT mesh configurations ==="
@@ -21,10 +22,31 @@ config interface 'loopback'
 	option ipaddr '127.0.0.1'
 	option netmask '255.0.0.0'
 
+config interface 'wan'
+	option device 'eth1'
+	option proto 'dhcp'
+
 config interface 'bat0'
 	option proto 'batadv'
 	option routing_algo 'BATMAN_IV'
 	option gw_mode 'server'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'bat0.10'
+	list ports 'eth0.10'
+
+config device
+	option name 'br-iot'
+	option type 'bridge'
+	list ports 'bat0.20'
+	list ports 'eth0.20'
+
+config device
+	option name 'br-guest'
+	option type 'bridge'
+	list ports 'bat0.30'
 
 config interface 'lan'
 	option device 'br-lan'
@@ -32,31 +54,19 @@ config interface 'lan'
 	option ipaddr '$LAN_GATEWAY'
 	option netmask '255.255.255.0'
 
-config device
-	option name 'br-lan'
-	option type 'bridge'
-	list ports 'bat0'
-
 config interface 'iot'
 	option device 'br-iot'
 	option proto 'static'
 	option ipaddr '$IOT_GATEWAY'
 	option netmask '255.255.255.0'
 
-config device
-	option name 'br-iot'
-	option type 'bridge'
-
 config interface 'guest'
 	option device 'br-guest'
 	option proto 'static'
 	option ipaddr '$GUEST_GATEWAY'
 	option netmask '255.255.255.0'
-
-config device
-	option name 'br-guest'
-	option type 'bridge'
 EOF
+
 
 cat > files-gateway/etc/config/wireless <<EOF
 config wifi-device 'radio0'
@@ -233,14 +243,32 @@ config interface 'bat0'
 	option routing_algo 'BATMAN_IV'
 	option gw_mode 'client'
 
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'bat0.10'
+
+config device
+	option name 'br-iot'
+	option type 'bridge'
+	list ports 'bat0.20'
+
+config device
+	option name 'br-guest'
+	option type 'bridge'
+	list ports 'bat0.30'
+
 config interface 'lan'
 	option device 'br-lan'
 	option proto 'dhcp'
 
-config device
-	option name 'br-lan'
-	option type 'bridge'
-	list ports 'bat0'
+config interface 'iot'
+	option device 'br-iot'
+	option proto 'none'
+
+config interface 'guest'
+	option device 'br-guest'
+	option proto 'none'
 EOF
 
 # 

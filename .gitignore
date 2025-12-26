@@ -9,3 +9,6 @@ files-ap/
 *.bin
 *.itb
 firmware/
+
+# .env for real passwords
+.env

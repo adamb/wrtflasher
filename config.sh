@@ -7,7 +7,7 @@ ROLE="${ROLE:-node}"
 
 # -------- Mesh (802.11s) --------
 MESH_ID="batmesh_network"
-MESH_KEY="beguelinmesh"
+# MESH_KEY="changeme" from .env
 
 # Use UCI device names (radio0/radio1). Typically:
 #   radio1 = 5GHz backhaul, radio0 = 2.4/5GHz clients
@@ -15,14 +15,14 @@ MESH_DEVICE="radio1"     # 802.11s backhaul
 CLIENT_DEVICE="radio0"   # client APs
 
 # -------- SSIDs (must match on all nodes) --------
-IOT_SSID="FDM_IoT"
+IOT_SSID="IOT"
 IOT_PASSWORD="begueliniot"      # WPA2/3 passphrase
 
-GUEST_SSID="FDM_Guest"
-GUEST_PASSWORD="beguelinguest"
+GUEST_SSID="Guest"
+# GUEST_PASSWORD="changeme" # from .env
 
-LAN_SSID="FDM_LAN"
-LAN_PASSWORD="beguelinlan"
+LAN_SSID="Finca"
+# LAN_PASSWORD="changeme" # from .env
 
 # -------- 802.11r fast roaming --------
 IOT_MOBILITY_DOMAIN="0001"
