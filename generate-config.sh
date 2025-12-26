@@ -67,62 +67,6 @@ config interface 'guest'
 	option netmask '255.255.255.0'
 EOF
 
-
-cat > files-gateway/etc/config/wireless <<EOF
-config wifi-device 'radio0'
-	option type 'mac80211'
-	option channel '36'
-	option band '5g'
-	option htmode 'HE80'
-	option disabled '0'
-
-config wifi-device 'radio1'
-	option type 'mac80211'
-	option channel '149'
-	option band '5g'
-	option htmode 'HE80'
-	option disabled '0'
-
-config wifi-iface
-	option device 'radio1'
-	option mode 'mesh'
-	option mesh_id '$MESH_ID'
-	option encryption 'sae'
-	option key '$MESH_KEY'
-	option network 'bat0'
-	option mesh_fwding '0'
-
-config wifi-iface
-	option device 'radio0'
-	option mode 'ap'
-	option ssid '$LAN_SSID'
-	option encryption 'sae-mixed'
-	option key '$LAN_PASSWORD'
-	option network 'lan'
-	option ieee80211r '1'
-	option mobility_domain '$LAN_MOBILITY_DOMAIN'
-
-config wifi-iface
-	option device 'radio0'
-	option mode 'ap'
-	option ssid '$IOT_SSID'
-	option encryption 'sae-mixed'
-	option key '$IOT_PASSWORD'
-	option network 'iot'
-	option ieee80211r '1'
-	option mobility_domain '$IOT_MOBILITY_DOMAIN'
-
-config wifi-iface
-	option device 'radio0'
-	option mode 'ap'
-	option ssid '$GUEST_SSID'
-	option encryption 'sae-mixed'
-	option key '$GUEST_PASSWORD'
-	option network 'guest'
-	option ieee80211r '1'
-	option mobility_domain '$GUEST_MOBILITY_DOMAIN'
-EOF
-
 cat > files-gateway/etc/config/dhcp <<EOF
 config dnsmasq
 	option domainneeded '1'
@@ -271,61 +215,24 @@ config interface 'guest'
 	option proto 'none'
 EOF
 
-# 
-cat > files-ap/etc/config/wireless <<EOF
-config wifi-device 'radio0'
-	option type 'mac80211'
-	option channel '36'
-	option band '5g'
-	option htmode 'HE80'
-	option disabled '0'
+echo "→ Generating UCI wireless setup scripts..."
+mkdir -p files-gateway/etc/uci-defaults files-ap/etc/uci-defaults
 
-config wifi-device 'radio1'
-	option type 'mac80211'
-	option channel '149'
-	option band '5g'
-	option htmode 'HE80'
-	option disabled '0'
-
-config wifi-iface
-	option device 'radio1'
-	option mode 'mesh'
-	option mesh_id '$MESH_ID'
-	option encryption 'sae'
-	option key '$MESH_KEY'
-	option network 'bat0'
-	option mesh_fwding '0'
-
-config wifi-iface
-	option device 'radio0'
-	option mode 'ap'
-	option ssid '$LAN_SSID'
-	option encryption 'sae-mixed'
-	option key '$LAN_PASSWORD'
-	option network 'lan'
-	option ieee80211r '1'
-	option mobility_domain '$LAN_MOBILITY_DOMAIN'
-
-config wifi-iface
-	option device 'radio0'
-	option mode 'ap'
-	option ssid '$IOT_SSID'
-	option encryption 'sae-mixed'
-	option key '$IOT_PASSWORD'
-	option network 'iot'
-	option ieee80211r '1'
-	option mobility_domain '$IOT_MOBILITY_DOMAIN'
-
-config wifi-iface
-	option device 'radio0'
-	option mode 'ap'
-	option ssid '$GUEST_SSID'
-	option encryption 'sae-mixed'
-	option key '$GUEST_PASSWORD'
-	option network 'guest'
-	option ieee80211r '1'
-	option mobility_domain '$GUEST_MOBILITY_DOMAIN'
-EOF
+for dir in files-gateway files-ap; do
+    cp templates/wifi-setup.sh $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/MESH_ID_PLACEHOLDER/$MESH_ID/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/MESH_KEY_PLACEHOLDER/$MESH_KEY/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/LAN_SSID_PLACEHOLDER/$LAN_SSID/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/LAN_PASSWORD_PLACEHOLDER/$LAN_PASSWORD/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/LAN_MOBILITY_DOMAIN_PLACEHOLDER/$LAN_MOBILITY_DOMAIN/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/IOT_SSID_PLACEHOLDER/$IOT_SSID/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/IOT_PASSWORD_PLACEHOLDER/$IOT_PASSWORD/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/IOT_MOBILITY_DOMAIN_PLACEHOLDER/$IOT_MOBILITY_DOMAIN/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/GUEST_SSID_PLACEHOLDER/$GUEST_SSID/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/GUEST_PASSWORD_PLACEHOLDER/$GUEST_PASSWORD/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/GUEST_MOBILITY_DOMAIN_PLACEHOLDER/$GUEST_MOBILITY_DOMAIN/g" $dir/etc/uci-defaults/99-wifi-setup
+    chmod +x $dir/etc/uci-defaults/99-wifi-setup
+done
 
 echo ""
 echo "✓ Configuration generation complete!"
