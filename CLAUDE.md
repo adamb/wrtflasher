@@ -17,8 +17,28 @@ The project uses a single-source-of-truth configuration system:
 
 1. **config.sh** - Master configuration defining mesh settings, SSIDs, passwords, network ranges, and firewall rules
 2. **.env** - Sensitive passwords (MESH_KEY, LAN_PASSWORD, IOT_PASSWORD, GUEST_PASSWORD) - sourced by generate-config.sh
-3. **generate-config.sh** - Reads config.sh and .env, then generates UCI configuration files in `files-gateway/` and `files-ap/`
+3. **generate-config.sh** - Reads config.sh and .env, then generates:
+   - UCI configuration files (network, dhcp, firewall) in `files-gateway/` and `files-ap/`
+   - First-boot wireless setup script (`/etc/uci-defaults/99-wifi-setup`) from templates
+   - Boot-time batman-adv attachment script (`/etc/init.d/batman-attach`)
 4. **build.sh** - Orchestrates the entire build: runs generate-config.sh, builds Docker image, and creates firmware for both device types
+
+### First Boot Process
+
+When a device boots with the custom firmware:
+
+1. **OpenWRT auto-detects hardware** - Creates default wireless config with correct radio bands/capabilities
+2. **UCI defaults scripts run** (`/etc/uci-defaults/99-wifi-setup`):
+   - Deletes default wireless interfaces
+   - Configures radio settings (country=US, channels)
+   - Creates mesh interface on radio1 (5GHz)
+   - Creates three AP interfaces on radio0 (2.4GHz) for LAN/IoT/Guest
+   - Auto-deletes after successful execution
+3. **Init scripts run** (`/etc/init.d/batman-attach`):
+   - Runs late in boot (START=99)
+   - Waits 10 seconds for WiFi initialization
+   - Manually attaches mesh interface (phy1-mesh0) to batman-adv (bat0)
+   - Runs on every boot to ensure mesh attachment
 
 ### Network Architecture
 
@@ -30,8 +50,8 @@ The project uses a single-source-of-truth configuration system:
 **Gateway node** bridges VLANs to physical ethernet (eth0.10, eth0.20) for wired devices. **AP nodes** only bridge to bat0.X VLANs.
 
 **Wireless configuration**:
-- radio1 (5GHz, channel 149): 802.11s mesh backhaul with SAE encryption
-- radio0 (5GHz, channel 36): Three AP SSIDs, one per VLAN, with 802.11r roaming enabled
+- radio1 (5GHz, channel 36): 802.11s mesh backhaul with SAE encryption
+- radio0 (2.4GHz, channel 6): Three AP SSIDs, one per VLAN, with 802.11r roaming enabled
 
 **Firewall isolation**:
 - LAN zone: full access to WAN and other networks
@@ -99,6 +119,18 @@ docker run --rm -v $(pwd)/files-ap:/files -v $(pwd)/firmware:/output openwrt-bui
   cp bin/targets/mediatek/filogic/*sysupgrade* /output/"
 ```
 
+### Serial Console Access
+
+Connect to the OpenWRT One serial console (useful for monitoring boot and flashing):
+
+```bash
+screen /dev/tty.usbmodem* 115200
+```
+
+**Note**: The `/dev/tty.usbmodem*` device persists even during flash cycles, making it ideal for monitoring the entire flash and boot process.
+
+**Exit screen**: Press `Ctrl-A` then `K` then `Y` to kill the session.
+
 ## Making Configuration Changes
 
 To modify mesh settings, SSIDs, network ranges, or firewall rules:
@@ -114,12 +146,15 @@ Do NOT edit files in `files-gateway/` or `files-ap/` directly - they are auto-ge
 - **config.sh** - Master configuration (VLAN IPs, SSID names, mobility domains, Home Assistant IP)
 - **.env** - Sensitive passwords (gitignored)
 - **generate-config.sh** - Template-based UCI config generator
-- **build.sh** - Main build orchestration script
+- **build.sh** - Main build orchestration script (suppresses LD_PRELOAD warnings)
 - **Dockerfile** - Ubuntu 22.04 with ImageBuilder extraction
+- **templates/** - Script templates for wireless setup and batman-adv attachment
+  - `wifi-setup.sh` - First-boot wireless configuration (uci-defaults)
+  - `batman-attach.sh` - Boot-time mesh interface attachment (init.d)
 - **downloads/** - ImageBuilder tarball (gitignored, ~500MB)
-- **files-gateway/** - Generated UCI configs for gateway node (gitignored)
-- **files-ap/** - Generated UCI configs for AP nodes (gitignored)
-- **firmware/** - Built firmware .bin files (gitignored)
+- **files-gateway/** - Generated UCI configs and scripts for gateway node (gitignored)
+- **files-ap/** - Generated UCI configs and scripts for AP nodes (gitignored)
+- **firmware/** - Built firmware .bin/.itb files (gitignored)
 
 ## Device Profiles
 
@@ -135,3 +170,4 @@ All firmware builds include:
 - batctl-default - batman-adv control utility
 - luci - Web interface
 - luci-ssl - HTTPS support for LuCI
+- luci-proto-batman-adv - LuCI protocol handler for batman-adv

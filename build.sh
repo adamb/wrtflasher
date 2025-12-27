@@ -20,7 +20,7 @@ echo ""
 echo "→ Building gateway firmware (OpenWRT One)..."
 docker run --rm -v $(pwd)/files-gateway:/files -v $(pwd)/firmware:/output openwrt-builder:24.10.0 \
   bash -c "cd /builder/openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64 && \
-  make image PROFILE='openwrt_one' PACKAGES='kmod-batman-adv batctl-default luci luci-ssl' FILES=/files && \
+  make image PROFILE='openwrt_one' PACKAGES='kmod-batman-adv batctl-default luci luci-ssl luci-proto-batman-adv' FILES=/files 2>&1 | grep -v 'LD_PRELOAD' && \
   cp bin/targets/mediatek/filogic/*sysupgrade* /output/"
 
 # Build AP firmware
@@ -28,7 +28,7 @@ echo ""
 echo "→ Building AP firmware (GL-MT3000)..."
 docker run --rm -v $(pwd)/files-ap:/files -v $(pwd)/firmware:/output openwrt-builder:24.10.0 \
   bash -c "cd /builder/openwrt-imagebuilder-24.10.0-mediatek-filogic.Linux-x86_64 && \
-  make image PROFILE='glinet_gl-mt3000' PACKAGES='kmod-batman-adv batctl-default luci luci-ssl' FILES=/files && \
+  make image PROFILE='glinet_gl-mt3000' PACKAGES='kmod-batman-adv batctl-default luci luci-ssl luci-proto-batman-adv' FILES=/files 2>&1 | grep -v 'LD_PRELOAD' && \
   cp bin/targets/mediatek/filogic/*sysupgrade* /output/"
 
 echo ""

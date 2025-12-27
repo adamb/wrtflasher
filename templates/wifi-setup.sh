@@ -1,14 +1,17 @@
 #!/bin/sh
 
-uci batch <<EOF
-delete wireless.default_radio0
-delete wireless.default_radio1
+# Delete default interfaces if they exist (ignore errors)
+uci delete wireless.default_radio0 2>/dev/null || true
+uci delete wireless.default_radio1 2>/dev/null || true
 
+uci batch <<EOF
 set wireless.radio0.disabled='0'
-set wireless.radio0.channel='auto'
+set wireless.radio0.country='US'
+set wireless.radio0.channel='6'
 
 set wireless.radio1.disabled='0'
-set wireless.radio1.channel='auto'
+set wireless.radio1.country='US'
+set wireless.radio1.channel='36'
 
 set wireless.mesh0=wifi-iface
 set wireless.mesh0.device='radio1'

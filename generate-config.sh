@@ -234,5 +234,16 @@ for dir in files-gateway files-ap; do
     chmod +x $dir/etc/uci-defaults/99-wifi-setup
 done
 
+echo "→ Setting up batman-adv mesh attachment init script..."
+mkdir -p files-gateway/etc/init.d files-gateway/etc/rc.d
+mkdir -p files-ap/etc/init.d files-ap/etc/rc.d
+
+cp templates/batman-attach.sh files-gateway/etc/init.d/batman-attach
+cp templates/batman-attach.sh files-ap/etc/init.d/batman-attach
+chmod +x files-gateway/etc/init.d/batman-attach
+chmod +x files-ap/etc/init.d/batman-attach
+ln -sf ../init.d/batman-attach files-gateway/etc/rc.d/S99batman-attach
+ln -sf ../init.d/batman-attach files-ap/etc/rc.d/S99batman-attach
+
 echo ""
 echo "✓ Configuration generation complete!"
