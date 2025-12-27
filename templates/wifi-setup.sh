@@ -58,7 +58,7 @@ uci commit wireless
 # Set unique hostname and stable MAC for APs only
 if [ "$(uci get network.bat0.gw_mode 2>/dev/null)" = "client" ]; then
     ETH_MAC=$(cat /sys/class/net/eth0/address)
-    SHORT_MAC=$(echo $ETH_MAC | tr -d ':' | tail -c 5)
+    SHORT_MAC=$(cat /sys/class/net/eth0/address | tr -d ':' | cut -c 9-12)
     uci set system.@system[0].hostname="ap-$SHORT_MAC"
     uci set network.bat0.macaddr="$ETH_MAC"
     uci commit system
