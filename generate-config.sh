@@ -220,6 +220,8 @@ config device
 	option name 'br-lan'
 	option type 'bridge'
 	list ports 'bat0.10'
+	list ports 'eth0'
+	list ports 'eth1'
 
 config device
 	option name 'br-iot'
