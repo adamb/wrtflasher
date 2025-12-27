@@ -12,6 +12,12 @@ echo ""
 rm -rf files-gateway files-ap
 mkdir -p files-gateway files-ap
 
+# Generate root password hash
+if [ -n "$ROOT_PASSWORD" ]; then
+	ROOT_PASSWORD_HASH=$(openssl passwd -6 "$ROOT_PASSWORD")
+	echo "  - Root password hash generated"
+fi
+
 echo "→ Generating gateway configuration..."
 mkdir -p files-gateway/etc/config
 
@@ -24,6 +30,10 @@ config interface 'loopback'
 
 config interface 'wan'
 	option device 'eth1'
+	option proto 'dhcp'
+
+config interface 'wan2'
+	option device 'eth2'
 	option proto 'dhcp'
 
 config interface 'bat0'
@@ -178,6 +188,19 @@ if [ "$WAN2_ENABLED" = "yes" ]; then
 	cp templates/mwan3 files-gateway/etc/config/mwan3
 fi
 
+# Set root password if configured
+if [ -n "$ROOT_PASSWORD_HASH" ]; then
+	echo "  - Setting root password"
+	cat > files-gateway/etc/shadow <<EOF
+root:$ROOT_PASSWORD_HASH:0:0:99999:7:::
+daemon:*:0:0:99999:7:::
+ftp:*:0:0:99999:7:::
+network:*:0:0:99999:7:::
+nobody:*:0:0:99999:7:::
+EOF
+	chmod 600 files-gateway/etc/shadow
+fi
+
 echo "→ Generating AP configuration..."
 mkdir -p files-ap/etc/config
 
@@ -220,6 +243,19 @@ config interface 'guest'
 	option device 'br-guest'
 	option proto 'none'
 EOF
+
+# Set root password for AP if configured
+if [ -n "$ROOT_PASSWORD_HASH" ]; then
+	echo "  - Setting root password"
+	cat > files-ap/etc/shadow <<EOF
+root:$ROOT_PASSWORD_HASH:0:0:99999:7:::
+daemon:*:0:0:99999:7:::
+ftp:*:0:0:99999:7:::
+network:*:0:0:99999:7:::
+nobody:*:0:0:99999:7:::
+EOF
+	chmod 600 files-ap/etc/shadow
+fi
 
 echo "→ Generating UCI wireless setup scripts..."
 mkdir -p files-gateway/etc/uci-defaults files-ap/etc/uci-defaults
