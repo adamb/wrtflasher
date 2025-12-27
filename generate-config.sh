@@ -130,6 +130,7 @@ config zone
 config zone
 	option name 'wan'
 	list network 'wan'
+	list network 'wan2'
 	option input 'REJECT'
 	option output 'ACCEPT'
 	option forward 'REJECT'

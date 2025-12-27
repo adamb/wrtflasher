@@ -16,7 +16,7 @@ CLIENT_DEVICE="radio0"   # client APs
 
 # -------- SSIDs (must match on all nodes) --------
 IOT_SSID="IOT"
-IOT_PASSWORD="begueliniot"      # WPA2/3 passphrase
+# IOT_PASSWORD from .env
 
 GUEST_SSID="Guest"
 # GUEST_PASSWORD="changeme" # from .env
