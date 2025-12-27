@@ -37,3 +37,6 @@ DHCP_START="100"; DHCP_LIMIT="150"
 
 # -------- Home Assistant --------
 HOME_ASSISTANT_IP="192.168.1.50"  # Change to your HA IP
+
+# -------- Multi-WAN Failover (gateway only) --------
+WAN2_ENABLED="no"  # Set to "yes" to enable USB tethering failover

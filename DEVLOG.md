@@ -1,4 +1,48 @@
 # Development Log
+
+## 2025-12-27 - Gateway Working
+
+### Completed
+- Fixed WiFi radio detection - needed `path` option, solved with uci-defaults script
+- Fixed batman-adv mesh attachment - created `/etc/init.d/batman-attach` to run at boot
+- Fixed WiFi not broadcasting - needed country code and explicit channels (US, ch6/ch36)
+- Gateway fully working:
+  - All three SSIDs broadcasting (Finca, IOT, Guest)
+  - Batman mesh active (`batctl if` shows phy1-mesh0)
+  - All VLANs bridged correctly
+  - DHCP working
+  - Internet working via WAN
+
+### Manual Configuration Done (not in firmware)
+- Installed `luci-proto-batman-adv` (need to add to build.sh)
+- Configured wan2 on eth2 for T-Mobile USB ethernet adapter:
+### Packages to Add to build.sh
+- `luci-proto-batman-adv`
+- `kmod-usb-net-rndis` (for USB modems)
+- `kmod-usb-net-cdc-ether` (for USB ethernet)
+- `mwan3` and `luci-app-mwan3` (for dual-WAN failover)
+
+### Port Mapping Discovered
+- **eth0**: LAN (2.5G port) - goes to switch
+- **eth1**: WAN (1G port) - Starlink
+- **eth2**: USB ethernet adapter - T-Mobile
+
+### Still TODO
+- Flash and test GL-MT3000 AP
+- Configure Zyxel switch VLANs
+- Set up mwan3 failover
+- Test mesh connectivity between gateway and AP
+
+### To Recreate This Setup
+1. Clone repo
+2. Create `.env` with passwords
+3. Run `./build.sh`
+4. Flash `firmware/openwrt-...-openwrt_one-...-sysupgrade.itb` to gateway
+5. Flash `firmware/openwrt-...-glinet_gl-mt3000-...-sysupgrade.bin` to APs
+6. Manual: Configure wan2 if using dual-WAN (see commands above)
+7. Manual: Configure mwan3 for failover
+
+
 ## 2025-12-02 - Configuration System Complete
 
 ### Completed

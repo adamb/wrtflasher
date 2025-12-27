@@ -49,6 +49,11 @@ When a device boots with the custom firmware:
 
 **Gateway node** bridges VLANs to physical ethernet (eth0.10, eth0.20) for wired devices. **AP nodes** only bridge to bat0.X VLANs.
 
+**WAN Configuration**:
+- eth1 = Primary WAN (DHCP)
+- Optional WAN2 (USB tethering) with mwan3 failover
+- When WAN2_ENABLED="yes", automatic failover: eth1 (metric 1) → USB (metric 2)
+
 **Wireless configuration**:
 - radio1 (5GHz, channel 36): 802.11s mesh backhaul with SAE encryption
 - radio0 (2.4GHz, channel 6): Three AP SSIDs, one per VLAN, with 802.11r roaming enabled
@@ -141,6 +146,17 @@ To modify mesh settings, SSIDs, network ranges, or firewall rules:
 
 Do NOT edit files in `files-gateway/` or `files-ap/` directly - they are auto-generated.
 
+### Enabling Multi-WAN Failover
+
+To enable USB tethering failover on the gateway:
+
+1. Edit **config.sh** and set `WAN2_ENABLED="yes"`
+2. Rebuild firmware with `./build.sh`
+3. Configure wan2 interface in OpenWRT (LuCI or UCI) to use USB device
+4. mwan3 will automatically failover: eth1 (primary) → USB (backup)
+
+The mwan3 config uses ping monitoring (8.8.8.8, 1.1.1.1) to detect WAN failures.
+
 ## Key Files
 
 - **config.sh** - Master configuration (VLAN IPs, SSID names, mobility domains, Home Assistant IP)
@@ -151,6 +167,7 @@ Do NOT edit files in `files-gateway/` or `files-ap/` directly - they are auto-ge
 - **templates/** - Script templates for wireless setup and batman-adv attachment
   - `wifi-setup.sh` - First-boot wireless configuration (uci-defaults)
   - `batman-attach.sh` - Boot-time mesh interface attachment (init.d)
+  - `mwan3` - Multi-WAN failover configuration (conditionally included if WAN2_ENABLED="yes")
 - **downloads/** - ImageBuilder tarball (gitignored, ~500MB)
 - **files-gateway/** - Generated UCI configs and scripts for gateway node (gitignored)
 - **files-ap/** - Generated UCI configs and scripts for AP nodes (gitignored)
@@ -165,9 +182,16 @@ Both devices use the mediatek/filogic platform.
 
 ## Required Packages
 
-All firmware builds include:
+**Gateway packages:**
 - kmod-batman-adv - batman-adv kernel module
 - batctl-default - batman-adv control utility
 - luci - Web interface
 - luci-ssl - HTTPS support for LuCI
 - luci-proto-batman-adv - LuCI protocol handler for batman-adv
+- kmod-usb-net-rndis - USB RNDIS ethernet support (for USB tethering)
+- kmod-usb-net-cdc-ether - USB CDC ethernet support (for USB tethering)
+- mwan3 - Multi-WAN routing and failover
+- luci-app-mwan3 - LuCI web interface for mwan3
+
+**AP packages:**
+- Same as gateway except mwan3/luci-app-mwan3 (APs don't need multi-WAN)

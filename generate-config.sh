@@ -172,6 +172,11 @@ config rule
 	option target 'ACCEPT'
 EOF
 
+if [ "$WAN2_ENABLED" = "yes" ]; then
+	echo "  - Configuring mwan3 failover"
+	cp templates/mwan3 files-gateway/etc/config/mwan3
+fi
+
 echo "→ Generating AP configuration..."
 mkdir -p files-ap/etc/config
 
