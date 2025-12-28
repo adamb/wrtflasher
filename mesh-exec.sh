@@ -24,7 +24,7 @@ echo ""
 
 for node in "${NODES[@]}"; do
     echo "→ $node"
-    ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@$node "$COMMAND" 2>&1
+    ssh -i ~/.ssh/mesh_nodes -o ConnectTimeout=5 -o StrictHostKeyChecking=no root@$node "$COMMAND" 2>&1
     if [ $? -eq 0 ]; then
         echo "✓ Success"
     else
