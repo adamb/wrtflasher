@@ -126,14 +126,14 @@ config zone
 config zone
 	option name 'iot'
 	list network 'iot'
-	option input 'REJECT'
+	option input 'ACCEPT'
 	option output 'ACCEPT'
 	option forward 'REJECT'
 
 config zone
 	option name 'guest'
 	list network 'guest'
-	option input 'REJECT'
+	option input 'ACCEPT'
 	option output 'ACCEPT'
 	option forward 'REJECT'
 
