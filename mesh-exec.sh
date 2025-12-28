@@ -14,7 +14,7 @@ NODES=(
     "192.168.1.1"      # gw-office (gateway)
     "192.168.1.114"    # ap-XXXX
     "192.168.1.157"    # ap-XXXX
-    "192.168.1.101"    # ap-XXXX
+    "192.168.1.101"    # ap-central
     "192.168.1.167"    # ap-XXXX
 )
 

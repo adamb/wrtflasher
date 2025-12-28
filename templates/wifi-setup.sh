@@ -8,6 +8,8 @@ uci batch <<EOF
 set wireless.radio0.disabled='0'
 set wireless.radio0.country='US'
 set wireless.radio0.channel='6'
+set wireless.radio0.htmode='HT20'
+set wireless.radio0.noscan='1'
 
 set wireless.radio1.disabled='0'
 set wireless.radio1.country='US'
