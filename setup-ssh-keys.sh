@@ -31,9 +31,9 @@ done
 echo "=== Testing passwordless SSH ==="
 for ip in "${NODES[@]}"; do
     echo "→ Testing $ip"
-    ssh -i ~/.ssh/mesh_nodes root@$ip "hostname" 2>/dev/null
+    result=$(ssh -i ~/.ssh/mesh_nodes root@$ip "cat /proc/sys/kernel/hostname" 2>/dev/null)
     if [ $? -eq 0 ]; then
-        echo "✓ OK"
+        echo "✓ OK - $result"
     else
         echo "✗ Failed"
     fi
