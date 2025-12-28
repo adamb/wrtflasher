@@ -36,11 +36,11 @@ set wireless.iot0=wifi-iface
 set wireless.iot0.device='radio0'
 set wireless.iot0.mode='ap'
 set wireless.iot0.ssid='IOT_SSID_PLACEHOLDER'
-set wireless.iot0.encryption='sae-mixed'
+set wireless.iot0.encryption='psk2'
 set wireless.iot0.key='IOT_PASSWORD_PLACEHOLDER'
 set wireless.iot0.network='iot'
-set wireless.iot0.ieee80211r='1'
-set wireless.iot0.mobility_domain='IOT_MOBILITY_DOMAIN_PLACEHOLDER'
+set wireless.iot0.ieee80211r='0'
+set wireless.iot0.ieee80211w='0'
 
 set wireless.guest0=wifi-iface
 set wireless.guest0.device='radio0'

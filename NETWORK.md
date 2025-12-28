@@ -38,14 +38,16 @@ Three isolated networks using VLANs over a batman-adv mesh:
 
 ## WiFi Networks
 
-| SSID | VLAN | Network | Purpose |
-|------|------|---------|---------|
-| Finca | 10 | 192.168.1.0/24 | Trusted devices |
-| IOT | 20 | 192.168.3.0/24 | IoT devices |
-| Guest | 30 | 192.168.4.0/24 | Guest access |
+| SSID | VLAN | Network | Encryption | 802.11r | Purpose |
+|------|------|---------|------------|---------|---------|
+| Finca | 10 | 192.168.1.0/24 | WPA3-SAE-Mixed | Yes | Trusted devices |
+| IOT | 20 | 192.168.3.0/24 | WPA2-PSK | No | IoT devices (legacy compat) |
+| Guest | 30 | 192.168.4.0/24 | WPA3-SAE-Mixed | Yes | Guest access |
 
-**Mesh backhaul**: `batmesh_network` on 5GHz (radio1, channel 36)
+**Mesh backhaul**: `batmesh_network` on 5GHz (radio1, channel 36, WPA3-SAE)
 **Client WiFi**: 2.4GHz (radio0, channel 6)
+
+**Note**: IOT network uses WPA2-PSK (psk2) instead of WPA3 for compatibility with legacy IoT devices that don't support WPA3. Fast roaming (802.11r) and management frame protection (802.11w) are disabled for maximum compatibility.
 
 ## Firewall Rules
 
@@ -80,6 +82,33 @@ cat /tmp/dhcp.leases          # DHCP clients
 
 # mwan3
 mwan3 status                  # failover status
+```
+
+## Mesh Management
+
+Use `mesh-exec.sh` to run commands on all nodes simultaneously:
+
+```bash
+# Check all node hostnames
+./mesh-exec.sh "cat /proc/sys/kernel/hostname"
+
+# Check mesh neighbors on all nodes
+./mesh-exec.sh "batctl meshif bat0 n"
+
+# Check WiFi channel configuration
+./mesh-exec.sh "uci show wireless.radio0.channel && uci show wireless.radio1.channel"
+
+# Reload WiFi on all nodes
+./mesh-exec.sh "wifi reload"
+
+# Change IOT network to WPA2-PSK for legacy device compatibility
+./mesh-exec.sh "uci set wireless.iot0.encryption='psk2'; uci set wireless.iot0.ieee80211r='0'; uci set wireless.iot0.ieee80211w='0'; uci commit wireless; wifi reload"
+
+# Check uptime on all nodes
+./mesh-exec.sh "uptime"
+
+# Check batman gateway mode
+./mesh-exec.sh "batctl meshif bat0 gw"
 ```
 
 ## IP Reservations

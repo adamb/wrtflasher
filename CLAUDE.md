@@ -56,7 +56,9 @@ When a device boots with the custom firmware:
 
 **Wireless configuration**:
 - radio1 (5GHz, channel 36): 802.11s mesh backhaul with SAE encryption
-- radio0 (2.4GHz, channel 6): Three AP SSIDs, one per VLAN, with 802.11r roaming enabled
+- radio0 (2.4GHz, channel 6): Three AP SSIDs, one per VLAN
+  - Finca/Guest: WPA3-SAE-Mixed with 802.11r fast roaming
+  - IOT: WPA2-PSK (legacy compatibility, no 802.11r/w)
 
 **Firewall isolation**:
 - LAN zone: full access to WAN and other networks
