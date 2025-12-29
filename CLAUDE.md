@@ -61,9 +61,11 @@ When a device boots with the custom firmware:
   - IOT: WPA2-PSK (legacy compatibility, no 802.11r/w)
 
 **Firewall isolation**:
-- LAN zone: full access to WAN and other networks
-- IoT/Guest zones: WAN access only, blocked from other networks
-- Exception: Home Assistant IP (from LAN) can access IoT network
+- LAN zone: Can access WAN and IoT networks (can manage IoT devices)
+- IoT zone: WAN access only, can only reply to LAN-initiated connections (stateful firewall)
+- Guest zone: WAN access only, fully isolated from LAN/IoT
+- IoT/Guest cannot initiate connections to LAN (security)
+- Exception: Home Assistant IP (192.168.1.50 from LAN) can access IoT network
 
 ## Common Commands
 
