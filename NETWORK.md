@@ -149,3 +149,113 @@ Use `mesh-exec.sh` to run commands on all nodes simultaneously:
 ```
 Device → SSID/wired port → VLAN (10/20/30) → switch/mesh → Gateway → mwan3 → Internet
 ```
+
+## Maintenance Tasks
+
+### Renaming Access Points
+
+APs auto-generate hostnames as `ap-XXXX` from MAC addresses. To rename an AP:
+
+**IMPORTANT:** DO NOT use `/etc/init.d/network restart` on mesh APs - it breaks batman-adv mesh connectivity and requires physical reboot to recover.
+
+**Correct Method (using reboot):**
+
+```bash
+# 1. Set hostname on the AP and reboot
+ssh root@<AP-IP> "
+  uci set system.@system[0].hostname='NEW-NAME'
+  uci set network.lan.hostname='NEW-NAME'
+  uci commit
+  reboot
+"
+
+# 2. (Optional) Clear stale DHCP lease on gateway
+ssh root@192.168.1.1 "
+  sed -i '/<AP-IP>/d' /tmp/dhcp.leases
+  /etc/init.d/dnsmasq restart
+"
+
+# 3. Wait 1-2 minutes for AP to boot and verify
+ssh root@192.168.1.1 "cat /tmp/dhcp.leases | grep NEW-NAME"
+```
+
+**Why this works:**
+- `system.@system[0].hostname` - Sets the local hostname
+- `network.lan.hostname` - Tells DHCP client to send this name to gateway
+- Reboot ensures clean reconnection to mesh and DHCP
+- Gateway's dnsmasq learns the new name from DHCP request
+
+**Why network restart fails on mesh APs:**
+- Disrupts batman-adv mesh interface (phy1-mesh0)
+- Breaks bridge configuration (br-lan)
+- DHCP client loses connection
+- Requires physical power cycle to recover
+
+### Forcing Device Roaming Between APs
+
+To force a device to disconnect from one AP and reconnect to another (e.g., when device has "sticky client" syndrome):
+
+```bash
+# Disconnect device from current AP
+ssh root@<CURRENT-AP-IP> "iw dev <interface> station del <MAC-ADDRESS>"
+
+# Device will automatically reconnect to strongest available AP
+# Example:
+ssh root@192.168.1.167 "iw dev phy0-ap1 station del 38:1f:8d:9a:27:c4"
+```
+
+**Temporarily ban a device from an AP** (force it to use a different AP for a period):
+
+```bash
+# Ban device for 5 minutes (300000 ms)
+ssh root@<AP-IP> "iw dev <interface> station del <MAC-ADDRESS>"
+# Device cannot reconnect to this AP for ban duration
+```
+
+### Finding Devices on the Mesh
+
+**Find which AP a device is connected to:**
+
+```bash
+# Search all APs for a specific MAC
+./mesh-exec.sh "
+  for iface in phy0-ap0 phy0-ap1 phy0-ap3 phy0-ap4; do
+    if iw dev \$iface station dump 2>/dev/null | grep -qi '<MAC>'; then
+      signal=\$(iw dev \$iface station dump 2>/dev/null | grep -i -A 10 '<MAC>' | grep 'signal avg')
+      echo \$(uci get system.@system[0].hostname) - \$iface - \$signal
+    fi
+  done
+" | grep -v "Running\|===\|Success"
+```
+
+**Check signal strength for a specific device:**
+
+```bash
+ssh root@<AP-IP> "iw dev <interface> station dump | grep -i -A 10 '<MAC>' | grep signal"
+```
+
+### Checking Mesh Health
+
+**View all mesh neighbors:**
+
+```bash
+# On gateway
+ssh root@192.168.1.1 "batctl meshif bat0 n"
+
+# On specific AP
+ssh root@<AP-IP> "batctl meshif bat0 n"
+```
+
+**View mesh topology (all nodes and paths):**
+
+```bash
+ssh root@192.168.1.1 "batctl meshif bat0 o"
+```
+
+**Check if an AP can reach mesh from its location:**
+
+```bash
+ssh root@<AP-IP> "batctl meshif bat0 n"
+# Should show 2+ neighbors with last-seen < 5 seconds
+# If no neighbors or high last-seen times (>10s), AP is too far from mesh
+```
