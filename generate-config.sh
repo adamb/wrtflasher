@@ -152,6 +152,10 @@ config forwarding
 	option dest 'wan'
 
 config forwarding
+	option src 'lan'
+	option dest 'iot'
+
+config forwarding
 	option src 'iot'
 	option dest 'wan'
 
