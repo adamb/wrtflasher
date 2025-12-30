@@ -48,10 +48,10 @@ check_signals() {
             neighbor_mac=\$(echo \$line | awk '{print \$2}')
             signal=\$(iw dev phy1-mesh0 station get \$neighbor_mac 2>/dev/null | grep 'signal avg' | awk '{print \$3}')
             if [ -n \"\$signal\" ]; then
-                echo \"NEIGHBOR:\$neighbor_mac:\$signal\"
+                echo \"NEIGHBOR|\$neighbor_mac|\$signal\"
             fi
         done
-    " 2>/dev/null | while IFS=: read prefix mac signal; do
+    " 2>/dev/null | while IFS='|' read prefix mac signal; do
         if [ "$prefix" = "NEIGHBOR" ]; then
             # Determine quality
             if [ "$signal" -ge -60 ]; then
