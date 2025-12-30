@@ -11,10 +11,29 @@ for node in $nodes; do
     name=$(echo $node | cut -d: -f2)
     
     temps=$(ssh -o ConnectTimeout=2 root@$ip "
+        # Try to get CPU temp from common locations
         cpu=\$(cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null | awk '{printf \"%.1f\", \$1/1000}')
+
+        # Try GL-MT3000 paths first (hwmon3/hwmon4)
         radio0=\$(cat /sys/class/hwmon/hwmon3/temp1_input 2>/dev/null | awk '{printf \"%.0f\", \$1/1000}')
         radio1=\$(cat /sys/class/hwmon/hwmon4/temp1_input 2>/dev/null | awk '{printf \"%.0f\", \$1/1000}')
+
+        # If not found, try OpenWRT One paths (mt7915)
+        if [ -z \"\$radio0\" ]; then
+            for hwmon in /sys/class/hwmon/hwmon*/name; do
+                if [ -f \"\$hwmon\" ] && grep -q 'mt7915_phy0' \"\$hwmon\" 2>/dev/null; then
+                    radio0=\$(cat \$(dirname \$hwmon)/temp1_input 2>/dev/null | awk '{printf \"%.0f\", \$1/1000}')
+                fi
+                if [ -f \"\$hwmon\" ] && grep -q 'mt7915_phy1' \"\$hwmon\" 2>/dev/null; then
+                    radio1=\$(cat \$(dirname \$hwmon)/temp1_input 2>/dev/null | awk '{printf \"%.0f\", \$1/1000}')
+                fi
+            done
+        fi
+
+        # Fan (only on GL-MT3000)
         fan=\$(cat /sys/class/hwmon/hwmon2/fan1_input 2>/dev/null)
+        [ -z \"\$fan\" ] && fan=\"N/A\"
+
         echo \"\$cpu|\$radio0|\$radio1|\$fan\"
     " 2>/dev/null)
     
@@ -46,4 +65,6 @@ echo "  ✅ <65°C: Good"
 echo "  ⚠️  65-75°C: Warm (monitor)"
 echo "  ❌ >75°C: Hot (check ventilation)"
 echo ""
-echo "Note: GL-MT3000 has active cooling (fan) and typically runs cool"
+echo "Note:"
+echo "  - GL-MT3000 APs: Active cooling (fan), typically run cool"
+echo "  - OpenWRT One gateway: Passive cooling only (no fan)"
