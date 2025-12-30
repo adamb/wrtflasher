@@ -113,6 +113,41 @@ Monitor temperature sensors on all APs.
 
 ---
 
+### toggle-ssid.sh
+Enable or disable SSIDs across all mesh nodes.
+
+**Capabilities:**
+- Shows current status of all SSIDs
+- Enable/disable any SSID on all nodes simultaneously
+- Confirmation prompt before applying changes
+- Automatic WiFi reload after changes
+
+**Usage:**
+```bash
+# Show current status of all SSIDs
+./tools/toggle-ssid.sh
+
+# Disable old "FincaDelMar Guest" SSID
+./tools/toggle-ssid.sh eero_guest disable
+
+# Disable old "FincaDelMar" main SSID
+./tools/toggle-ssid.sh eero_main disable
+
+# Re-enable if needed
+./tools/toggle-ssid.sh eero_guest enable
+```
+
+**Available interfaces:**
+- `lan0` - Finca (new LAN SSID)
+- `iot0` - IOT (new IoT SSID)
+- `guest0` - Guest (new guest SSID)
+- `eero_main` - FincaDelMar (old main SSID)
+- `eero_guest` - FincaDelMar Guest (old guest SSID)
+
+**Use case:** Disable old SSIDs after migrating devices to new networks. Forces remaining devices to reconnect to new SSIDs.
+
+---
+
 ## Requirements
 
 All scripts require:
