@@ -91,6 +91,28 @@ Check which SSID each Ring camera is connected to.
 
 ---
 
+### check-temps.sh
+Monitor temperature sensors on all APs.
+
+**Monitors:**
+- CPU/SoC temperature
+- WiFi radio temperatures (2.4GHz and 5GHz)
+- Fan speed (RPM)
+
+**Usage:**
+```bash
+./tools/check-temps.sh
+```
+
+**Output:**
+- Temperature readings for all APs
+- Color-coded status (✅ <65°C, ⚠️ 65-75°C, ❌ >75°C)
+- Fan speeds in RPM
+
+**Use case:** Monitor AP thermal performance, especially after relocating APs or during hot weather. GL-MT3000 APs have active cooling and comprehensive thermal sensors.
+
+---
+
 ## Requirements
 
 All scripts require:
