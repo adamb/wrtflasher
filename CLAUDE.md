@@ -65,7 +65,7 @@ When a device boots with the custom firmware:
 - IoT zone: WAN access only, can only reply to LAN-initiated connections (stateful firewall)
 - Guest zone: WAN access only, fully isolated from LAN/IoT
 - IoT/Guest cannot initiate connections to LAN (security)
-- Exception: Home Assistant IP (192.168.1.50 from LAN) can access IoT network
+- Exception: Home Assistant IP (192.168.1.151 from LAN) can access IoT network
 
 ## Common Commands
 

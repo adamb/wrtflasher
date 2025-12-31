@@ -36,7 +36,7 @@ LAN_NETWORK="192.168.1.0/24";   LAN_GATEWAY="192.168.1.1";   LAN_LEASE_TIME="24h
 DHCP_START="100"; DHCP_LIMIT="150"
 
 # -------- Home Assistant --------
-HOME_ASSISTANT_IP="192.168.1.50"  # Change to your HA IP
+HOME_ASSISTANT_IP="192.168.1.151"  # Change to your HA IP
 
 # -------- Multi-WAN Failover (gateway only) --------
 WAN2_ENABLED="yes"  # Set to "yes" to enable USB tethering failover

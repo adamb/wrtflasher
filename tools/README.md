@@ -148,6 +148,37 @@ Enable or disable SSIDs across all mesh nodes.
 
 ---
 
+### watch-roaming.sh
+Monitor a device's WiFi roaming between APs in real-time.
+
+**Monitors:**
+- Which AP the device is connected to
+- Signal strength changes
+- Roaming transitions between APs
+- Device activity (inactive time)
+
+**Usage:**
+```bash
+# Monitor by IP address
+./tools/watch-roaming.sh 192.168.1.119
+
+# Monitor by MAC address
+./tools/watch-roaming.sh 46:f2:12:7e:9d:72
+
+# Monitor IoT device
+./tools/watch-roaming.sh 192.168.3.200 phy0-ap1
+```
+
+**Output:**
+- Real-time updates every 2 seconds
+- 🔄 ROAMED indicator when device switches APs
+- Signal strength in dBm
+- Inactive time (shows if device is actively transmitting)
+
+**Use case:** Test 802.11r fast roaming behavior by watching a device as you move it around. Verify devices roam to the closest AP with best signal. Identify roaming ping-pong issues.
+
+---
+
 ## Requirements
 
 All scripts require:

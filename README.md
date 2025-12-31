@@ -239,7 +239,7 @@ The mesh automatically scales:
 
 By default, IoT network is isolated. To allow specific LAN devices (like Home Assistant) to access IoT:
 
-1. Edit `config.sh` and set `HOME_ASSISTANT_IP="192.168.1.50"`
+1. Edit `config.sh` and set `HOME_ASSISTANT_IP="192.168.1.151"` (or your HA's IP)
 2. Rebuild and reflash gateway firmware
 3. Stateful firewall allows that IP to initiate connections to IoT network
 
