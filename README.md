@@ -238,12 +238,14 @@ uci set sqm.wan.qdisc='cake'
 uci set sqm.wan.link_layer='ethernet'
 uci set sqm.wan.overhead='44'
 
-# Optional: Configure SQM for SECONDARY WAN (if using dual-WAN)
+# Configure SQM for SECONDARY WAN (if using dual-WAN)
+# Test WAN2 speeds first: curl --interface eth2 -o /dev/null -w 'Speed: %{speed_download}\n' \
+#   https://speed.cloudflare.com/__down?bytes=200000000
 uci set sqm.wan2=queue
 uci set sqm.wan2.enabled='1'
-uci set sqm.wan2.interface='wan2'
-uci set sqm.wan2.download='50000'   # Adjust for your backup WAN speeds
-uci set sqm.wan2.upload='20000'
+uci set sqm.wan2.interface='eth2'   # Use actual interface (eth2 for USB tethering)
+uci set sqm.wan2.download='200000'  # Adjust: 85-90% of actual WAN2 download speed
+uci set sqm.wan2.upload='75000'     # Adjust: 85-90% of actual WAN2 upload speed
 uci set sqm.wan2.script='piece_of_cake.qos'
 uci set sqm.wan2.qdisc='cake'
 uci set sqm.wan2.link_layer='ethernet'
@@ -258,10 +260,13 @@ uci commit sqm
 
 **Tuning Guidelines:**
 - Set download/upload to **85-90% of actual WAN speeds** (test first with speedtest)
-- For Starlink (250 down / 40 up): use download='210000' upload='30000'
-- For cable/fiber: adjust overhead to 22-38 for pure Ethernet
-- **Interface name:** Use `eth1` for physical interface, or `wan` if your setup uses logical interface names
+- **Example configurations:**
+  - Starlink (250 down / 40 up): download='210000' upload='30000'
+  - T-Mobile 5G USB tethering (230 down / 85 up): download='200000' upload='75000'
+  - Cable/fiber: adjust overhead to 22-38 for pure Ethernet
+- **Interface name:** Use `eth1`/`eth2` for physical interfaces, or `wan`/`wan2` for logical interfaces
 - If you get "interface does not exist" error, change `interface='wan'` to `interface='eth1'`
+- **Test WAN2 speeds before configuring:** Use `curl --interface eth2` to test without failover
 - Test bufferbloat before/after at dslreports.com/speedtest (look for grade A/B)
 
 **To disable SQM if needed:**
@@ -277,17 +282,26 @@ ssh root@192.168.1.1 "
 # Check SQM is running
 /etc/init.d/sqm status
 
-# View CAKE statistics
-tc -s qdisc show dev eth1
+# View CAKE qdisc on both WANs
+tc qdisc show dev eth1  # Starlink
+tc qdisc show dev eth2  # T-Mobile
+
+# View detailed statistics
+tc -s qdisc show dev eth1 | head -5
+tc -s qdisc show dev eth2 | head -5
 "
 ```
 
 **Test Download Speed:**
 ```bash
 ssh root@192.168.1.1 "
-# Fast server test (Cloudflare)
+# Test primary WAN (Starlink/eth1)
 curl -o /dev/null -w 'Time: %{time_total}s | Speed: %{speed_download} bytes/sec\n' \
   https://speed.cloudflare.com/__down?bytes=100000000
+
+# Test secondary WAN (T-Mobile/eth2) without failing over
+curl --interface eth2 -o /dev/null -w 'Time: %{time_total}s | Speed: %{speed_download} bytes/sec\n' \
+  https://speed.cloudflare.com/__down?bytes=200000000
 "
 ```
 
