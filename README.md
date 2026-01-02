@@ -230,7 +230,7 @@ opkg update && opkg install sqm-scripts luci-app-sqm
 # Configure SQM for PRIMARY WAN
 uci set sqm.wan=queue
 uci set sqm.wan.enabled='1'
-uci set sqm.wan.interface='wan'
+uci set sqm.wan.interface='eth1'  # Use 'eth1' for physical interface (or 'wan' if using logical interface)
 uci set sqm.wan.download='210000'   # Set to 85% of your actual download speed
 uci set sqm.wan.upload='30000'      # Set to 75-85% of your actual upload speed
 uci set sqm.wan.script='piece_of_cake.qos'
@@ -260,6 +260,8 @@ uci commit sqm
 - Set download/upload to **85-90% of actual WAN speeds** (test first with speedtest)
 - For Starlink (250 down / 40 up): use download='210000' upload='30000'
 - For cable/fiber: adjust overhead to 22-38 for pure Ethernet
+- **Interface name:** Use `eth1` for physical interface, or `wan` if your setup uses logical interface names
+- If you get "interface does not exist" error, change `interface='wan'` to `interface='eth1'`
 - Test bufferbloat before/after at dslreports.com/speedtest (look for grade A/B)
 
 **To disable SQM if needed:**
