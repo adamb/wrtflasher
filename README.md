@@ -208,6 +208,65 @@ Located in `tools/` directory:
 
 See `tools/README.md` for detailed documentation.
 
+## Post-Installation Tuning
+
+### Smart Queue Management (SQM) for Bufferbloat Reduction
+
+After installation, configure SQM on the gateway to reduce bufferbloat and improve latency under load. This is especially important for satellite connections like Starlink.
+
+**What is SQM:**
+- Reduces bufferbloat (high latency when network is saturated)
+- Keeps connection responsive during downloads/uploads
+- Uses CAKE qdisc (Common Applications Kept Enhanced)
+- Applies only to gateway WAN interfaces
+
+**Installation and Configuration:**
+
+```bash
+ssh root@192.168.1.1 "
+# Install SQM packages
+opkg update && opkg install sqm-scripts luci-app-sqm
+
+# Configure SQM for PRIMARY WAN
+uci set sqm.wan=queue
+uci set sqm.wan.enabled='1'
+uci set sqm.wan.interface='wan'
+uci set sqm.wan.download='210000'   # Set to 85% of your actual download speed
+uci set sqm.wan.upload='30000'      # Set to 75-85% of your actual upload speed
+uci set sqm.wan.script='piece_of_cake.qos'
+uci set sqm.wan.qdisc='cake'
+uci set sqm.wan.link_layer='ethernet'
+uci set sqm.wan.overhead='44'
+
+# Optional: Configure SQM for SECONDARY WAN (if using dual-WAN)
+uci set sqm.wan2=queue
+uci set sqm.wan2.enabled='1'
+uci set sqm.wan2.interface='wan2'
+uci set sqm.wan2.download='50000'   # Adjust for your backup WAN speeds
+uci set sqm.wan2.upload='20000'
+uci set sqm.wan2.script='piece_of_cake.qos'
+uci set sqm.wan2.qdisc='cake'
+uci set sqm.wan2.link_layer='ethernet'
+uci set sqm.wan2.overhead='44'
+
+# Apply configuration (no reboot required)
+uci commit sqm
+/etc/init.d/sqm enable
+/etc/init.d/sqm restart
+"
+```
+
+**Tuning Guidelines:**
+- Set download/upload to **85-90% of actual WAN speeds** (test first with speedtest)
+- For Starlink (250 down / 40 up): use download='210000' upload='30000'
+- For cable/fiber: adjust overhead to 22-38 for pure Ethernet
+- Test bufferbloat before/after at dslreports.com/speedtest (look for grade A/B)
+
+**To disable SQM if needed:**
+```bash
+ssh root@192.168.1.1 "uci set sqm.wan.enabled='0' && uci commit sqm && /etc/init.d/sqm restart"
+```
+
 ## Advanced Topics
 
 ### Dual-WAN Failover
