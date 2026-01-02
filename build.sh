@@ -16,7 +16,7 @@ docker build -t openwrt-builder:24.10.0 .
 mkdir -p firmware
 
 # Package lists
-GATEWAY_PACKAGES='kmod-batman-adv batctl-default luci luci-ssl luci-proto-batman-adv kmod-usb-net-rndis kmod-usb-net-cdc-ether mwan3 luci-app-mwan3'
+GATEWAY_PACKAGES='kmod-batman-adv batctl-default luci luci-ssl luci-proto-batman-adv kmod-usb-net-rndis kmod-usb-net-cdc-ether mwan3 luci-app-mwan3 sqm-scripts luci-app-sqm'
 AP_PACKAGES='kmod-batman-adv batctl-default luci luci-ssl luci-proto-batman-adv kmod-usb-net-rndis kmod-usb-net-cdc-ether'
 
 # Build gateway firmware

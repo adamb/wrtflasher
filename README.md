@@ -212,20 +212,20 @@ See `tools/README.md` for detailed documentation.
 
 ### Smart Queue Management (SQM) for Bufferbloat Reduction
 
-After installation, configure SQM on the gateway to reduce bufferbloat and improve latency under load. This is especially important for satellite connections like Starlink.
+SQM is **pre-installed on the gateway** to reduce bufferbloat and improve latency under load. This is especially important for satellite connections like Starlink.
 
 **What is SQM:**
 - Reduces bufferbloat (high latency when network is saturated)
 - Keeps connection responsive during downloads/uploads
 - Uses CAKE qdisc (Common Applications Kept Enhanced)
+- Pre-installed on gateway, just needs configuration
 - Applies only to gateway WAN interfaces
 
-**Installation and Configuration:**
+**Configuration:**
 
 ```bash
 ssh root@192.168.1.1 "
-# Install SQM packages
-opkg update && opkg install sqm-scripts luci-app-sqm
+# SQM packages already installed in gateway firmware
 
 # Configure SQM for PRIMARY WAN
 uci set sqm.wan=queue

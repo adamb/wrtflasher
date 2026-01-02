@@ -196,6 +196,8 @@ Both devices use the mediatek/filogic platform.
 - kmod-usb-net-cdc-ether - USB CDC ethernet support (for USB tethering)
 - mwan3 - Multi-WAN routing and failover
 - luci-app-mwan3 - LuCI web interface for mwan3
+- sqm-scripts - Smart Queue Management (CAKE/fq_codel)
+- luci-app-sqm - LuCI web interface for SQM
 
 **AP packages:**
-- Same as gateway except mwan3/luci-app-mwan3 (APs don't need multi-WAN)
+- Same as gateway except mwan3/luci-app-mwan3/sqm-scripts (APs don't need WAN features)
