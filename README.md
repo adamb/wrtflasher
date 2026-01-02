@@ -269,6 +269,51 @@ uci commit sqm
 ssh root@192.168.1.1 "uci set sqm.wan.enabled='0' && uci commit sqm && /etc/init.d/sqm restart"
 ```
 
+### Testing SQM Performance
+
+**Verify SQM Status:**
+```bash
+ssh root@192.168.1.1 "
+# Check SQM is running
+/etc/init.d/sqm status
+
+# View CAKE statistics
+tc -s qdisc show dev eth1
+"
+```
+
+**Test Download Speed:**
+```bash
+ssh root@192.168.1.1 "
+# Fast server test (Cloudflare)
+curl -o /dev/null -w 'Time: %{time_total}s | Speed: %{speed_download} bytes/sec\n' \
+  https://speed.cloudflare.com/__down?bytes=100000000
+"
+```
+
+**Bufferbloat Test (Latency Under Load):**
+
+Open TWO SSH sessions to the gateway:
+
+*Session 1 - Monitor ping/latency:*
+```bash
+ssh root@192.168.1.1 "ping 1.1.1.1"
+```
+
+*Session 2 - Generate heavy download+upload load:*
+```bash
+ssh root@192.168.1.1 "
+curl -o /dev/null https://speed.cloudflare.com/__down?bytes=100000000 &
+dd if=/dev/zero bs=1M count=100 2>/dev/null | curl -T - -o /dev/null http://speedtest.tele2.net/upload.php
+"
+```
+
+**Expected Results:**
+- **Without SQM:** Ping spikes to 500-2000ms under load (bufferbloat)
+- **With SQM:** Ping stays under 100ms under load (good QoS)
+
+Watch ping times in Session 1 while load runs in Session 2. SQM is working if latency remains stable.
+
 ## Advanced Topics
 
 ### Dual-WAN Failover
