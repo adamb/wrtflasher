@@ -328,6 +328,77 @@ dd if=/dev/zero bs=1M count=100 2>/dev/null | curl -T - -o /dev/null http://spee
 
 Watch ping times in Session 1 while load runs in Session 2. SQM is working if latency remains stable.
 
+## Future Enhancements / TODO
+
+### IPv6 Support
+
+Enable IPv6 on your network for full dual-stack connectivity. Starlink provides native IPv6, which also enables WireGuard VPN access (since you're behind CGNAT on IPv4).
+
+**Benefits:**
+- Real public IPv6 address (no CGNAT)
+- Better performance for IPv6-native services
+- Enables inbound VPN connections without relay servers
+- Future-proof networking
+
+**Configuration:** (Requires physical access - brief network restart)
+```bash
+ssh root@192.168.1.1 "
+# Enable IPv6 on WAN
+uci set network.wan.ipv6='1'
+uci set network.wan.ip6assign='60'
+
+# Create WAN6 interface for DHCPv6
+uci set network.wan6=interface
+uci set network.wan6.device='eth1'
+uci set network.wan6.proto='dhcpv6'
+uci set network.wan6.reqaddress='try'
+uci set network.wan6.reqprefix='auto'
+
+# Enable IPv6 on LAN for client devices
+uci set network.lan.ip6assign='60'
+
+# Commit and restart
+uci commit network
+/etc/init.d/network restart
+/etc/init.d/odhcpd restart
+"
+```
+
+**Verify:** `curl -6 ifconfig.me` should show your public IPv6 address (2xxx:xxxx::)
+
+### WireGuard VPN Server
+
+Set up WireGuard to securely access your home network remotely. Requires IPv6 (since both WANs use CGNAT on IPv4) or a VPS relay.
+
+**Options:**
+1. **WireGuard over IPv6** (recommended - free, direct access)
+   - Requires IPv6 enabled (see above)
+   - Works for clients with IPv6 connectivity (most mobile networks)
+
+2. **Tailscale** (easiest - works behind CGNAT)
+   - Mesh VPN using WireGuard protocol
+   - Free for personal use
+   - No public IP needed
+
+3. **VPS Relay** (advanced - full control)
+   - Requires VPS with public IP (~$5/month)
+   - WireGuard tunnel from gateway to VPS
+   - Clients connect to VPS, traffic routes to home
+
+**Installation:** (Documentation coming soon)
+
+### DNS-over-HTTPS / DNS-over-TLS
+
+Encrypt DNS queries for privacy and security.
+
+**Status:** Planned enhancement
+
+### VLAN Guest Portal
+
+Captive portal for guest network with custom terms/authentication.
+
+**Status:** Planned enhancement
+
 ## Advanced Topics
 
 ### Dual-WAN Failover
