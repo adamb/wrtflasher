@@ -148,6 +148,38 @@ Enable or disable SSIDs across all mesh nodes.
 
 ---
 
+### find-device.sh
+Find a device across all APs by MAC address (full or partial) or IP address.
+
+**Searches:**
+- All wireless interfaces on all APs
+- Supports full MAC, partial MAC (last bytes), or IP address
+- Shows connection details and network info
+
+**Usage:**
+```bash
+# Find by full MAC address
+./tools/find-device.sh f4:91:1e:6f:db:ad
+
+# Find by partial MAC (last bytes)
+./tools/find-device.sh db:ad
+
+# Find by IP address
+./tools/find-device.sh 192.168.3.158
+```
+
+**Output:**
+- AP name and interface where device is connected
+- SSID name
+- Full MAC address
+- Signal strength, bitrate, inactive time, connected duration
+- IP address and hostname from DHCP
+- Network assignment (LAN/IoT/Guest)
+
+**Use case:** Quickly locate a specific device when you have its MAC or IP address. Useful for troubleshooting connectivity issues or verifying which SSID a device is using.
+
+---
+
 ### watch-roaming.sh
 Monitor a device's WiFi roaming between APs in real-time.
 
