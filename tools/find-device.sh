@@ -88,11 +88,34 @@ for node_ip in 192.168.1.1 192.168.1.101 192.168.1.167; do
 done
 
 if [ "$FOUND" = false ]; then
-    echo "✗ Device not found"
+    echo "✗ Device not found on any wireless interface"
     echo ""
-    echo "Possible reasons:"
-    echo "  - Device is not connected to WiFi"
-    echo "  - MAC address is incorrect"
-    echo "  - Device is on a wired connection (not checked by this script)"
+
+    # Check if device has ARP entry (recently communicated)
+    arp_entry=$(ssh root@192.168.1.1 "cat /proc/net/arp | grep -i '$SEARCH'" 2>/dev/null)
+    if [ -n "$arp_entry" ]; then
+        arp_ip=$(echo "$arp_entry" | awk '{print $1}')
+        arp_iface=$(echo "$arp_entry" | awk '{print $6}')
+        echo "→ Device has recent network activity:"
+        echo "  IP: $arp_ip"
+        echo "  Interface: $arp_iface"
+
+        # Try to ping it
+        if ssh root@192.168.1.1 "ping -c 1 -W 2 $arp_ip >/dev/null 2>&1" 2>/dev/null; then
+            echo "  Status: ✓ Online (responds to ping)"
+        else
+            echo "  Status: ✗ Offline (no ping response)"
+        fi
+        echo ""
+        echo "This device is not currently connected via WiFi but may be:"
+        echo "  - On a wired ethernet connection"
+        echo "  - Recently disconnected (ARP cache not expired)"
+        echo "  - Intermittently connecting/disconnecting"
+    else
+        echo "Possible reasons:"
+        echo "  - Device is not connected to WiFi"
+        echo "  - MAC address is incorrect"
+        echo "  - Device is on a wired connection (not checked by this script)"
+    fi
     exit 1
 fi
