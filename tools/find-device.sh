@@ -35,9 +35,16 @@ if [[ "$SEARCH" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     fi
 fi
 
+# Discover all APs dynamically from DHCP leases
+echo "→ Discovering mesh nodes..."
+ap_ips=$(ssh root@192.168.1.1 "cat /tmp/dhcp.leases | grep -E 'ap-' | awk '{print \$3}' | sort" 2>/dev/null)
+all_nodes="192.168.1.1 $ap_ips"
+echo "  Found $(echo $all_nodes | wc -w) nodes to search"
+echo ""
+
 # Search all APs for the device
 FOUND=false
-for node_ip in 192.168.1.1 192.168.1.101 192.168.1.167; do
+for node_ip in $all_nodes; do
     node_name=$(ssh -o ConnectTimeout=2 root@$node_ip "uci get system.@system[0].hostname 2>/dev/null" 2>/dev/null)
 
     for iface in phy0-ap0 phy0-ap1 phy0-ap2 phy0-ap3 phy0-ap4 phy1-mesh0; do
