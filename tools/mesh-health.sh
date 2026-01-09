@@ -4,6 +4,40 @@ echo ""
 echo "Generated: $(date)"
 echo ""
 
+# Build MAC to hostname mapping
+MAC_MAP_FILE=$(mktemp)
+trap "rm -f $MAC_MAP_FILE" EXIT
+
+NODES=(
+    "192.168.1.1:gw-office"
+    "192.168.1.101:ap-central"
+    "192.168.1.114:ap-jade"
+    "192.168.1.125:ap-repay-ruffled"
+    "192.168.1.157:ap-casita"
+    "192.168.1.159:ap-replay-surrender"
+    "192.168.1.167:ap-toilet"
+)
+
+for node in "${NODES[@]}"; do
+    ip="${node%%:*}"
+    name="${node##*:}"
+    mac=$(ssh -o ConnectTimeout=2 root@$ip "cat /sys/class/ieee80211/phy1/macaddress 2>/dev/null | tr -d '\n'" 2>/dev/null)
+    if [ -n "$mac" ]; then
+        echo "$mac|$name" >> "$MAC_MAP_FILE"
+    fi
+done
+
+# Lookup function to convert MAC to hostname
+mac_to_name() {
+    local mac=$1
+    local name=$(grep "^${mac}|" "$MAC_MAP_FILE" 2>/dev/null | head -1 | cut -d'|' -f2)
+    if [ -n "$name" ]; then
+        echo "$name"
+    else
+        echo "$mac"
+    fi
+}
+
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "1. NEIGHBOR COUNT (Redundancy Check)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -28,21 +62,23 @@ check_node() {
 check_node "192.168.1.1" "gw-office"
 check_node "192.168.1.101" "ap-central"
 check_node "192.168.1.114" "ap-jade"
+check_node "192.168.1.125" "ap-repay-ruffled"
 check_node "192.168.1.157" "ap-casita"
+check_node "192.168.1.159" "ap-replay-surrender"
 check_node "192.168.1.167" "ap-toilet"
 
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "2. MESH BACKHAUL SIGNAL STRENGTH (5GHz)"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-printf "%-15s → %-15s %10s  %s\n" "From Node" "To Neighbor" "Signal" "Quality"
-echo "────────────────────────────────────────────────────────────────"
+printf "%-15s → %-20s %10s  %s\n" "From Node" "To Neighbor" "Signal" "Quality"
+echo "─────────────────────────────────────────────────────────────────────────"
 
 check_signals() {
     from_ip=$1
     from_name=$2
-    
+
     ssh -o ConnectTimeout=3 root@$from_ip "
         batctl meshif bat0 n 2>/dev/null | grep phy1-mesh0 | while read line; do
             neighbor_mac=\$(echo \$line | awk '{print \$2}')
@@ -63,7 +99,11 @@ check_signals() {
             else
                 quality="❌ Very Poor"
             fi
-            printf "%-15s → %-15s %8s dBm  %s\n" "$from_name" "${mac:0:17}" "$signal" "$quality"
+
+            # Lookup hostname from MAC
+            neighbor_name=$(mac_to_name "$mac")
+
+            printf "%-15s → %-20s %8s dBm  %s\n" "$from_name" "$neighbor_name" "$signal" "$quality"
         fi
     done
 }
@@ -71,7 +111,9 @@ check_signals() {
 check_signals "192.168.1.1" "gw-office"
 check_signals "192.168.1.101" "ap-central"
 check_signals "192.168.1.114" "ap-jade"
+check_signals "192.168.1.125" "ap-repay-ruffled"
 check_signals "192.168.1.157" "ap-casita"
+check_signals "192.168.1.159" "ap-replay-surrender"
 check_signals "192.168.1.167" "ap-toilet"
 
 echo ""
@@ -91,7 +133,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 weak=0
-for ip in 192.168.1.1 192.168.1.101 192.168.1.114 192.168.1.157 192.168.1.167; do
+for ip in 192.168.1.1 192.168.1.101 192.168.1.114 192.168.1.125 192.168.1.157 192.168.1.159 192.168.1.167; do
     count=$(ssh -o ConnectTimeout=2 root@$ip "batctl meshif bat0 n 2>/dev/null | grep -c phy1-mesh0" 2>/dev/null)
     if [ -n "$count" ] && [ "$count" -eq 1 ]; then
         weak=$((weak + 1))

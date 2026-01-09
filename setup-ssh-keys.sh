@@ -11,10 +11,12 @@ echo ""
 
 NODES=(
     "192.168.1.1"      # gw-office
-    "192.168.1.114"    # ap
-    "192.168.1.157"    # ap
-    "192.168.1.101"    # ap
-    "192.168.1.167"    # ap
+    "192.168.1.114"    # ap-jade
+    "192.168.1.157"    # ap-casita
+    "192.168.1.101"    # ap-central
+    "192.168.1.125"    # ap-repay-ruffled
+    "192.168.1.159"    # ap-replay-surrender
+    "192.168.1.167"    # ap-toilet
 )
 
 for ip in "${NODES[@]}"; do

@@ -89,6 +89,10 @@ config dnsmasq
 	option authoritative '1'
 	option readethers '1'
 	option leasefile '/tmp/dhcp.leases'
+	option noresolv '1'
+	list server '1.1.1.1'
+	list server '1.0.0.1'
+	list server '9.9.9.9'
 
 config dhcp 'lan'
 	option interface 'lan'
@@ -279,6 +283,7 @@ for dir in files-gateway files-ap; do
     sed -i '' "s/GUEST_SSID_PLACEHOLDER/$GUEST_SSID/g" $dir/etc/uci-defaults/99-wifi-setup
     sed -i '' "s/GUEST_PASSWORD_PLACEHOLDER/$GUEST_PASSWORD/g" $dir/etc/uci-defaults/99-wifi-setup
     sed -i '' "s/GUEST_MOBILITY_DOMAIN_PLACEHOLDER/$GUEST_MOBILITY_DOMAIN/g" $dir/etc/uci-defaults/99-wifi-setup
+    sed -i '' "s/PGP_WORDS_PLACEHOLDER/$PGP_WORDS/g" $dir/etc/uci-defaults/99-wifi-setup
     chmod +x $dir/etc/uci-defaults/99-wifi-setup
 done
 

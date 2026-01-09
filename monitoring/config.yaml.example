@@ -1,0 +1,41 @@
+# Mesh Network Monitor Configuration
+# Copy this file to config.yaml and edit with your values
+
+mqtt:
+  broker: "192.168.1.151"           # Home Assistant IP address
+  port: 1883
+  username: "mqtt_user"              # MQTT username (create in HA: Settings → People → Users)
+  password: "your_mqtt_password"     # MQTT password
+  lwt_topic: "homeassistant/sensor/mesh_monitor/availability"
+  discovery_prefix: "homeassistant"  # HA MQTT discovery prefix (default: homeassistant)
+
+nodes:
+  - name: "gw-office"
+    ip: "192.168.1.1"
+    type: "gateway"                  # Gateway has extra WAN monitoring
+  - name: "ap-central"
+    ip: "192.168.1.101"
+    type: "ap"
+  - name: "ap-jade"
+    ip: "192.168.1.114"
+    type: "ap"
+  - name: "ap-casita"
+    ip: "192.168.1.157"
+    type: "ap"
+  - name: "ap-toilet"
+    ip: "192.168.1.167"
+    type: "ap"
+
+ssh:
+  key_file: "~/.ssh/mesh_nodes"      # SSH private key for mesh nodes
+  connect_timeout: 3                 # SSH connection timeout (seconds)
+  user: "root"                       # SSH username (always root on OpenWRT)
+
+settings:
+  poll_interval: 60                  # Seconds between polls (60 = 1 minute)
+  mesh_interface: "phy1-mesh0"       # 5GHz mesh backhaul interface
+  ap_interfaces:                     # Client WiFi interfaces to monitor
+    - "phy0-ap0"  # Finca (LAN VLAN 10)
+    - "phy0-ap1"  # IOT (VLAN 20)
+    - "phy0-ap3"  # Guest (VLAN 30)
+  debug: false                       # Enable debug logging

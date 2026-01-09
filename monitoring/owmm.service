@@ -1,0 +1,28 @@
+[Unit]
+Description=OpenWRT Mesh Monitor (OWMM)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=adam
+Group=adam
+WorkingDirectory=/home/adam/code/wrtflasher/monitoring
+ExecStart=/usr/bin/python3 /home/adam/code/wrtflasher/monitoring/main.py
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=owmm
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/adam/.ssh/sockets
+
+[Install]
+WantedBy=multi-user.target

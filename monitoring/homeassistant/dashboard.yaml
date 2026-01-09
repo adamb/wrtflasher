@@ -1,0 +1,79 @@
+# Home Assistant Dashboard for Mesh Network Monitor
+#
+# To import:
+# 1. Settings → Dashboards → Add Dashboard
+# 2. Name it "Mesh Network"
+# 3. Click the three dots → Edit Dashboard → Raw configuration editor
+# 4. Paste this YAML
+#
+# This is a placeholder - will be populated once main.py creates actual sensors
+
+title: Mesh Network Monitor
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:wifi-star
+    cards:
+      - type: markdown
+        content: |
+          # Mesh Network Status
+          This dashboard will display mesh network health metrics.
+
+          **Setup required:**
+          1. Ensure OWMM service is running on Debian server
+          2. Check MQTT integration in HA (Settings → Integrations → MQTT)
+          3. Sensors should auto-discover via MQTT Discovery
+
+          **Expected sensors (per node):**
+          - Mesh neighbor count
+          - Average/min/max signal strength
+          - Client counts (Finca, IOT, Guest)
+          - Uptime and load average
+
+          **Gateway-only sensors:**
+          - WAN1/WAN2 status
+          - Active WAN interface
+          - Batman-adv gateway mode
+
+      - type: entities
+        title: Mesh Nodes Status
+        entities:
+          - sensor.mesh_gw_office_neighbors
+          - sensor.mesh_ap_central_neighbors
+          - sensor.mesh_ap_jade_neighbors
+          - sensor.mesh_ap_casita_neighbors
+          - sensor.mesh_ap_toilet_neighbors
+
+      - type: entities
+        title: Signal Strength (Average)
+        entities:
+          - sensor.mesh_gw_office_signal_avg
+          - sensor.mesh_ap_central_signal_avg
+          - sensor.mesh_ap_jade_signal_avg
+          - sensor.mesh_ap_casita_signal_avg
+          - sensor.mesh_ap_toilet_signal_avg
+
+      - type: entities
+        title: Client Counts
+        entities:
+          - sensor.mesh_gw_office_clients_total
+          - sensor.mesh_ap_central_clients_total
+          - sensor.mesh_ap_jade_clients_total
+          - sensor.mesh_ap_casita_clients_total
+          - sensor.mesh_ap_toilet_clients_total
+
+      - type: entities
+        title: Gateway WAN Status
+        entities:
+          - sensor.mesh_gw_wan_active
+          - sensor.mesh_gw_wan1_status
+          - sensor.mesh_gw_wan2_status
+
+# Note: This is a placeholder. Once sensors are auto-discovered via MQTT,
+# you can customize this dashboard using the HA GUI or by editing this YAML.
+#
+# Sensor naming will follow: sensor.mesh_{node}_{metric}
+# Examples:
+#   - sensor.mesh_gw_office_neighbors
+#   - sensor.mesh_ap_central_signal_avg
+#   - sensor.mesh_ap_jade_clients_finca
