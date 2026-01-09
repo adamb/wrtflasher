@@ -410,7 +410,14 @@ The gateway supports automatic WAN failover using mwan3:
 3. Configure WAN2 interface in LuCI (USB tethering, secondary ISP, etc.)
 4. mwan3 automatically fails over when primary WAN goes down
 
-Monitoring: 8.8.8.8 and 1.1.1.1 via ping, metric-based routing (eth1=1, wan2=2).
+**How it works:**
+- **Health monitoring**: Pings 8.8.8.8 and 1.1.1.1 every 5 seconds to detect WAN failures
+- **Metric-based routing**: eth1 (metric 1) is primary, wan2 (metric 2) is backup
+- **DNS failover**: Static DNS servers (Cloudflare 1.1.1.1/1.0.0.1, Quad9 9.9.9.9) ensure DNS resolution works on both WANs
+- **Automatic failback**: When primary WAN recovers, traffic automatically switches back
+
+**DNS configuration:**
+The gateway uses static public DNS servers instead of WAN-provided DNS to ensure DNS resolution continues working during failover. Without this, you could ping IP addresses but not resolve domain names when failed over.
 
 ### Adding More Access Points
 
@@ -443,6 +450,56 @@ The IOT network uses WPA2-PSK (not WPA3) and HT20 channel width for maximum comp
 - Pool controllers and similar IoT hardware
 
 802.11r fast roaming and 802.11w management frame protection are disabled on IOT network.
+
+### Remote Access with Tailscale
+
+Access your entire home network remotely using Tailscale VPN. Only the gateway needs Tailscale installed.
+
+**Installation (Gateway only):**
+```bash
+ssh root@192.168.1.1
+opkg update
+opkg install tailscale
+/etc/init.d/tailscale start
+/etc/init.d/tailscale enable
+```
+
+**Configuration:**
+```bash
+# Advertise all three networks as subnet routes
+tailscale up --advertise-routes=192.168.1.0/24,192.168.3.0/24,192.168.4.0/24 --accept-routes
+```
+
+This will output an authentication URL. Visit it in your browser to authenticate.
+
+**Approve subnet routes:**
+1. Go to https://login.tailscale.com/admin/machines
+2. Find your gateway device
+3. Click "..." menu → "Edit route settings"
+4. Approve the three subnet routes (192.168.1.0/24, 192.168.3.0/24, 192.168.4.0/24)
+
+**Firewall configuration:**
+
+Add Tailscale interface to WAN zone so it can access your networks:
+```bash
+ssh root@192.168.1.1
+uci add_list firewall.@zone[0].network='tailscale'
+uci commit firewall
+/etc/init.d/firewall restart
+```
+
+**Testing:**
+
+From any device on your Tailscale network (phone, laptop, etc.), you can now access:
+- Gateway LuCI web interface: http://192.168.1.1
+- Any LAN device: 192.168.1.x
+- Any IoT device: 192.168.3.x
+- Any Guest device: 192.168.4.x
+
+**Notes:**
+- Tailscale state is stored in `/var/lib/tailscale` and persists across reboots
+- After reflashing gateway firmware, you'll need to reinstall and reconfigure Tailscale
+- Only the gateway needs Tailscale - APs do not
 
 ## Troubleshooting
 
