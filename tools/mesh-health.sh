@@ -46,7 +46,16 @@ echo ""
 check_node() {
     ip=$1
     name=$2
-    count=$(ssh -o ConnectTimeout=2 root@$ip "batctl meshif bat0 n 2>/dev/null | grep -c phy1-mesh0" 2>/dev/null)
+    # Count only neighbors with good or excellent signal (>= -70 dBm)
+    count=$(ssh -o ConnectTimeout=2 root@$ip "
+        batctl meshif bat0 n 2>/dev/null | grep phy1-mesh0 | while read line; do
+            neighbor_mac=\$(echo \$line | awk '{print \$2}')
+            signal=\$(iw dev phy1-mesh0 station get \$neighbor_mac 2>/dev/null | grep 'signal avg' | awk '{print \$3}')
+            if [ -n \"\$signal\" ] && [ \"\$signal\" -ge -70 ]; then
+                echo \"\$neighbor_mac\"
+            fi
+        done | wc -l
+    " 2>/dev/null | tr -d ' ')
     if [ -n "$count" ]; then
         if [ "$count" -ge 3 ]; then
             status="✅ GOOD"
@@ -134,16 +143,25 @@ echo ""
 
 weak=0
 for ip in 192.168.1.1 192.168.1.101 192.168.1.114 192.168.1.125 192.168.1.157 192.168.1.159 192.168.1.167; do
-    count=$(ssh -o ConnectTimeout=2 root@$ip "batctl meshif bat0 n 2>/dev/null | grep -c phy1-mesh0" 2>/dev/null)
+    # Count only neighbors with good or excellent signal (>= -70 dBm)
+    count=$(ssh -o ConnectTimeout=2 root@$ip "
+        batctl meshif bat0 n 2>/dev/null | grep phy1-mesh0 | while read line; do
+            neighbor_mac=\$(echo \$line | awk '{print \$2}')
+            signal=\$(iw dev phy1-mesh0 station get \$neighbor_mac 2>/dev/null | grep 'signal avg' | awk '{print \$3}')
+            if [ -n \"\$signal\" ] && [ \"\$signal\" -ge -70 ]; then
+                echo \"\$neighbor_mac\"
+            fi
+        done | wc -l
+    " 2>/dev/null | tr -d ' ')
     if [ -n "$count" ] && [ "$count" -eq 1 ]; then
         weak=$((weak + 1))
     fi
 done
 
 if [ "$weak" -eq 0 ]; then
-    echo "✅ All nodes have 2+ mesh neighbors (good redundancy)"
+    echo "✅ All nodes have 2+ quality mesh neighbors (good redundancy)"
 else
-    echo "⚠️  $weak node(s) have only 1 mesh neighbor (single point of failure)"
+    echo "⚠️  $weak node(s) have only 1 quality mesh neighbor (single point of failure)"
 fi
 
 echo ""

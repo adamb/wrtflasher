@@ -12,3 +12,6 @@ firmware/
 
 # .env for real passwords
 .env
+
+# Monitoring config with MQTT credentials
+monitoring/config.yaml

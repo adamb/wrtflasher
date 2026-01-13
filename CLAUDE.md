@@ -53,6 +53,7 @@ When a device boots with the custom firmware:
 - eth1 = Primary WAN (DHCP)
 - Optional WAN2 (USB tethering) with mwan3 failover
 - When WAN2_ENABLED="yes", automatic failover: eth1 (metric 1) → USB (metric 2)
+- DNS: Static DNS servers (Cloudflare 1.1.1.1/1.0.0.1, Quad9 9.9.9.9 backup) ensure DNS resolution works during WAN failover
 
 **Wireless configuration**:
 - radio1 (5GHz, channel 36): 802.11s mesh backhaul with SAE encryption
