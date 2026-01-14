@@ -53,16 +53,30 @@ Three isolated networks using VLANs over a batman-adv mesh:
 
 ## WiFi Networks
 
-| SSID | VLAN | Network | Encryption | 802.11r | Purpose |
-|------|------|---------|------------|---------|---------|
-| Finca | 10 | 192.168.1.0/24 | WPA3-SAE-Mixed | Yes | Trusted devices |
-| IOT | 20 | 192.168.3.0/24 | WPA2-PSK | No | IoT devices (legacy compat) |
-| Guest | 30 | 192.168.4.0/24 | WPA3-SAE-Mixed | Yes | Guest access |
+| SSID | VLAN | Network | WiFi Mode | Encryption | Roaming | Purpose |
+|------|------|---------|-----------|------------|---------|---------|
+| Finca | 10 | 192.168.1.0/24 | WiFi 6 (HE20) | WPA3-SAE-Mixed | 802.11r/k/v | Trusted devices, seamless roaming |
+| IOT | 20 | 192.168.3.0/24 | WiFi 6 (HE20) | WPA2-PSK | None | IoT devices (legacy compat) |
+| Guest | 30 | 192.168.4.0/24 | WiFi 6 (HE20) | WPA3-SAE-Mixed | 802.11r/k/v | Guest access, seamless roaming |
 
-**Mesh backhaul**: `batmesh_network` on 5GHz (radio1, channel 36, WPA3-SAE)
-**Client WiFi**: 2.4GHz (radio0, channel 6)
+**Mesh backhaul**: `batmesh_network` on 5GHz WiFi 6 (radio1, channel 36, HE80, WPA3-SAE)
+**Client WiFi**: 2.4GHz WiFi 6 (radio0, channel 6, HE20)
 
-**Note**: IOT network uses WPA2-PSK (psk2) instead of WPA3 for compatibility with legacy IoT devices that don't support WPA3. Fast roaming (802.11r) and management frame protection (802.11w) are disabled for maximum compatibility.
+**WiFi 6 Benefits:**
+- Better performance with multiple devices (OFDMA)
+- Improved efficiency and battery life for clients
+- Backwards compatible - WiFi 4/5 devices still work
+
+**Roaming Features (Finca & Guest only):**
+- **802.11r**: Fast handoff between APs without disconnection
+- **802.11k**: Neighbor discovery without channel scanning (saves battery)
+- **802.11v**: APs can suggest clients move to better APs
+
+**IOT Network Compatibility:**
+- Uses WPA2-PSK (not WPA3) for legacy device support
+- No roaming features (802.11r/k/v) or management frame protection (802.11w)
+- WiFi 6 with backwards compatibility to WiFi 4 (802.11n)
+- Works with ESP8266/ESP32, older cameras, pool controllers, etc.
 
 ## Firewall Rules
 

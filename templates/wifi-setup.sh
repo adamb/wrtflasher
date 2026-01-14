@@ -33,6 +33,8 @@ set wireless.lan0.encryption='sae-mixed'
 set wireless.lan0.key='LAN_PASSWORD_PLACEHOLDER'
 set wireless.lan0.network='lan'
 set wireless.lan0.ieee80211r='1'
+set wireless.lan0.ieee80211k='1'
+set wireless.lan0.ieee80211v='1'
 set wireless.lan0.mobility_domain='LAN_MOBILITY_DOMAIN_PLACEHOLDER'
 
 set wireless.iot0=wifi-iface
@@ -53,6 +55,8 @@ set wireless.guest0.encryption='sae-mixed'
 set wireless.guest0.key='GUEST_PASSWORD_PLACEHOLDER'
 set wireless.guest0.network='guest'
 set wireless.guest0.ieee80211r='1'
+set wireless.guest0.ieee80211k='1'
+set wireless.guest0.ieee80211v='1'
 set wireless.guest0.mobility_domain='GUEST_MOBILITY_DOMAIN_PLACEHOLDER'
 EOF
 

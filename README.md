@@ -1,6 +1,6 @@
 # OpenWRT Batman-adv Mesh Network Builder
 
-Build custom OpenWRT firmware for a self-healing wireless mesh network using batman-adv, with VLAN segmentation and 802.11r fast roaming.
+Build custom OpenWRT firmware for a self-healing wireless mesh network using batman-adv, with VLAN segmentation and seamless WiFi 6 roaming (802.11r/k/v).
 
 ## What This Does
 
@@ -8,7 +8,8 @@ This project builds custom OpenWRT firmware that creates a **mesh network** wher
 
 - **Self-healing mesh**: APs automatically route traffic through each other using batman-adv (Better Approach To Mobile Ad-hoc Networking)
 - **VLAN isolation**: Three separate networks (LAN, IoT, Guest) with firewall rules
-- **Fast roaming**: Devices seamlessly move between APs without disconnection (802.11r)
+- **WiFi 6 (802.11ax)**: Modern wireless standard on both 2.4GHz (HE20) and 5GHz (HE80) for better performance
+- **Seamless roaming**: Devices move between APs without disconnection using 802.11r/k/v (Fast Roaming + Neighbor Reports + BSS Transition)
 - **Single configuration**: Configure once, flash many APs
 - **Auto-discovery**: APs automatically join the mesh when powered on
 
@@ -26,11 +27,11 @@ This project builds custom OpenWRT firmware that creates a **mesh network** wher
 
 Three isolated networks using VLANs over the batman-adv mesh:
 
-| Network | VLAN | Subnet | Encryption | Purpose |
-|---------|------|--------|------------|---------|
-| **Finca** (LAN) | 10 | 192.168.1.0/24 | WPA3-SAE-Mixed + 802.11r | Trusted devices |
-| **IOT** | 20 | 192.168.3.0/24 | WPA2-PSK (legacy compat) | IoT devices, isolated |
-| **Guest** | 30 | 192.168.4.0/24 | WPA3-SAE-Mixed + 802.11r | Guest WiFi, fully isolated |
+| Network | VLAN | Subnet | Encryption | Roaming | Purpose |
+|---------|------|--------|------------|---------|---------|
+| **Finca** (LAN) | 10 | 192.168.1.0/24 | WPA3-SAE-Mixed | 802.11r/k/v | Trusted devices, seamless roaming |
+| **IOT** | 20 | 192.168.3.0/24 | WPA2-PSK | None | IoT devices, isolated, legacy compat |
+| **Guest** | 30 | 192.168.4.0/24 | WPA3-SAE-Mixed | 802.11r/k/v | Guest WiFi, fully isolated, seamless roaming |
 
 ### Firewall Security Model
 
@@ -44,14 +45,21 @@ This prevents compromised IoT devices from attacking trusted LAN devices.
 ### Wireless Configuration
 
 **Client WiFi (2.4GHz, radio0):**
-- Channel 6, HT20 mode (legacy device compatibility)
+- Channel 6, WiFi 6 (HE20) for better performance
 - Three SSIDs: Finca, IOT, Guest
-- IOT uses WPA2-PSK for maximum compatibility (no 802.11r/w)
+- Finca and Guest: 802.11r/k/v for seamless roaming across APs
+- IOT: WPA2-PSK with no roaming features for maximum legacy compatibility
 
 **Mesh Backhaul (5GHz, radio1):**
-- Channel 36, WPA3-SAE encryption
+- Channel 36, WiFi 6 (HE80, 80MHz wide channel)
+- WPA3-SAE encryption
 - Hidden SSID (batmesh_network)
 - Automatic multi-hop routing via batman-adv
+
+**Roaming Features:**
+- **802.11r (Fast Roaming)**: Instant handoff between APs without disconnection
+- **802.11k (Neighbor Reports)**: Clients can discover nearby APs without scanning, saving battery
+- **802.11v (BSS Transition)**: APs can suggest clients move to better APs for optimal performance
 
 ## Hardware Support
 
@@ -443,13 +451,13 @@ By default, IoT network is isolated. To allow specific LAN devices (like Home As
 
 ### Legacy Device Compatibility
 
-The IOT network uses WPA2-PSK (not WPA3) and HT20 channel width for maximum compatibility with:
-- Older smart home devices
-- ESP8266/ESP32 devices
-- Legacy WiFi cameras
-- Pool controllers and similar IoT hardware
+The IOT network is configured for maximum compatibility with older devices:
+- **WPA2-PSK encryption** (not WPA3) for legacy device support
+- **WiFi 6 (HE20)** with backwards compatibility to WiFi 4 (802.11n)
+- **No roaming features**: 802.11r/k/v and 802.11w management frame protection disabled
+- Works with: ESP8266/ESP32, older smart home devices, legacy WiFi cameras, pool controllers
 
-802.11r fast roaming and 802.11w management frame protection are disabled on IOT network.
+Even on WiFi 6, older devices can connect - they'll negotiate down to WiFi 4 speeds while modern devices benefit from WiFi 6 improvements.
 
 ### Remote Access with Tailscale
 
@@ -599,4 +607,4 @@ Built with:
 - **tools/README.md** - Complete monitoring tool documentation
 - [OpenWRT Documentation](https://openwrt.org/docs/start)
 - [batman-adv Documentation](https://www.open-mesh.org/projects/batman-adv/wiki)
-- [802.11r Fast Roaming](https://openwrt.org/docs/guide-user/network/wifi/80211r)
+- [802.11r/k/v Roaming](https://openwrt.org/docs/guide-user/network/wifi/80211r)
