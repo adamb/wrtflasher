@@ -6,74 +6,428 @@
 # 3. Click the three dots → Edit Dashboard → Raw configuration editor
 # 4. Paste this YAML
 #
-# This is a placeholder - will be populated once main.py creates actual sensors
 
 title: Mesh Network Monitor
 views:
+  # ========================================
+  # OVERVIEW - Quick glance at mesh health
+  # ========================================
   - title: Overview
     path: overview
     icon: mdi:wifi-star
     cards:
+      # Mesh Health Status
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              # 🌐 Mesh Network Status
+              Live monitoring of 7-node batman-adv mesh network
+
+          - type: horizontal-stack
+            cards:
+              - type: statistic
+                entity: sensor.mesh_gw_office_neighbors
+                name: Gateway
+                icon: mdi:router-wireless
+              - type: statistic
+                entity: sensor.mesh_ap_ec54_neighbors
+                name: EC54
+                icon: mdi:access-point
+              - type: statistic
+                entity: sensor.mesh_ap_d74c_neighbors
+                name: D74C
+                icon: mdi:access-point
+              - type: statistic
+                entity: sensor.mesh_ap_repay_ruffled_neighbors
+                name: Ruffled
+                icon: mdi:access-point
+
+          - type: horizontal-stack
+            cards:
+              - type: statistic
+                entity: sensor.mesh_ap_gate_neighbors
+                name: Gate
+                icon: mdi:access-point
+              - type: statistic
+                entity: sensor.mesh_ap_repay_surrender_neighbors
+                name: Surrender
+                icon: mdi:access-point
+              - type: statistic
+                entity: sensor.mesh_ap_dc99_neighbors
+                name: DC99
+                icon: mdi:access-point
+
+      # Total Clients Across Network
+      - type: gauge
+        entity: sensor.mesh_total_clients
+        name: Total WiFi Clients
+        min: 0
+        max: 100
+        needle: true
+        severity:
+          green: 0
+          yellow: 50
+          red: 80
+
+      # WAN Status
+      - type: entities
+        title: 🌍 Gateway WAN Status
+        show_header_toggle: false
+        entities:
+          - entity: sensor.mesh_gw_office_active_wan
+            name: Active WAN
+            icon: mdi:wan
+          - entity: sensor.mesh_gw_office_wan1_status
+            name: Starlink (eth1)
+            icon: mdi:satellite-variant
+          - entity: sensor.mesh_gw_office_wan2_status
+            name: T-Mobile (usb0)
+            icon: mdi:cellphone-wireless
+          - entity: sensor.mesh_gw_office_batman_mode
+            name: Batman Mode
+            icon: mdi:router-network
+
+      # Average Signal Strength
+      - type: entities
+        title: 📡 Mesh Signal Strength (dBm)
+        show_header_toggle: false
+        entities:
+          - entity: sensor.mesh_gw_office_signal_avg
+            name: gw-office
+          - entity: sensor.mesh_ap_ec54_signal_avg
+            name: ap-ec54
+          - entity: sensor.mesh_ap_d74c_signal_avg
+            name: ap-d74c
+          - entity: sensor.mesh_ap_repay_ruffled_signal_avg
+            name: ap-repay-ruffled
+          - entity: sensor.mesh_ap_gate_signal_avg
+            name: ap-gate
+          - entity: sensor.mesh_ap_repay_surrender_signal_avg
+            name: ap-repay-surrender
+          - entity: sensor.mesh_ap_dc99_signal_avg
+            name: ap-dc99
+
+  # ========================================
+  # CLIENT MONITORING - WiFi client details
+  # ========================================
+  - title: Clients
+    path: clients
+    icon: mdi:devices
+    cards:
       - type: markdown
         content: |
-          # Mesh Network Status
-          This dashboard will display mesh network health metrics.
+          # 📱 WiFi Client Monitoring
+          Client counts by SSID across all access points
 
-          **Setup required:**
-          1. Ensure OWMM service is running on Debian server
-          2. Check MQTT integration in HA (Settings → Integrations → MQTT)
-          3. Sensors should auto-discover via MQTT Discovery
+      # Total Clients by SSID
+      - type: horizontal-stack
+        cards:
+          - type: statistic
+            entity: sensor.mesh_total_clients_finca
+            name: Finca (LAN)
+            icon: mdi:home-wifi
+          - type: statistic
+            entity: sensor.mesh_total_clients_iot
+            name: IoT
+            icon: mdi:devices
+          - type: statistic
+            entity: sensor.mesh_total_clients_guest
+            name: Guest
+            icon: mdi:account-multiple
 
-          **Expected sensors (per node):**
-          - Mesh neighbor count
-          - Average/min/max signal strength
-          - Client counts (Finca, IOT, Guest)
-          - Uptime and load average
-
-          **Gateway-only sensors:**
-          - WAN1/WAN2 status
-          - Active WAN interface
-          - Batman-adv gateway mode
-
+      # Gateway Clients
       - type: entities
-        title: Mesh Nodes Status
+        title: Gateway (gw-office)
+        show_header_toggle: false
         entities:
-          - sensor.mesh_gw_office_neighbors
-          - sensor.mesh_ap_central_neighbors
-          - sensor.mesh_ap_jade_neighbors
-          - sensor.mesh_ap_casita_neighbors
-          - sensor.mesh_ap_toilet_neighbors
+          - entity: sensor.mesh_gw_office_clients_total
+            name: Total
+            icon: mdi:sigma
+          - entity: sensor.mesh_gw_office_clients_finca
+            name: Finca
+            icon: mdi:home-wifi
+          - entity: sensor.mesh_gw_office_clients_iot
+            name: IoT
+            icon: mdi:devices
+          - entity: sensor.mesh_gw_office_clients_guest
+            name: Guest
+            icon: mdi:account-multiple
 
+      # AP Clients Grid
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: entities
+            title: ap-ec54
+            entities:
+              - sensor.mesh_ap_ec54_clients_total
+              - sensor.mesh_ap_ec54_clients_finca
+              - sensor.mesh_ap_ec54_clients_iot
+              - sensor.mesh_ap_ec54_clients_guest
+
+          - type: entities
+            title: ap-d74c
+            entities:
+              - sensor.mesh_ap_d74c_clients_total
+              - sensor.mesh_ap_d74c_clients_finca
+              - sensor.mesh_ap_d74c_clients_iot
+              - sensor.mesh_ap_d74c_clients_guest
+
+          - type: entities
+            title: ap-repay-ruffled (Casito)
+            entities:
+              - sensor.mesh_ap_repay_ruffled_clients_total
+              - sensor.mesh_ap_repay_ruffled_clients_finca
+              - sensor.mesh_ap_repay_ruffled_clients_iot
+              - sensor.mesh_ap_repay_ruffled_clients_guest
+
+          - type: entities
+            title: ap-gate
+            entities:
+              - sensor.mesh_ap_gate_clients_total
+              - sensor.mesh_ap_gate_clients_finca
+              - sensor.mesh_ap_gate_clients_iot
+              - sensor.mesh_ap_gate_clients_guest
+
+          - type: entities
+            title: ap-repay-surrender (Casito)
+            entities:
+              - sensor.mesh_ap_repay_surrender_clients_total
+              - sensor.mesh_ap_repay_surrender_clients_finca
+              - sensor.mesh_ap_repay_surrender_clients_iot
+              - sensor.mesh_ap_repay_surrender_clients_guest
+
+          - type: entities
+            title: ap-dc99
+            entities:
+              - sensor.mesh_ap_dc99_clients_total
+              - sensor.mesh_ap_dc99_clients_finca
+              - sensor.mesh_ap_dc99_clients_iot
+              - sensor.mesh_ap_dc99_clients_guest
+
+      # Client Distribution History
+      - type: history-graph
+        title: Client Count History (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.mesh_total_clients_finca
+            name: Finca
+          - entity: sensor.mesh_total_clients_iot
+            name: IoT
+          - entity: sensor.mesh_total_clients_guest
+            name: Guest
+
+  # ========================================
+  # MESH HEALTH - Detailed mesh metrics
+  # ========================================
+  - title: Mesh Health
+    path: mesh_health
+    icon: mdi:chart-line
+    cards:
+      - type: markdown
+        content: |
+          # 🔗 Mesh Health & Topology
+          Batman-adv mesh backhaul monitoring (5GHz 802.11s)
+
+      # Neighbor Counts (Mesh Redundancy)
       - type: entities
-        title: Signal Strength (Average)
+        title: Mesh Neighbor Count (Redundancy)
+        show_header_toggle: false
         entities:
-          - sensor.mesh_gw_office_signal_avg
-          - sensor.mesh_ap_central_signal_avg
-          - sensor.mesh_ap_jade_signal_avg
-          - sensor.mesh_ap_casita_signal_avg
-          - sensor.mesh_ap_toilet_signal_avg
+          - entity: sensor.mesh_gw_office_neighbors
+            name: gw-office
+            icon: mdi:router-wireless
+          - entity: sensor.mesh_ap_ec54_neighbors
+            name: ap-ec54
+            icon: mdi:access-point
+          - entity: sensor.mesh_ap_d74c_neighbors
+            name: ap-d74c
+            icon: mdi:access-point
+          - entity: sensor.mesh_ap_repay_ruffled_neighbors
+            name: ap-repay-ruffled
+            icon: mdi:access-point
+          - entity: sensor.mesh_ap_gate_neighbors
+            name: ap-gate
+            icon: mdi:access-point
+          - entity: sensor.mesh_ap_repay_surrender_neighbors
+            name: ap-repay-surrender
+            icon: mdi:access-point
+          - entity: sensor.mesh_ap_dc99_neighbors
+            name: ap-dc99
+            icon: mdi:access-point
 
+      # Signal Strength Details
+      - type: grid
+        columns: 2
+        square: false
+        cards:
+          - type: gauge
+            entity: sensor.mesh_gw_office_signal_avg
+            name: gw-office Avg Signal
+            min: -90
+            max: -30
+            needle: true
+            severity:
+              green: -70
+              yellow: -80
+              red: -90
+
+          - type: gauge
+            entity: sensor.mesh_ap_ec54_signal_avg
+            name: ap-ec54 Avg Signal
+            min: -90
+            max: -30
+            needle: true
+            severity:
+              green: -70
+              yellow: -80
+              red: -90
+
+          - type: gauge
+            entity: sensor.mesh_ap_d74c_signal_avg
+            name: ap-d74c Avg Signal
+            min: -90
+            max: -30
+            needle: true
+            severity:
+              green: -70
+              yellow: -80
+              red: -90
+
+          - type: gauge
+            entity: sensor.mesh_ap_repay_ruffled_signal_avg
+            name: ap-repay-ruffled Avg Signal
+            min: -90
+            max: -30
+            needle: true
+            severity:
+              green: -70
+              yellow: -80
+              red: -90
+
+          - type: gauge
+            entity: sensor.mesh_ap_gate_signal_avg
+            name: ap-gate Avg Signal
+            min: -90
+            max: -30
+            needle: true
+            severity:
+              green: -70
+              yellow: -80
+              red: -90
+
+          - type: gauge
+            entity: sensor.mesh_ap_repay_surrender_signal_avg
+            name: ap-repay-surrender Avg Signal
+            min: -90
+            max: -30
+            needle: true
+            severity:
+              green: -70
+              yellow: -80
+              red: -90
+
+          - type: gauge
+            entity: sensor.mesh_ap_dc99_signal_avg
+            name: ap-dc99 Avg Signal
+            min: -90
+            max: -30
+            needle: true
+            severity:
+              green: -70
+              yellow: -80
+              red: -90
+
+      # Signal Strength History
+      - type: history-graph
+        title: Mesh Signal Strength (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.mesh_gw_office_signal_avg
+            name: gw-office
+          - entity: sensor.mesh_ap_ec54_signal_avg
+            name: ap-ec54
+          - entity: sensor.mesh_ap_d74c_signal_avg
+            name: ap-d74c
+          - entity: sensor.mesh_ap_repay_ruffled_signal_avg
+            name: ap-repay-ruffled
+          - entity: sensor.mesh_ap_gate_signal_avg
+            name: ap-gate
+          - entity: sensor.mesh_ap_repay_surrender_signal_avg
+            name: ap-repay-surrender
+          - entity: sensor.mesh_ap_dc99_signal_avg
+            name: ap-dc99
+
+  # ========================================
+  # SYSTEM STATS - Uptime and load
+  # ========================================
+  - title: System
+    path: system
+    icon: mdi:server
+    cards:
+      - type: markdown
+        content: |
+          # 🖥️ System Statistics
+          Node uptime and load averages
+
+      # Uptime
       - type: entities
-        title: Client Counts
+        title: Uptime
+        show_header_toggle: false
         entities:
-          - sensor.mesh_gw_office_clients_total
-          - sensor.mesh_ap_central_clients_total
-          - sensor.mesh_ap_jade_clients_total
-          - sensor.mesh_ap_casita_clients_total
-          - sensor.mesh_ap_toilet_clients_total
+          - entity: sensor.mesh_gw_office_uptime
+            name: gw-office
+          - entity: sensor.mesh_ap_ec54_uptime
+            name: ap-ec54
+          - entity: sensor.mesh_ap_d74c_uptime
+            name: ap-d74c
+          - entity: sensor.mesh_ap_repay_ruffled_uptime
+            name: ap-repay-ruffled
+          - entity: sensor.mesh_ap_gate_uptime
+            name: ap-gate
+          - entity: sensor.mesh_ap_repay_surrender_uptime
+            name: ap-repay-surrender
+          - entity: sensor.mesh_ap_dc99_uptime
+            name: ap-dc99
 
+      # Load Average
       - type: entities
-        title: Gateway WAN Status
+        title: Load Average (1min)
+        show_header_toggle: false
         entities:
-          - sensor.mesh_gw_wan_active
-          - sensor.mesh_gw_wan1_status
-          - sensor.mesh_gw_wan2_status
+          - entity: sensor.mesh_gw_office_load
+            name: gw-office
+          - entity: sensor.mesh_ap_ec54_load
+            name: ap-ec54
+          - entity: sensor.mesh_ap_d74c_load
+            name: ap-d74c
+          - entity: sensor.mesh_ap_repay_ruffled_load
+            name: ap-repay-ruffled
+          - entity: sensor.mesh_ap_gate_load
+            name: ap-gate
+          - entity: sensor.mesh_ap_repay_surrender_load
+            name: ap-repay-surrender
+          - entity: sensor.mesh_ap_dc99_load
+            name: ap-dc99
 
-# Note: This is a placeholder. Once sensors are auto-discovered via MQTT,
-# you can customize this dashboard using the HA GUI or by editing this YAML.
-#
-# Sensor naming will follow: sensor.mesh_{node}_{metric}
-# Examples:
-#   - sensor.mesh_gw_office_neighbors
-#   - sensor.mesh_ap_central_signal_avg
-#   - sensor.mesh_ap_jade_clients_finca
+      # Load History
+      - type: history-graph
+        title: System Load (24h)
+        hours_to_show: 24
+        entities:
+          - entity: sensor.mesh_gw_office_load
+            name: gw-office
+          - entity: sensor.mesh_ap_ec54_load
+            name: ap-ec54
+          - entity: sensor.mesh_ap_d74c_load
+            name: ap-d74c
+          - entity: sensor.mesh_ap_repay_ruffled_load
+            name: ap-repay-ruffled
+          - entity: sensor.mesh_ap_gate_load
+            name: ap-gate
+          - entity: sensor.mesh_ap_repay_surrender_load
+            name: ap-repay-surrender
+          - entity: sensor.mesh_ap_dc99_load
+            name: ap-dc99
