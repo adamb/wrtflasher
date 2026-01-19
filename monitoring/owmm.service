@@ -8,7 +8,7 @@ Type=simple
 User=adam
 Group=adam
 WorkingDirectory=/home/adam/code/wrtflasher/monitoring
-ExecStart=/usr/bin/python3 /home/adam/code/wrtflasher/monitoring/main.py
+ExecStart=/home/adam/code/wrtflasher/monitoring/venv/bin/python /home/adam/code/wrtflasher/monitoring/main.py
 Restart=always
 RestartSec=10
 

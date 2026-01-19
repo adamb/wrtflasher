@@ -88,12 +88,23 @@ This creates a service account for the monitoring script. The Mosquitto broker u
 ```bash
 cd ~/code/wrtflasher/monitoring
 
-# Install Python dependencies
-pip3 install -r requirements.txt
+# Create Python virtual environment (Debian 12+ requirement)
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Install Python dependencies in venv
+pip install -r requirements.txt
 
 # Or manually:
-pip3 install paho-mqtt pyyaml
+pip install paho-mqtt pyyaml
+
+# Deactivate when done (venv will be used by systemd service)
+deactivate
 ```
+
+**Note:** Debian 12+ requires using virtual environments for Python packages. The systemd service is configured to use `venv/bin/python` automatically.
 
 ### 3. SSH Key Setup
 
@@ -141,13 +152,22 @@ Edit these values:
 Run the monitor manually to verify:
 
 ```bash
+# Run using the virtual environment's Python
+./venv/bin/python main.py
+
+# Or activate venv first, then run
+source venv/bin/activate
 python3 main.py
+# Press Ctrl+C to stop, then deactivate
+deactivate
 ```
 
 You should see:
-- SSH connections established
-- MQTT connection successful
-- Sensors published to MQTT
+- "Connected to MQTT broker"
+- "Publishing MQTT discovery configs..."
+- "Published discovery for gw-office"
+- "Collected stats from gw-office" (and all 6 APs)
+- "Poll completed in X.Xs"
 - No errors in output
 
 Check Home Assistant:
@@ -161,7 +181,7 @@ Check Home Assistant:
 # Copy service file
 sudo cp owmm.service /etc/systemd/system/
 
-# Edit service to use your username and paths
+# Edit service file if needed (username is 'adam', venv path already configured)
 sudo nano /etc/systemd/system/owmm.service
 
 # Enable and start
@@ -175,6 +195,8 @@ sudo systemctl status owmm.service
 # View logs
 sudo journalctl -u owmm.service -f
 ```
+
+**Note:** The service file is pre-configured to use `venv/bin/python` from the virtual environment. If your username or paths differ, edit the service file accordingly.
 
 ## Configuration Reference
 
