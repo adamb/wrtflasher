@@ -62,7 +62,27 @@ wrtflasher/
 
 ## Setup
 
-### 1. Prerequisites
+### 1. Install MQTT Broker on Home Assistant
+
+**Install Mosquitto broker:**
+1. In Home Assistant: Settings → Add-ons → Add-on Store
+2. Search for "Mosquitto broker"
+3. Click Install → Start → Enable "Start on boot"
+
+**Create dedicated MQTT user:**
+1. Settings → People → Users tab (at top)
+2. Add User with these settings:
+   - Name: `MQTT Monitor`
+   - Username: `mqtt_monitor`
+   - Password: (generate strong password - **store in Bitwarden**)
+   - Can only login from local network: ✓ (checked)
+   - Administrator: ✗ (unchecked)
+
+This creates a service account for the monitoring script. The Mosquitto broker uses username/password authentication (not API tokens).
+
+**Note:** MQTT password is stored in Bitwarden for reference.
+
+### 2. Prerequisites
 
 **On your Debian server:**
 ```bash
@@ -75,7 +95,7 @@ pip3 install -r requirements.txt
 pip3 install paho-mqtt pyyaml
 ```
 
-### 2. SSH Key Setup
+### 3. SSH Key Setup
 
 The existing `mesh_nodes` SSH key should already be set up. Verify:
 
@@ -91,7 +111,7 @@ done
 
 If the key doesn't exist, see the main README for SSH key distribution instructions.
 
-### 3. Configure SSH ControlMaster
+### 4. Configure SSH ControlMaster
 
 Run the setup script to enable persistent SSH connections:
 
@@ -101,7 +121,7 @@ Run the setup script to enable persistent SSH connections:
 
 This configures your SSH client to reuse connections, reducing overhead on mesh nodes from ~100ms handshake to <1ms per command.
 
-### 4. Configure Monitoring
+### 5. Configure Monitoring
 
 Copy the example config and edit:
 
@@ -111,11 +131,12 @@ nano config.yaml
 ```
 
 Edit these values:
-- `mqtt.broker` - Your Home Assistant IP
-- `mqtt.username` / `mqtt.password` - MQTT credentials (create in HA)
+- `mqtt.broker` - Your Home Assistant IP (e.g., 192.168.1.151)
+- `mqtt.username` - `mqtt_monitor`
+- `mqtt.password` - Password from Bitwarden
 - `poll_interval` - How often to poll (default: 60 seconds)
 
-### 5. Test Manually
+### 6. Test Manually
 
 Run the monitor manually to verify:
 
@@ -131,10 +152,10 @@ You should see:
 
 Check Home Assistant:
 - Settings → Devices & Services → MQTT
-- Should see 5+ devices (gw-office, ap-central, ap-jade, ap-casita, ap-toilet)
+- Should see 7 devices (gw-office and 6 APs)
 - Each device has multiple sensors (neighbors, signal, clients, uptime, etc.)
 
-### 6. Install as Systemd Service
+### 7. Install as Systemd Service
 
 ```bash
 # Copy service file
@@ -163,7 +184,7 @@ sudo journalctl -u owmm.service -f
 mqtt:
   broker: "192.168.1.151"           # Home Assistant IP
   port: 1883
-  username: "mqtt_user"              # Create in HA: Settings → People → Users
+  username: "mqtt_monitor"           # Dedicated MQTT user (password in Bitwarden)
   password: "your_mqtt_password"
   lwt_topic: "homeassistant/sensor/mesh_monitor/availability"
   discovery_prefix: "homeassistant"  # HA default
