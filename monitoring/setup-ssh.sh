@@ -41,6 +41,8 @@ else
 
 # Mesh network nodes - persistent connections
 Host 192.168.1.*
+    User root
+    IdentityFile ~/.ssh/mesh_nodes
     ControlMaster auto
     ControlPath ~/.ssh/sockets/%r@%h:%p
     ControlPersist 10m
@@ -61,10 +63,12 @@ echo ""
 # Test access to all nodes
 NODES=(
     "192.168.1.1:gw-office"
-    "192.168.1.101:ap-central"
-    "192.168.1.114:ap-jade"
-    "192.168.1.157:ap-casita"
-    "192.168.1.167:ap-toilet"
+    "192.168.1.101:ap-ec54"
+    "192.168.1.114:ap-d74c"
+    "192.168.1.125:ap-repay-ruffled"
+    "192.168.1.157:ap-gate"
+    "192.168.1.159:ap-repay-surrender"
+    "192.168.1.167:ap-dc99"
 )
 
 SUCCESS=0
