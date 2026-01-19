@@ -80,7 +80,7 @@ for node in "${NODES[@]}"; do
 
     printf "%-15s (%s) ... " "$name" "$ip"
 
-    if ssh -i ~/.ssh/mesh_nodes -o ConnectTimeout=3 root@$ip "hostname" >/dev/null 2>&1; then
+    if ssh -i ~/.ssh/mesh_nodes -o ConnectTimeout=3 root@$ip "uci get system.@system[0].hostname" >/dev/null 2>&1; then
         echo "✓"
         SUCCESS=$((SUCCESS + 1))
     else
