@@ -38,6 +38,9 @@ DHCP_START="100"; DHCP_LIMIT="150"
 # -------- Home Assistant --------
 HOME_ASSISTANT_IP="192.168.1.151"  # Change to your HA IP
 
+# -------- FTP Server --------
+FTP_SERVER_IP="192.168.1.164"  # Debian FTP server (deb.lan)
+
 # -------- Multi-WAN Failover (gateway only) --------
 WAN2_ENABLED="yes"  # Set to "yes" to enable USB tethering failover
 

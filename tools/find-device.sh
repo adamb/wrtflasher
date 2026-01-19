@@ -45,16 +45,23 @@ echo ""
 # Search all APs for the device
 FOUND=false
 for node_ip in $all_nodes; do
-    node_name=$(ssh -o ConnectTimeout=2 root@$node_ip "uci get system.@system[0].hostname 2>/dev/null" 2>/dev/null)
+    # Use jump host for APs, direct connection for gateway
+    if [ "$node_ip" = "192.168.1.1" ]; then
+        SSH_CMD="ssh -o ConnectTimeout=2 root@$node_ip"
+    else
+        SSH_CMD="ssh -J root@192.168.1.1 -o ConnectTimeout=3 root@$node_ip"
+    fi
+
+    node_name=$($SSH_CMD "uci get system.@system[0].hostname 2>/dev/null" 2>/dev/null)
 
     for iface in phy0-ap0 phy0-ap1 phy0-ap2 phy0-ap3 phy0-ap4 phy1-mesh0; do
-        result=$(ssh -o ConnectTimeout=2 root@$node_ip "iw dev $iface station dump 2>/dev/null | grep -i '$SEARCH'" 2>/dev/null)
+        result=$($SSH_CMD "iw dev $iface station dump 2>/dev/null | grep -i '$SEARCH'" 2>/dev/null)
 
         if [ -n "$result" ]; then
             # Extract full MAC from result
             full_mac=$(echo "$result" | grep -oE '([0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}' | head -1)
 
-            ssid=$(ssh -o ConnectTimeout=2 root@$node_ip "iw dev $iface info 2>/dev/null | grep ssid | sed 's/.*ssid //'" 2>/dev/null)
+            ssid=$($SSH_CMD "iw dev $iface info 2>/dev/null | grep ssid | sed 's/.*ssid //'" 2>/dev/null)
 
             echo "✓ Found on: $node_name"
             echo "  Interface: $iface"
@@ -64,7 +71,7 @@ for node_ip in $all_nodes; do
 
             # Get detailed station info
             echo "→ Connection details:"
-            ssh root@$node_ip "iw dev $iface station get $full_mac 2>/dev/null | grep -E 'signal|bitrate|inactive|connected time|tx bytes|rx bytes'" 2>/dev/null | sed 's/^/  /'
+            $SSH_CMD "iw dev $iface station get $full_mac 2>/dev/null | grep -E 'signal|bitrate|inactive|connected time|tx bytes|rx bytes'" 2>/dev/null | sed 's/^/  /'
             echo ""
 
             # Try to get DHCP info

@@ -175,6 +175,24 @@ config rule
 	option target 'ACCEPT'
 
 config rule
+	option name 'Allow-IoT-to-FTP-Server'
+	option src 'iot'
+	option dest 'lan'
+	option dest_ip '$FTP_SERVER_IP'
+	option proto 'tcp'
+	option dest_port '21'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-IoT-FTP-Passive'
+	option src 'iot'
+	option dest 'lan'
+	option dest_ip '$FTP_SERVER_IP'
+	option proto 'tcp'
+	option dest_port '40000-50000'
+	option target 'ACCEPT'
+
+config rule
 	option name 'Allow-DHCP-Renew'
 	option src 'wan'
 	option proto 'udp'
