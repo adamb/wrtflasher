@@ -356,12 +356,12 @@ class MeshMonitor:
             'device': device
         })
 
-        # Average signal strength
+        # Best signal strength (max = strongest/closest neighbor)
         sensors.append({
-            'name': f'Mesh Node {node["name"]} Avg Signal',
-            'unique_id': f'mesh_node_{node_id}_{node_id}_avg_signal',
+            'name': f'Mesh Node {node["name"]} Best Signal',
+            'unique_id': f'mesh_node_{node_id}_{node_id}_best_signal',
             'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
-            'value_template': '{{ value_json.mesh.signal_avg }}',
+            'value_template': '{{ value_json.mesh.signal_max }}',
             'unit_of_measurement': 'dBm',
             'device_class': 'signal_strength',
             'icon': 'mdi:signal',

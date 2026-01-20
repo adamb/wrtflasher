@@ -1,74 +1,70 @@
 # Template Sensors for Mesh Network Monitor
 #
 # These create aggregate sensors (totals across all nodes)
-# To install:
-# 1. Go to Settings → Devices & Services → Helpers
-# 2. Click "Create Helper" → "Template" → "Template a sensor"
-# 3. Copy each sensor config below
 #
-# Or add to configuration.yaml:
-# template:
-#   - sensor: !include template_sensors.yaml
+# Add to configuration.yaml:
+#   template:
+#     - sensor: !include template_sensors.yaml
 #
+# Then restart Home Assistant or reload template entities.
 
 # Total clients across all nodes
-- sensor:
-    - name: "Mesh Total Clients"
-      unique_id: mesh_total_clients
-      state: >
-        {{
-          states('sensor.mesh_node_gw_office_gw_office_clients_total')|int(0) +
-          states('sensor.mesh_node_ap_ec54_ap_ec54_clients_total')|int(0) +
-          states('sensor.mesh_node_ap_d74c_ap_d74c_clients_total')|int(0) +
-          states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_total')|int(0) +
-          states('sensor.mesh_node_ap_gate_ap_gate_clients_total')|int(0) +
-          states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_total')|int(0) +
-          states('sensor.mesh_node_ap_dc99_ap_dc99_clients_total')|int(0)
-        }}
-      unit_of_measurement: "clients"
-      icon: mdi:devices
+- name: "Mesh Total Clients"
+  unique_id: mesh_total_clients
+  state: >
+    {{
+      states('sensor.mesh_node_gw_office_gw_office_clients_total')|int(0) +
+      states('sensor.mesh_node_ap_ec54_ap_ec54_clients_total')|int(0) +
+      states('sensor.mesh_node_ap_d74c_ap_d74c_clients_total')|int(0) +
+      states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_total')|int(0) +
+      states('sensor.mesh_node_ap_gate_ap_gate_clients_total')|int(0) +
+      states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_total')|int(0) +
+      states('sensor.mesh_node_ap_dc99_ap_dc99_clients_total')|int(0)
+    }}
+  unit_of_measurement: "clients"
+  icon: mdi:devices
 
-    - name: "Mesh Total Clients Finca"
-      unique_id: mesh_total_clients_finca
-      state: >
-        {{
-          states('sensor.mesh_node_gw_office_gw_office_clients_finca')|int(0) +
-          states('sensor.mesh_node_ap_ec54_ap_ec54_clients_finca')|int(0) +
-          states('sensor.mesh_node_ap_d74c_ap_d74c_clients_finca')|int(0) +
-          states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_finca')|int(0) +
-          states('sensor.mesh_node_ap_gate_ap_gate_clients_finca')|int(0) +
-          states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_finca')|int(0) +
-          states('sensor.mesh_node_ap_dc99_ap_dc99_clients_finca')|int(0)
-        }}
-      unit_of_measurement: "clients"
-      icon: mdi:home-wifi
+- name: "Mesh Total Clients Finca"
+  unique_id: mesh_total_clients_finca
+  state: >
+    {{
+      states('sensor.mesh_node_gw_office_gw_office_clients_finca')|int(0) +
+      states('sensor.mesh_node_ap_ec54_ap_ec54_clients_finca')|int(0) +
+      states('sensor.mesh_node_ap_d74c_ap_d74c_clients_finca')|int(0) +
+      states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_finca')|int(0) +
+      states('sensor.mesh_node_ap_gate_ap_gate_clients_finca')|int(0) +
+      states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_finca')|int(0) +
+      states('sensor.mesh_node_ap_dc99_ap_dc99_clients_finca')|int(0)
+    }}
+  unit_of_measurement: "clients"
+  icon: mdi:home-wifi
 
-    - name: "Mesh Total Clients IoT"
-      unique_id: mesh_total_clients_iot
-      state: >
-        {{
-          states('sensor.mesh_node_gw_office_gw_office_clients_iot')|int(0) +
-          states('sensor.mesh_node_ap_ec54_ap_ec54_clients_iot')|int(0) +
-          states('sensor.mesh_node_ap_d74c_ap_d74c_clients_iot')|int(0) +
-          states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_iot')|int(0) +
-          states('sensor.mesh_node_ap_gate_ap_gate_clients_iot')|int(0) +
-          states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_iot')|int(0) +
-          states('sensor.mesh_node_ap_dc99_ap_dc99_clients_iot')|int(0)
-        }}
-      unit_of_measurement: "clients"
-      icon: mdi:devices
+- name: "Mesh Total Clients IoT"
+  unique_id: mesh_total_clients_iot
+  state: >
+    {{
+      states('sensor.mesh_node_gw_office_gw_office_clients_iot')|int(0) +
+      states('sensor.mesh_node_ap_ec54_ap_ec54_clients_iot')|int(0) +
+      states('sensor.mesh_node_ap_d74c_ap_d74c_clients_iot')|int(0) +
+      states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_iot')|int(0) +
+      states('sensor.mesh_node_ap_gate_ap_gate_clients_iot')|int(0) +
+      states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_iot')|int(0) +
+      states('sensor.mesh_node_ap_dc99_ap_dc99_clients_iot')|int(0)
+    }}
+  unit_of_measurement: "clients"
+  icon: mdi:devices
 
-    - name: "Mesh Total Clients Guest"
-      unique_id: mesh_total_clients_guest
-      state: >
-        {{
-          states('sensor.mesh_node_gw_office_gw_office_clients_guest')|int(0) +
-          states('sensor.mesh_node_ap_ec54_ap_ec54_clients_guest')|int(0) +
-          states('sensor.mesh_node_ap_d74c_ap_d74c_clients_guest')|int(0) +
-          states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_guest')|int(0) +
-          states('sensor.mesh_node_ap_gate_ap_gate_clients_guest')|int(0) +
-          states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_guest')|int(0) +
-          states('sensor.mesh_node_ap_dc99_ap_dc99_clients_guest')|int(0)
-        }}
-      unit_of_measurement: "clients"
-      icon: mdi:account-multiple
+- name: "Mesh Total Clients Guest"
+  unique_id: mesh_total_clients_guest
+  state: >
+    {{
+      states('sensor.mesh_node_gw_office_gw_office_clients_guest')|int(0) +
+      states('sensor.mesh_node_ap_ec54_ap_ec54_clients_guest')|int(0) +
+      states('sensor.mesh_node_ap_d74c_ap_d74c_clients_guest')|int(0) +
+      states('sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_guest')|int(0) +
+      states('sensor.mesh_node_ap_gate_ap_gate_clients_guest')|int(0) +
+      states('sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_guest')|int(0) +
+      states('sensor.mesh_node_ap_dc99_ap_dc99_clients_guest')|int(0)
+    }}
+  unit_of_measurement: "clients"
+  icon: mdi:account-multiple

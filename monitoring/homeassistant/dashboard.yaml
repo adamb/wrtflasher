@@ -24,36 +24,35 @@ views:
               # 🌐 Mesh Network Status
               Live monitoring of 7-node batman-adv mesh network
 
-          - type: horizontal-stack
+          - type: grid
+            columns: 4
+            square: false
             cards:
-              - type: statistic
+              - type: tile
                 entity: sensor.mesh_node_gw_office_gw_office_neighbor_count
                 name: Gateway
                 icon: mdi:router-wireless
-              - type: statistic
+              - type: tile
                 entity: sensor.mesh_node_ap_ec54_ap_ec54_neighbor_count
                 name: EC54
                 icon: mdi:access-point
-              - type: statistic
+              - type: tile
                 entity: sensor.mesh_node_ap_d74c_ap_d74c_neighbor_count
                 name: D74C
                 icon: mdi:access-point
-              - type: statistic
+              - type: tile
                 entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_neighbor_count
                 name: Ruffled
                 icon: mdi:access-point
-
-          - type: horizontal-stack
-            cards:
-              - type: statistic
+              - type: tile
                 entity: sensor.mesh_node_ap_gate_ap_gate_neighbor_count
                 name: Gate
                 icon: mdi:access-point
-              - type: statistic
+              - type: tile
                 entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_neighbor_count
                 name: Surrender
                 icon: mdi:access-point
-              - type: statistic
+              - type: tile
                 entity: sensor.mesh_node_ap_dc99_ap_dc99_neighbor_count
                 name: DC99
                 icon: mdi:access-point
@@ -88,24 +87,24 @@ views:
             name: Batman Mode
             icon: mdi:router-network
 
-      # Average Signal Strength
+      # Best Signal Strength
       - type: entities
         title: 📡 Mesh Signal Strength (dBm)
         show_header_toggle: false
         entities:
-          - entity: sensor.mesh_node_gw_office_gw_office_avg_signal
+          - entity: sensor.mesh_node_gw_office_gw_office_best_signal
             name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_ap_ec54_avg_signal
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_best_signal
             name: ap-ec54
-          - entity: sensor.mesh_node_ap_d74c_ap_d74c_avg_signal
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_best_signal
             name: ap-d74c
-          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_avg_signal
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_ap_gate_avg_signal
+          - entity: sensor.mesh_node_ap_gate_ap_gate_best_signal
             name: ap-gate
-          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_avg_signal
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_best_signal
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_ap_dc99_avg_signal
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_best_signal
             name: ap-dc99
 
   # ========================================
@@ -123,15 +122,15 @@ views:
       # Total Clients by SSID
       - type: horizontal-stack
         cards:
-          - type: statistic
+          - type: tile
             entity: sensor.mesh_total_clients_finca
             name: Finca (LAN)
             icon: mdi:home-wifi
-          - type: statistic
+          - type: tile
             entity: sensor.mesh_total_clients_iot
             name: IoT
             icon: mdi:devices
-          - type: statistic
+          - type: tile
             entity: sensor.mesh_total_clients_guest
             name: Guest
             icon: mdi:account-multiple
@@ -264,100 +263,142 @@ views:
         square: false
         cards:
           - type: gauge
-            entity: sensor.mesh_node_gw_office_gw_office_avg_signal
-            name: gw-office Avg Signal
+            entity: sensor.mesh_node_gw_office_gw_office_best_signal
+            name: gw-office Best Signal
             min: -90
             max: -30
             needle: true
-            severity:
-              green: -70
-              yellow: -80
-              red: -90
+            segments:
+              - from: -90
+                to: -80
+                color: '#db4437'
+              - from: -80
+                to: -70
+                color: '#ffa600'
+              - from: -70
+                to: -30
+                color: '#43a047'
 
           - type: gauge
-            entity: sensor.mesh_node_ap_ec54_ap_ec54_avg_signal
-            name: ap-ec54 Avg Signal
+            entity: sensor.mesh_node_ap_ec54_ap_ec54_best_signal
+            name: ap-ec54 Best Signal
             min: -90
             max: -30
             needle: true
-            severity:
-              green: -70
-              yellow: -80
-              red: -90
+            segments:
+              - from: -90
+                to: -80
+                color: '#db4437'
+              - from: -80
+                to: -70
+                color: '#ffa600'
+              - from: -70
+                to: -30
+                color: '#43a047'
 
           - type: gauge
-            entity: sensor.mesh_node_ap_d74c_ap_d74c_avg_signal
-            name: ap-d74c Avg Signal
+            entity: sensor.mesh_node_ap_d74c_ap_d74c_best_signal
+            name: ap-d74c Best Signal
             min: -90
             max: -30
             needle: true
-            severity:
-              green: -70
-              yellow: -80
-              red: -90
+            segments:
+              - from: -90
+                to: -80
+                color: '#db4437'
+              - from: -80
+                to: -70
+                color: '#ffa600'
+              - from: -70
+                to: -30
+                color: '#43a047'
 
           - type: gauge
-            entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_avg_signal
-            name: ap-repay-ruffled Avg Signal
+            entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_best_signal
+            name: ap-repay-ruffled Best Signal
             min: -90
             max: -30
             needle: true
-            severity:
-              green: -70
-              yellow: -80
-              red: -90
+            segments:
+              - from: -90
+                to: -80
+                color: '#db4437'
+              - from: -80
+                to: -70
+                color: '#ffa600'
+              - from: -70
+                to: -30
+                color: '#43a047'
 
           - type: gauge
-            entity: sensor.mesh_node_ap_gate_ap_gate_avg_signal
-            name: ap-gate Avg Signal
+            entity: sensor.mesh_node_ap_gate_ap_gate_best_signal
+            name: ap-gate Best Signal
             min: -90
             max: -30
             needle: true
-            severity:
-              green: -70
-              yellow: -80
-              red: -90
+            segments:
+              - from: -90
+                to: -80
+                color: '#db4437'
+              - from: -80
+                to: -70
+                color: '#ffa600'
+              - from: -70
+                to: -30
+                color: '#43a047'
 
           - type: gauge
-            entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_avg_signal
-            name: ap-repay-surrender Avg Signal
+            entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_best_signal
+            name: ap-repay-surrender Best Signal
             min: -90
             max: -30
             needle: true
-            severity:
-              green: -70
-              yellow: -80
-              red: -90
+            segments:
+              - from: -90
+                to: -80
+                color: '#db4437'
+              - from: -80
+                to: -70
+                color: '#ffa600'
+              - from: -70
+                to: -30
+                color: '#43a047'
 
           - type: gauge
-            entity: sensor.mesh_node_ap_dc99_ap_dc99_avg_signal
-            name: ap-dc99 Avg Signal
+            entity: sensor.mesh_node_ap_dc99_ap_dc99_best_signal
+            name: ap-dc99 Best Signal
             min: -90
             max: -30
             needle: true
-            severity:
-              green: -70
-              yellow: -80
-              red: -90
+            segments:
+              - from: -90
+                to: -80
+                color: '#db4437'
+              - from: -80
+                to: -70
+                color: '#ffa600'
+              - from: -70
+                to: -30
+                color: '#43a047'
 
       # Signal Strength History
       - type: history-graph
         title: Mesh Signal Strength (24h)
         hours_to_show: 24
         entities:
-          - entity: sensor.mesh_node_gw_office_gw_office_avg_signal
+          - entity: sensor.mesh_node_gw_office_gw_office_best_signal
             name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_ap_ec54_avg_signal
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_best_signal
             name: ap-ec54
-          - entity: sensor.mesh_node_ap_d74c_ap_d74c_avg_signal
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_best_signal
             name: ap-d74c
-          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_avg_signal
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_ap_gate_avg_signal
+          - entity: sensor.mesh_node_ap_gate_ap_gate_best_signal
             name: ap-gate
-          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_avg_signal
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_best_signal
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_ap_dc99_avg_signal
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_best_signal
             name: ap-dc99
 
   # ========================================
