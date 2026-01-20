@@ -1,0 +1,177 @@
+# Casita (Guest House) Dashboard
+#
+# Copy to HA: scp monitoring/homeassistant/casita.yaml ha:/config/dashboards/
+#
+
+title: Casita
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:home
+    cards:
+      # Header
+      - type: markdown
+        content: |
+          # Casita Guest House
+
+      # Quick Light Controls
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: light.cocina_light_1
+            name: Kitchen
+            icon: mdi:ceiling-light
+            tap_action:
+              action: toggle
+          - type: button
+            entity: light.isla_light_1
+            name: Island
+            icon: mdi:ceiling-light
+            tap_action:
+              action: toggle
+          - type: button
+            entity: light.porche_light_1
+            name: Porch
+            icon: mdi:outdoor-lamp
+            tap_action:
+              action: toggle
+
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: light.loft_light_1
+            name: Loft
+            icon: mdi:ceiling-light
+            tap_action:
+              action: toggle
+          - type: button
+            entity: light.loft_bed_light_1
+            name: Loft Bed
+            icon: mdi:bed
+            tap_action:
+              action: toggle
+          - type: button
+            entity: light.urchin_top_light_1
+            name: Urchin Top
+            icon: mdi:chandelier
+            tap_action:
+              action: toggle
+          - type: button
+            entity: light.urchin_bottom_light_1
+            name: Urchin Bottom
+            icon: mdi:chandelier
+            tap_action:
+              action: toggle
+
+      # Climate
+      - type: thermostat
+        entity: climate.casita_kitchen
+        name: Kitchen AC
+
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
+            entity: climate.big_ac
+            name: Big AC
+          - type: thermostat
+            entity: climate.air_conditioner_2
+            name: AC 2
+
+      # Security
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Security"
+
+          - type: picture-entity
+            entity: camera.casita_live_view
+            name: Front Door
+            show_state: false
+            camera_view: live
+
+          - type: glance
+            entities:
+              - entity: binary_sensor.casita_door
+                name: Door
+              - entity: event.casita_motion
+                name: Motion
+              - entity: switch.casita_motion_detection
+                name: Detection
+              - entity: sensor.casita_door_battery
+                name: Battery
+
+      # Media
+      - type: media-control
+        entity: media_player.symfonisk_floor_lamp
+
+  # Lights Detail View
+  - title: Lights
+    path: lights
+    icon: mdi:lightbulb-group
+    cards:
+      - type: entities
+        title: All Lights
+        show_header_toggle: true
+        entities:
+          - entity: light.cocina_light_1
+            name: Kitchen
+          - entity: light.isla_light_1
+            name: Island
+          - entity: light.porche_light_1
+            name: Porch
+          - entity: light.loft_light_1
+            name: Loft
+          - entity: light.loft_bed_light_1
+            name: Loft Bed
+          - entity: light.urchin_top_light_1
+            name: Urchin Top
+          - entity: light.urchin_bottom_light_1
+            name: Urchin Bottom
+
+  # Climate Detail View
+  - title: Climate
+    path: climate
+    icon: mdi:thermostat
+    cards:
+      - type: thermostat
+        entity: climate.casita_kitchen
+        name: Kitchen AC
+
+      - type: thermostat
+        entity: climate.big_ac
+        name: Big AC
+
+      - type: thermostat
+        entity: climate.air_conditioner_2
+        name: AC 2
+
+  # Security Detail View
+  - title: Security
+    path: security
+    icon: mdi:shield-home
+    cards:
+      - type: picture-entity
+        entity: camera.casita_live_view
+        name: Front Door Camera
+        show_state: false
+        camera_view: live
+
+      - type: entities
+        title: Door Sensor
+        entities:
+          - entity: binary_sensor.casita_door
+            name: Door Status
+          - entity: sensor.casita_door_battery
+            name: Battery
+          - entity: sensor.casita_door_battery_voltage
+            name: Battery Voltage
+
+      - type: entities
+        title: Motion & Alerts
+        entities:
+          - entity: event.casita_motion
+            name: Last Motion
+          - entity: switch.casita_motion_detection
+            name: Motion Detection
+          - entity: siren.casita_siren
+            name: Siren
