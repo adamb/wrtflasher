@@ -522,12 +522,62 @@ class MeshMonitor:
 
             logger.info("Monitor stopped")
 
+    def cleanup_old_entities(self):
+        """Remove old entities with doubled names from MQTT discovery"""
+        logger.info("Cleaning up old entity discovery configs...")
+
+        self.setup_mqtt()
+        prefix = self.config['mqtt']['discovery_prefix']
+
+        # Old entity unique_id patterns (with doubled node names)
+        nodes = ['gw_office', 'ap_ec54', 'ap_d74c', 'ap_repay_ruffled',
+                 'ap_gate', 'ap_repay_surrender', 'ap_dc99']
+
+        metrics = ['neighbor_count', 'best_signal', 'avg_signal',
+                   'clients_total', 'clients_finca', 'clients_iot', 'clients_guest',
+                   'uptime', 'load']
+
+        gateway_metrics = ['wan1_status', 'wan2_status', 'active_wan', 'batman_mode']
+
+        count = 0
+        for node in nodes:
+            for metric in metrics:
+                # Old format: mesh_node_{node}_{node}_{metric}
+                old_unique_id = f'mesh_node_{node}_{node}_{metric}'
+                config_topic = f'{prefix}/sensor/{old_unique_id}/config'
+                # Publish empty retained message to remove discovery
+                self.mqtt_client.publish(config_topic, '', qos=1, retain=True)
+                count += 1
+
+            # Gateway-specific old entities
+            if node == 'gw_office':
+                for metric in gateway_metrics:
+                    old_unique_id = f'mesh_node_{node}_{node}_{metric}'
+                    config_topic = f'{prefix}/sensor/{old_unique_id}/config'
+                    self.mqtt_client.publish(config_topic, '', qos=1, retain=True)
+                    count += 1
+
+        # Give MQTT time to process
+        time.sleep(2)
+
+        logger.info(f"Removed {count} old entity discovery configs")
+
+        self.mqtt_client.loop_stop()
+        self.mqtt_client.disconnect()
+
 
 def main():
     """Entry point"""
+    import argparse
+
+    parser = argparse.ArgumentParser(description='OpenWRT Mesh Network Monitor')
+    parser.add_argument('--cleanup', action='store_true',
+                        help='Remove old entities with doubled names and exit')
+    args = parser.parse_args()
+
     # Get the absolute path to the script's directory
     script_dir = Path(__file__).parent.resolve()
-    
+
     # Construct the absolute path to the config file
     config_path = script_dir / 'config.yaml'
 
@@ -538,7 +588,12 @@ def main():
 
     try:
         monitor = MeshMonitor(config_path)
-        monitor.run()
+
+        if args.cleanup:
+            monitor.cleanup_old_entities()
+            logger.info("Cleanup complete. You can now restart the monitor normally.")
+        else:
+            monitor.run()
     except Exception as e:
         logger.error(f"Failed to start monitor: {e}", exc_info=True)
         sys.exit(1)
