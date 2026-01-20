@@ -34,11 +34,11 @@ views:
                 icon: mdi:router-wireless
               - type: tile
                 entity: sensor.mesh_node_ap_ec54_neighbor_count
-                name: EC54
+                name: Central
                 icon: mdi:access-point
               - type: tile
                 entity: sensor.mesh_node_ap_d74c_neighbor_count
-                name: D74C
+                name: Jade
                 icon: mdi:access-point
               - type: tile
                 entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
@@ -46,7 +46,7 @@ views:
                 icon: mdi:access-point
               - type: tile
                 entity: sensor.mesh_node_ap_gate_neighbor_count
-                name: Gate
+                name: Casita
                 icon: mdi:access-point
               - type: tile
                 entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
@@ -54,7 +54,7 @@ views:
                 icon: mdi:access-point
               - type: tile
                 entity: sensor.mesh_node_ap_dc99_neighbor_count
-                name: DC99
+                name: Toilet
                 icon: mdi:access-point
 
       # Total Clients Across Network
@@ -95,17 +95,17 @@ views:
           - entity: sensor.mesh_node_gw_office_best_signal
             name: gw-office
           - entity: sensor.mesh_node_ap_ec54_best_signal
-            name: ap-ec54
+            name: ap-central
           - entity: sensor.mesh_node_ap_d74c_best_signal
-            name: ap-d74c
+            name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled
           - entity: sensor.mesh_node_ap_gate_best_signal
-            name: ap-gate
+            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_best_signal
             name: ap-repay-surrender
           - entity: sensor.mesh_node_ap_dc99_best_signal
-            name: ap-dc99
+            name: ap-toilet
 
   # ========================================
   # CLIENT MONITORING - WiFi client details
@@ -159,7 +159,7 @@ views:
         square: false
         cards:
           - type: entities
-            title: ap-ec54
+            title: ap-central
             entities:
               - sensor.mesh_node_ap_ec54_clients_total
               - sensor.mesh_node_ap_ec54_clients_finca
@@ -167,7 +167,7 @@ views:
               - sensor.mesh_node_ap_ec54_clients_guest
 
           - type: entities
-            title: ap-d74c
+            title: ap-jade
             entities:
               - sensor.mesh_node_ap_d74c_clients_total
               - sensor.mesh_node_ap_d74c_clients_finca
@@ -183,7 +183,7 @@ views:
               - sensor.mesh_node_ap_repay_ruffled_clients_guest
 
           - type: entities
-            title: ap-gate
+            title: ap-casita
             entities:
               - sensor.mesh_node_ap_gate_clients_total
               - sensor.mesh_node_ap_gate_clients_finca
@@ -199,7 +199,7 @@ views:
               - sensor.mesh_node_ap_repay_surrender_clients_guest
 
           - type: entities
-            title: ap-dc99
+            title: ap-toilet
             entities:
               - sensor.mesh_node_ap_dc99_clients_total
               - sensor.mesh_node_ap_dc99_clients_finca
@@ -239,22 +239,22 @@ views:
             name: gw-office
             icon: mdi:router-wireless
           - entity: sensor.mesh_node_ap_ec54_neighbor_count
-            name: ap-ec54
+            name: ap-central
             icon: mdi:access-point
           - entity: sensor.mesh_node_ap_d74c_neighbor_count
-            name: ap-d74c
+            name: ap-jade
             icon: mdi:access-point
           - entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
             name: ap-repay-ruffled
             icon: mdi:access-point
           - entity: sensor.mesh_node_ap_gate_neighbor_count
-            name: ap-gate
+            name: ap-casita
             icon: mdi:access-point
           - entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
             name: ap-repay-surrender
             icon: mdi:access-point
           - entity: sensor.mesh_node_ap_dc99_neighbor_count
-            name: ap-dc99
+            name: ap-toilet
             icon: mdi:access-point
 
       # Signal Strength Details
@@ -281,7 +281,7 @@ views:
 
           - type: gauge
             entity: sensor.mesh_node_ap_ec54_best_signal
-            name: ap-ec54 Best Signal
+            name: ap-central Best Signal
             min: -90
             max: -30
             needle: true
@@ -298,7 +298,7 @@ views:
 
           - type: gauge
             entity: sensor.mesh_node_ap_d74c_best_signal
-            name: ap-d74c Best Signal
+            name: ap-jade Best Signal
             min: -90
             max: -30
             needle: true
@@ -332,7 +332,7 @@ views:
 
           - type: gauge
             entity: sensor.mesh_node_ap_gate_best_signal
-            name: ap-gate Best Signal
+            name: ap-casita Best Signal
             min: -90
             max: -30
             needle: true
@@ -366,7 +366,7 @@ views:
 
           - type: gauge
             entity: sensor.mesh_node_ap_dc99_best_signal
-            name: ap-dc99 Best Signal
+            name: ap-toilet Best Signal
             min: -90
             max: -30
             needle: true
@@ -389,17 +389,17 @@ views:
           - entity: sensor.mesh_node_gw_office_best_signal
             name: gw-office
           - entity: sensor.mesh_node_ap_ec54_best_signal
-            name: ap-ec54
+            name: ap-central
           - entity: sensor.mesh_node_ap_d74c_best_signal
-            name: ap-d74c
+            name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled
           - entity: sensor.mesh_node_ap_gate_best_signal
-            name: ap-gate
+            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_best_signal
             name: ap-repay-surrender
           - entity: sensor.mesh_node_ap_dc99_best_signal
-            name: ap-dc99
+            name: ap-toilet
 
   # ========================================
   # SYSTEM STATS - Uptime and load
@@ -421,17 +421,17 @@ views:
           - entity: sensor.mesh_node_gw_office_uptime
             name: gw-office
           - entity: sensor.mesh_node_ap_ec54_uptime
-            name: ap-ec54
+            name: ap-central
           - entity: sensor.mesh_node_ap_d74c_uptime
-            name: ap-d74c
+            name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_uptime
             name: ap-repay-ruffled
           - entity: sensor.mesh_node_ap_gate_uptime
-            name: ap-gate
+            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_uptime
             name: ap-repay-surrender
           - entity: sensor.mesh_node_ap_dc99_uptime
-            name: ap-dc99
+            name: ap-toilet
 
       # Load Average
       - type: entities
@@ -441,17 +441,17 @@ views:
           - entity: sensor.mesh_node_gw_office_load
             name: gw-office
           - entity: sensor.mesh_node_ap_ec54_load
-            name: ap-ec54
+            name: ap-central
           - entity: sensor.mesh_node_ap_d74c_load
-            name: ap-d74c
+            name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_load
             name: ap-repay-ruffled
           - entity: sensor.mesh_node_ap_gate_load
-            name: ap-gate
+            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_load
             name: ap-repay-surrender
           - entity: sensor.mesh_node_ap_dc99_load
-            name: ap-dc99
+            name: ap-toilet
 
       # Load History
       - type: history-graph
@@ -461,14 +461,14 @@ views:
           - entity: sensor.mesh_node_gw_office_load
             name: gw-office
           - entity: sensor.mesh_node_ap_ec54_load
-            name: ap-ec54
+            name: ap-central
           - entity: sensor.mesh_node_ap_d74c_load
-            name: ap-d74c
+            name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_load
             name: ap-repay-ruffled
           - entity: sensor.mesh_node_ap_gate_load
-            name: ap-gate
+            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_load
             name: ap-repay-surrender
           - entity: sensor.mesh_node_ap_dc99_load
-            name: ap-dc99
+            name: ap-toilet
