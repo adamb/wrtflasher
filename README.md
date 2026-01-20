@@ -196,6 +196,9 @@ Run commands on all mesh nodes simultaneously:
 # Check all node hostnames
 ./mesh-exec.sh "cat /proc/sys/kernel/hostname"
 
+# Get MAC address and hostname for all nodes
+./mesh-exec.sh "cat /sys/class/net/eth0/address && uci get system.@system[0].hostname"
+
 # Check mesh neighbors
 ./mesh-exec.sh "batctl meshif bat0 n"
 
