@@ -81,7 +81,7 @@ views:
             name: Starlink (eth1)
             icon: mdi:satellite-variant
           - entity: sensor.mesh_node_gw_office_wan2_status
-            name: T-Mobile (usb0)
+            name: T-Mobile (eth2)
             icon: mdi:cellphone-wireless
           - entity: sensor.mesh_node_gw_office_batman_mode
             name: Batman Mode

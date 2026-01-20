@@ -183,12 +183,12 @@ class MeshMonitor:
         """Collect gateway-specific stats (WAN status, batman mode)"""
         stats = {}
 
-        # Check WAN interfaces status
-        wan1_output = self.ssh_command(node_ip, "ip link show eth1 2>/dev/null | grep -q 'state UP' && echo 'up' || echo 'down'")
+        # Check WAN interfaces status via mwan3 (uses actual health checks)
+        wan1_output = self.ssh_command(node_ip, "ubus call mwan3 status | jsonfilter -e '$.interfaces.wan.status' 2>/dev/null")
         stats['wan1_status'] = wan1_output if wan1_output else 'unknown'
 
-        wan2_output = self.ssh_command(node_ip, "ip link show usb0 2>/dev/null | grep -q 'state UP' && echo 'up' || echo 'down'")
-        stats['wan2_status'] = wan2_output if wan2_output else 'down'
+        wan2_output = self.ssh_command(node_ip, "ubus call mwan3 status | jsonfilter -e '$.interfaces.wan2.status' 2>/dev/null")
+        stats['wan2_status'] = wan2_output if wan2_output else 'unknown'
 
         # Get active WAN interface from routing
         active_wan = self.ssh_command(node_ip, "ip route get 8.8.8.8 2>/dev/null | head -1 | awk '{print $5}'")
