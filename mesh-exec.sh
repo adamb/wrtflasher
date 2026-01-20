@@ -12,10 +12,12 @@ COMMAND="$1"
 
 NODES=(
     "192.168.1.1"      # gw-office (gateway)
-    "192.168.1.114"    # ap-XXXX
-    "192.168.1.157"    # ap-XXXX
     "192.168.1.101"    # ap-central
-    "192.168.1.167"    # ap-XXXX
+    "192.168.1.114"    # ap-jade
+    "192.168.1.125"    # ap-repay-ruffled
+    "192.168.1.157"    # ap-casita
+    "192.168.1.159"    # ap-repay-surrender
+    "192.168.1.167"    # ap-toilet
 )
 
 echo "Running command on all nodes: $COMMAND"
