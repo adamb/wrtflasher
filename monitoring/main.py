@@ -34,9 +34,9 @@ class MeshMonitor:
         self.mqtt_client = None
         self.connected = False
 
-        # Expand SSH key path
-        self.ssh_key = os.path.expanduser(self.config['ssh']['key_file'])
-        if not os.path.exists(self.ssh_key):
+        # Expand and resolve SSH key path
+        self.ssh_key = Path(self.config['ssh']['key_file']).expanduser().resolve()
+        if not self.ssh_key.exists():
             raise FileNotFoundError(f"SSH key not found: {self.ssh_key}")
 
         # Debug mode
@@ -525,17 +525,19 @@ class MeshMonitor:
 
 def main():
     """Entry point"""
-    # Change to script directory
-    script_dir = Path(__file__).parent
-    os.chdir(script_dir)
+    # Get the absolute path to the script's directory
+    script_dir = Path(__file__).parent.resolve()
+    
+    # Construct the absolute path to the config file
+    config_path = script_dir / 'config.yaml'
 
     # Check for config file
-    if not os.path.exists('config.yaml'):
-        logger.error("config.yaml not found. Copy config.yaml.example and edit it.")
+    if not config_path.exists():
+        logger.error(f"{config_path} not found. Copy config.yaml.example and edit it.")
         sys.exit(1)
 
     try:
-        monitor = MeshMonitor('config.yaml')
+        monitor = MeshMonitor(config_path)
         monitor.run()
     except Exception as e:
         logger.error(f"Failed to start monitor: {e}", exc_info=True)
