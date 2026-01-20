@@ -24,6 +24,12 @@ views:
             tap_action:
               action: toggle
           - type: button
+            entity: light.cocina_bano
+            name: Bathroom
+            icon: mdi:toilet
+            tap_action:
+              action: toggle
+          - type: button
             entity: light.isla_light_1
             name: Island
             icon: mdi:ceiling-light
@@ -64,18 +70,16 @@ views:
               action: toggle
 
       # Climate
-      - type: thermostat
-        entity: climate.casita_kitchen
-        name: Kitchen AC
-
-      - type: horizontal-stack
-        cards:
-          - type: thermostat
-            entity: climate.big_ac
+      - type: entities
+        title: Climate Control
+        show_header_toggle: false
+        entities:
+          - entity: climate.casita_kitchen
+            name: Kitchen AC
+          - entity: climate.big_ac
             name: Big AC
-          - type: thermostat
-            entity: climate.air_conditioner_2
-            name: AC 2
+          - entity: climate.air_conditioner_2
+            name: Bedroom AC
 
       # Security
       - type: vertical-stack
@@ -115,6 +119,8 @@ views:
         entities:
           - entity: light.cocina_light_1
             name: Kitchen
+          - entity: light.cocina_bano
+            name: Bathroom
           - entity: light.isla_light_1
             name: Island
           - entity: light.porche_light_1
@@ -133,17 +139,15 @@ views:
     path: climate
     icon: mdi:thermostat
     cards:
-      - type: thermostat
-        entity: climate.casita_kitchen
-        name: Kitchen AC
-
-      - type: thermostat
-        entity: climate.big_ac
-        name: Big AC
-
-      - type: thermostat
-        entity: climate.air_conditioner_2
-        name: AC 2
+      - type: entities
+        title: Air Conditioners
+        entities:
+          - entity: climate.casita_kitchen
+            name: Kitchen AC
+          - entity: climate.big_ac
+            name: Big AC
+          - entity: climate.air_conditioner_2
+            name: Bedroom AC
 
   # Security Detail View
   - title: Security
