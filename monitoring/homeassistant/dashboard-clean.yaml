@@ -1,63 +1,46 @@
-# Home Assistant Dashboard for Mesh Network Monitor
-#
-# To import:
-# 1. Settings → Dashboards → Add Dashboard
-# 2. Name it "Mesh Network"
-# 3. Click the three dots → Edit Dashboard → Raw configuration editor
-# 4. Paste this YAML
-#
-
 title: Mesh Network Monitor
 views:
-  # ========================================
-  # OVERVIEW - Quick glance at mesh health
-  # ========================================
   - title: Overview
     path: overview
     icon: mdi:wifi-star
     cards:
-      # Mesh Health Status
       - type: vertical-stack
         cards:
           - type: markdown
             content: |
-              # 🌐 Mesh Network Status
               Live monitoring of 7-node batman-adv mesh network
-
           - type: grid
             columns: 4
             square: false
             cards:
               - type: tile
-                entity: sensor.mesh_node_gw_office_neighbor_count
+                entity: sensor.mesh_node_gw_office_gw_office_neighbor_count
                 name: Gateway
                 icon: mdi:router-wireless
               - type: tile
-                entity: sensor.mesh_node_ap_ec54_neighbor_count
+                entity: sensor.mesh_node_ap_ec54_ap_ec54_neighbor_count
                 name: EC54
                 icon: mdi:access-point
               - type: tile
-                entity: sensor.mesh_node_ap_d74c_neighbor_count
+                entity: sensor.mesh_node_ap_d74c_ap_d74c_neighbor_count
                 name: D74C
                 icon: mdi:access-point
               - type: tile
-                entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
+                entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_neighbor_count
                 name: Ruffled
                 icon: mdi:access-point
               - type: tile
-                entity: sensor.mesh_node_ap_gate_neighbor_count
+                entity: sensor.mesh_node_ap_gate_ap_gate_neighbor_count
                 name: Gate
                 icon: mdi:access-point
               - type: tile
-                entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
+                entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_neighbor_count
                 name: Surrender
                 icon: mdi:access-point
               - type: tile
-                entity: sensor.mesh_node_ap_dc99_neighbor_count
+                entity: sensor.mesh_node_ap_dc99_ap_dc99_neighbor_count
                 name: DC99
                 icon: mdi:access-point
-
-      # Total Clients Across Network
       - type: gauge
         entity: sensor.mesh_total_clients
         name: Total WiFi Clients
@@ -68,58 +51,47 @@ views:
           green: 0
           yellow: 50
           red: 80
-
-      # WAN Status
       - type: entities
         title: 🌍 Gateway WAN Status
         show_header_toggle: false
         entities:
-          - entity: sensor.mesh_node_gw_office_active_wan
+          - entity: sensor.mesh_node_gw_office_gw_office_active_wan
             name: Active WAN
             icon: mdi:wan
-          - entity: sensor.mesh_node_gw_office_wan1_status
+          - entity: sensor.mesh_node_gw_office_gw_office_wan1_status
             name: Starlink (eth1)
             icon: mdi:satellite-variant
-          - entity: sensor.mesh_node_gw_office_wan2_status
+          - entity: sensor.mesh_node_gw_office_gw_office_wan2_status
             name: T-Mobile (usb0)
             icon: mdi:cellphone-wireless
-          - entity: sensor.mesh_node_gw_office_batman_mode
+          - entity: sensor.mesh_node_gw_office_gw_office_batman_mode
             name: Batman Mode
             icon: mdi:router-network
-
-      # Best Signal Strength
       - type: entities
         title: 📡 Mesh Signal Strength (dBm)
         show_header_toggle: false
         entities:
-          - entity: sensor.mesh_node_gw_office_best_signal
+          - entity: sensor.mesh_node_gw_office_gw_office_best_signal
             name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_best_signal
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_best_signal
             name: ap-ec54
-          - entity: sensor.mesh_node_ap_d74c_best_signal
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_best_signal
             name: ap-d74c
-          - entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_best_signal
+          - entity: sensor.mesh_node_ap_gate_ap_gate_best_signal
             name: ap-gate
-          - entity: sensor.mesh_node_ap_repay_surrender_best_signal
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_best_signal
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_best_signal
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_best_signal
             name: ap-dc99
-
-  # ========================================
-  # CLIENT MONITORING - WiFi client details
-  # ========================================
   - title: Clients
     path: clients
     icon: mdi:devices
     cards:
       - type: markdown
         content: |
-          # 📱 WiFi Client Monitoring
           Client counts by SSID across all access points
-
-      # Total Clients by SSID
       - type: horizontal-stack
         cards:
           - type: tile
@@ -134,26 +106,22 @@ views:
             entity: sensor.mesh_total_clients_guest
             name: Guest
             icon: mdi:account-multiple
-
-      # Gateway Clients
       - type: entities
         title: Gateway (gw-office)
         show_header_toggle: false
         entities:
-          - entity: sensor.mesh_node_gw_office_clients_total
+          - entity: sensor.mesh_node_gw_office_gw_office_clients_total
             name: Total
             icon: mdi:sigma
-          - entity: sensor.mesh_node_gw_office_clients_finca
+          - entity: sensor.mesh_node_gw_office_gw_office_clients_finca
             name: Finca
             icon: mdi:home-wifi
-          - entity: sensor.mesh_node_gw_office_clients_iot
+          - entity: sensor.mesh_node_gw_office_gw_office_clients_iot
             name: IoT
             icon: mdi:devices
-          - entity: sensor.mesh_node_gw_office_clients_guest
+          - entity: sensor.mesh_node_gw_office_gw_office_clients_guest
             name: Guest
             icon: mdi:account-multiple
-
-      # AP Clients Grid
       - type: grid
         columns: 2
         square: false
@@ -161,52 +129,45 @@ views:
           - type: entities
             title: ap-ec54
             entities:
-              - sensor.mesh_node_ap_ec54_clients_total
-              - sensor.mesh_node_ap_ec54_clients_finca
-              - sensor.mesh_node_ap_ec54_clients_iot
-              - sensor.mesh_node_ap_ec54_clients_guest
-
+              - sensor.mesh_node_ap_ec54_ap_ec54_clients_total
+              - sensor.mesh_node_ap_ec54_ap_ec54_clients_finca
+              - sensor.mesh_node_ap_ec54_ap_ec54_clients_iot
+              - sensor.mesh_node_ap_ec54_ap_ec54_clients_guest
           - type: entities
             title: ap-d74c
             entities:
-              - sensor.mesh_node_ap_d74c_clients_total
-              - sensor.mesh_node_ap_d74c_clients_finca
-              - sensor.mesh_node_ap_d74c_clients_iot
-              - sensor.mesh_node_ap_d74c_clients_guest
-
+              - sensor.mesh_node_ap_d74c_ap_d74c_clients_total
+              - sensor.mesh_node_ap_d74c_ap_d74c_clients_finca
+              - sensor.mesh_node_ap_d74c_ap_d74c_clients_iot
+              - sensor.mesh_node_ap_d74c_ap_d74c_clients_guest
           - type: entities
             title: ap-repay-ruffled (Casito)
             entities:
-              - sensor.mesh_node_ap_repay_ruffled_clients_total
-              - sensor.mesh_node_ap_repay_ruffled_clients_finca
-              - sensor.mesh_node_ap_repay_ruffled_clients_iot
-              - sensor.mesh_node_ap_repay_ruffled_clients_guest
-
+              - sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_total
+              - sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_finca
+              - sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_iot
+              - sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_clients_guest
           - type: entities
             title: ap-gate
             entities:
-              - sensor.mesh_node_ap_gate_clients_total
-              - sensor.mesh_node_ap_gate_clients_finca
-              - sensor.mesh_node_ap_gate_clients_iot
-              - sensor.mesh_node_ap_gate_clients_guest
-
+              - sensor.mesh_node_ap_gate_ap_gate_clients_total
+              - sensor.mesh_node_ap_gate_ap_gate_clients_finca
+              - sensor.mesh_node_ap_gate_ap_gate_clients_iot
+              - sensor.mesh_node_ap_gate_ap_gate_clients_guest
           - type: entities
             title: ap-repay-surrender (Casito)
             entities:
-              - sensor.mesh_node_ap_repay_surrender_clients_total
-              - sensor.mesh_node_ap_repay_surrender_clients_finca
-              - sensor.mesh_node_ap_repay_surrender_clients_iot
-              - sensor.mesh_node_ap_repay_surrender_clients_guest
-
+              - sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_total
+              - sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_finca
+              - sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_iot
+              - sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_clients_guest
           - type: entities
             title: ap-dc99
             entities:
-              - sensor.mesh_node_ap_dc99_clients_total
-              - sensor.mesh_node_ap_dc99_clients_finca
-              - sensor.mesh_node_ap_dc99_clients_iot
-              - sensor.mesh_node_ap_dc99_clients_guest
-
-      # Client Distribution History
+              - sensor.mesh_node_ap_dc99_ap_dc99_clients_total
+              - sensor.mesh_node_ap_dc99_ap_dc99_clients_finca
+              - sensor.mesh_node_ap_dc99_ap_dc99_clients_iot
+              - sensor.mesh_node_ap_dc99_ap_dc99_clients_guest
       - type: history-graph
         title: Client Count History (24h)
         hours_to_show: 24
@@ -217,53 +178,44 @@ views:
             name: IoT
           - entity: sensor.mesh_total_clients_guest
             name: Guest
-
-  # ========================================
-  # MESH HEALTH - Detailed mesh metrics
-  # ========================================
   - title: Mesh Health
     path: mesh_health
     icon: mdi:chart-line
     cards:
       - type: markdown
         content: |
-          # 🔗 Mesh Health & Topology
           Batman-adv mesh backhaul monitoring (5GHz 802.11s)
-
-      # Neighbor Counts (Mesh Redundancy)
       - type: entities
         title: Mesh Neighbor Count (Redundancy)
         show_header_toggle: false
         entities:
-          - entity: sensor.mesh_node_gw_office_neighbor_count
+          - entity: sensor.mesh_node_gw_office_gw_office_neighbor_count
             name: gw-office
             icon: mdi:router-wireless
-          - entity: sensor.mesh_node_ap_ec54_neighbor_count
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_neighbor_count
             name: ap-ec54
             icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_d74c_neighbor_count
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_neighbor_count
             name: ap-d74c
             icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_neighbor_count
             name: ap-repay-ruffled
             icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_gate_neighbor_count
+          - entity: sensor.mesh_node_ap_gate_ap_gate_neighbor_count
             name: ap-gate
             icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_neighbor_count
             name: ap-repay-surrender
             icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_dc99_neighbor_count
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_neighbor_count
             name: ap-dc99
             icon: mdi:access-point
-
-      # Signal Strength Details
       - type: grid
         columns: 2
         square: false
         cards:
           - type: gauge
-            entity: sensor.mesh_node_gw_office_best_signal
+            entity: sensor.mesh_node_gw_office_gw_office_best_signal
             name: gw-office Best Signal
             min: -90
             max: -30
@@ -278,9 +230,8 @@ views:
               - from: -70
                 to: -30
                 color: '#43a047'
-
           - type: gauge
-            entity: sensor.mesh_node_ap_ec54_best_signal
+            entity: sensor.mesh_node_ap_ec54_ap_ec54_best_signal
             name: ap-ec54 Best Signal
             min: -90
             max: -30
@@ -295,9 +246,8 @@ views:
               - from: -70
                 to: -30
                 color: '#43a047'
-
           - type: gauge
-            entity: sensor.mesh_node_ap_d74c_best_signal
+            entity: sensor.mesh_node_ap_d74c_ap_d74c_best_signal
             name: ap-d74c Best Signal
             min: -90
             max: -30
@@ -312,9 +262,8 @@ views:
               - from: -70
                 to: -30
                 color: '#43a047'
-
           - type: gauge
-            entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+            entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled Best Signal
             min: -90
             max: -30
@@ -329,9 +278,8 @@ views:
               - from: -70
                 to: -30
                 color: '#43a047'
-
           - type: gauge
-            entity: sensor.mesh_node_ap_gate_best_signal
+            entity: sensor.mesh_node_ap_gate_ap_gate_best_signal
             name: ap-gate Best Signal
             min: -90
             max: -30
@@ -346,9 +294,8 @@ views:
               - from: -70
                 to: -30
                 color: '#43a047'
-
           - type: gauge
-            entity: sensor.mesh_node_ap_repay_surrender_best_signal
+            entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_best_signal
             name: ap-repay-surrender Best Signal
             min: -90
             max: -30
@@ -363,9 +310,8 @@ views:
               - from: -70
                 to: -30
                 color: '#43a047'
-
           - type: gauge
-            entity: sensor.mesh_node_ap_dc99_best_signal
+            entity: sensor.mesh_node_ap_dc99_ap_dc99_best_signal
             name: ap-dc99 Best Signal
             min: -90
             max: -30
@@ -380,95 +326,82 @@ views:
               - from: -70
                 to: -30
                 color: '#43a047'
-
-      # Signal Strength History
       - type: history-graph
         title: Mesh Signal Strength (24h)
         hours_to_show: 24
         entities:
-          - entity: sensor.mesh_node_gw_office_best_signal
+          - entity: sensor.mesh_node_gw_office_gw_office_best_signal
             name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_best_signal
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_best_signal
             name: ap-ec54
-          - entity: sensor.mesh_node_ap_d74c_best_signal
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_best_signal
             name: ap-d74c
-          - entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_best_signal
+          - entity: sensor.mesh_node_ap_gate_ap_gate_best_signal
             name: ap-gate
-          - entity: sensor.mesh_node_ap_repay_surrender_best_signal
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_best_signal
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_best_signal
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_best_signal
             name: ap-dc99
-
-  # ========================================
-  # SYSTEM STATS - Uptime and load
-  # ========================================
   - title: System
     path: system
     icon: mdi:server
     cards:
       - type: markdown
         content: |
-          # 🖥️ System Statistics
           Node uptime and load averages
-
-      # Uptime
       - type: entities
         title: Uptime
         show_header_toggle: false
         entities:
-          - entity: sensor.mesh_node_gw_office_uptime
+          - entity: sensor.mesh_node_gw_office_gw_office_uptime
             name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_uptime
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_uptime
             name: ap-ec54
-          - entity: sensor.mesh_node_ap_d74c_uptime
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_uptime
             name: ap-d74c
-          - entity: sensor.mesh_node_ap_repay_ruffled_uptime
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_uptime
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_uptime
+          - entity: sensor.mesh_node_ap_gate_ap_gate_uptime
             name: ap-gate
-          - entity: sensor.mesh_node_ap_repay_surrender_uptime
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_uptime
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_uptime
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_uptime
             name: ap-dc99
-
-      # Load Average
       - type: entities
         title: Load Average (1min)
         show_header_toggle: false
         entities:
-          - entity: sensor.mesh_node_gw_office_load
+          - entity: sensor.mesh_node_gw_office_gw_office_load
             name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_load
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_load
             name: ap-ec54
-          - entity: sensor.mesh_node_ap_d74c_load
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_load
             name: ap-d74c
-          - entity: sensor.mesh_node_ap_repay_ruffled_load
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_load
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_load
+          - entity: sensor.mesh_node_ap_gate_ap_gate_load
             name: ap-gate
-          - entity: sensor.mesh_node_ap_repay_surrender_load
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_load
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_load
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_load
             name: ap-dc99
-
-      # Load History
       - type: history-graph
         title: System Load (24h)
         hours_to_show: 24
         entities:
-          - entity: sensor.mesh_node_gw_office_load
+          - entity: sensor.mesh_node_gw_office_gw_office_load
             name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_load
+          - entity: sensor.mesh_node_ap_ec54_ap_ec54_load
             name: ap-ec54
-          - entity: sensor.mesh_node_ap_d74c_load
+          - entity: sensor.mesh_node_ap_d74c_ap_d74c_load
             name: ap-d74c
-          - entity: sensor.mesh_node_ap_repay_ruffled_load
+          - entity: sensor.mesh_node_ap_repay_ruffled_ap_repay_ruffled_load
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_load
+          - entity: sensor.mesh_node_ap_gate_ap_gate_load
             name: ap-gate
-          - entity: sensor.mesh_node_ap_repay_surrender_load
+          - entity: sensor.mesh_node_ap_repay_surrender_ap_repay_surrender_load
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_load
+          - entity: sensor.mesh_node_ap_dc99_ap_dc99_load
             name: ap-dc99

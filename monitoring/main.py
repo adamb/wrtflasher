@@ -348,8 +348,8 @@ class MeshMonitor:
 
         # Mesh neighbor count
         sensors.append({
-            'name': f'Mesh Node {node["name"]} Neighbor Count',
-            'unique_id': f'mesh_node_{node_id}_{node_id}_neighbor_count',
+            'name': 'Neighbor Count',
+            'unique_id': f'mesh_node_{node_id}_neighbor_count',
             'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
             'value_template': '{{ value_json.mesh.count }}',
             'icon': 'mdi:wifi-strength-4',
@@ -358,8 +358,8 @@ class MeshMonitor:
 
         # Best signal strength (max = strongest/closest neighbor)
         sensors.append({
-            'name': f'Mesh Node {node["name"]} Best Signal',
-            'unique_id': f'mesh_node_{node_id}_{node_id}_best_signal',
+            'name': 'Best Signal',
+            'unique_id': f'mesh_node_{node_id}_best_signal',
             'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
             'value_template': '{{ value_json.mesh.signal_max }}',
             'unit_of_measurement': 'dBm',
@@ -371,8 +371,8 @@ class MeshMonitor:
         # Client counts per SSID
         for ssid in ['finca', 'iot', 'guest', 'total']:
             sensors.append({
-                'name': f'Mesh Node {node["name"]} Clients {ssid.capitalize()}',
-                'unique_id': f'mesh_node_{node_id}_{node_id}_clients_{ssid}',
+                'name': f'Clients {ssid.capitalize()}',
+                'unique_id': f'mesh_node_{node_id}_clients_{ssid}',
                 'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                 'value_template': f'{{{{ value_json.clients.{ssid} }}}}',
                 'icon': 'mdi:devices',
@@ -381,8 +381,8 @@ class MeshMonitor:
 
         # Uptime
         sensors.append({
-            'name': f'Mesh Node {node["name"]} Uptime',
-            'unique_id': f'mesh_node_{node_id}_{node_id}_uptime',
+            'name': 'Uptime',
+            'unique_id': f'mesh_node_{node_id}_uptime',
             'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
             'value_template': '{{ value_json.system.uptime }}',
             'unit_of_measurement': 's',
@@ -393,8 +393,8 @@ class MeshMonitor:
 
         # Load average
         sensors.append({
-            'name': f'Mesh Node {node["name"]} Load',
-            'unique_id': f'mesh_node_{node_id}_{node_id}_load',
+            'name': 'Load',
+            'unique_id': f'mesh_node_{node_id}_load',
             'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
             'value_template': '{{ value_json.system.load_avg }}',
             'icon': 'mdi:chip',
@@ -405,32 +405,32 @@ class MeshMonitor:
         if node.get('type') == 'gateway':
             sensors.extend([
                 {
-                    'name': f'Mesh Node {node["name"]} WAN1 Status',
-                    'unique_id': f'mesh_node_{node_id}_{node_id}_wan1_status',
+                    'name': 'WAN1 Status',
+                    'unique_id': f'mesh_node_{node_id}_wan1_status',
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.wan1_status }}',
                     'icon': 'mdi:wan',
                     'device': device
                 },
                 {
-                    'name': f'Mesh Node {node["name"]} WAN2 Status',
-                    'unique_id': f'mesh_node_{node_id}_{node_id}_wan2_status',
+                    'name': 'WAN2 Status',
+                    'unique_id': f'mesh_node_{node_id}_wan2_status',
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.wan2_status }}',
                     'icon': 'mdi:wan',
                     'device': device
                 },
                 {
-                    'name': f'Mesh Node {node["name"]} Active WAN',
-                    'unique_id': f'mesh_node_{node_id}_{node_id}_active_wan',
+                    'name': 'Active WAN',
+                    'unique_id': f'mesh_node_{node_id}_active_wan',
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.active_wan }}',
                     'icon': 'mdi:router-wireless',
                     'device': device
                 },
                 {
-                    'name': f'Mesh Node {node["name"]} Batman Mode',
-                    'unique_id': f'mesh_node_{node_id}_{node_id}_batman_mode',
+                    'name': 'Batman Mode',
+                    'unique_id': f'mesh_node_{node_id}_batman_mode',
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.batman_mode }}',
                     'icon': 'mdi:router-network',
