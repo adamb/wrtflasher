@@ -202,3 +202,29 @@ Both devices use the mediatek/filogic platform.
 
 **AP packages:**
 - Same as gateway except mwan3/luci-app-mwan3/sqm-scripts (APs don't need WAN features)
+
+## Home Assistant Integration
+
+The `monitoring/` directory contains a Python script that polls mesh nodes via SSH and publishes stats to Home Assistant via MQTT.
+
+- **monitoring/main.py** - MQTT publisher script (runs on deb)
+- **monitoring/homeassistant/ha2/** - HA config files (automations, sensors, etc.)
+- **Poll interval**: 60 seconds (configurable in config.yaml)
+
+### HA UI Notes
+
+- **Services is now Actions** - In Developer Tools, "Services" was renamed to "Actions"
+- **Reload automations**: Developer Tools → YAML → Reload Automations
+- **Test notifications**: Developer Tools → Actions → notify.mobile_app_*
+
+### Syncing HA Config
+
+```bash
+# Pull from HA
+scp 192.168.1.151:/homeassistant/automations.yaml monitoring/homeassistant/ha2/
+
+# Push to HA
+scp monitoring/homeassistant/ha2/automations.yaml 192.168.1.151:/homeassistant/
+```
+
+HA Green config directory is `/homeassistant/` (not `/config/`).

@@ -242,9 +242,15 @@ class MeshMonitor:
 
         return stats
 
-    def collect_all_nodes(self) -> List[Dict[str, Any]]:
-        """Collect statistics from all nodes in parallel"""
+    def collect_all_nodes(self) -> tuple[List[Dict[str, Any]], List[str], List[str]]:
+        """Collect statistics from all nodes in parallel
+
+        Returns:
+            tuple: (all_stats, online_nodes, offline_nodes)
+        """
         all_stats = []
+        online_nodes = []
+        offline_nodes = []
 
         with ThreadPoolExecutor(max_workers=len(self.config['nodes'])) as executor:
             future_to_node = {
@@ -257,11 +263,28 @@ class MeshMonitor:
                 try:
                     stats = future.result(timeout=10)
                     all_stats.append(stats)
+                    online_nodes.append(node['name'])
                     logger.info(f"Collected stats from {node['name']}")
                 except Exception as e:
+                    offline_nodes.append(node['name'])
                     logger.error(f"Failed to collect stats from {node['name']}: {e}")
 
-        return all_stats
+        return all_stats, online_nodes, offline_nodes
+
+    def publish_node_availability(self, node_name: str, available: bool):
+        """Publish availability status for a node"""
+        prefix = self.config['mqtt']['discovery_prefix']
+        node_id = node_name.replace('-', '_')
+        availability_topic = f'{prefix}/sensor/mesh_node_{node_id}/availability'
+        status = 'online' if available else 'offline'
+
+        self.mqtt_client.publish(
+            availability_topic,
+            status,
+            qos=1,
+            retain=True
+        )
+        logger.debug(f"Published availability for {node_name}: {status}")
 
     def on_connect(self, client, userdata, flags, rc):
         """MQTT connection callback"""
@@ -334,6 +357,9 @@ class MeshMonitor:
         prefix = self.config['mqtt']['discovery_prefix']
         node_id = node['name'].replace('-', '_')
 
+        # Per-node availability topic
+        availability_topic = f'{prefix}/sensor/mesh_node_{node_id}/availability'
+
         # Base device info
         device = {
             'identifiers': [f'mesh_node_{node_id}'],
@@ -353,7 +379,10 @@ class MeshMonitor:
             'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
             'value_template': '{{ value_json.mesh.count }}',
             'icon': 'mdi:wifi-strength-4',
-            'device': device
+            'device': device,
+            'availability_topic': availability_topic,
+            'payload_available': 'online',
+            'payload_not_available': 'offline'
         })
 
         # Best signal strength (max = strongest/closest neighbor)
@@ -365,7 +394,10 @@ class MeshMonitor:
             'unit_of_measurement': 'dBm',
             'device_class': 'signal_strength',
             'icon': 'mdi:signal',
-            'device': device
+            'device': device,
+            'availability_topic': availability_topic,
+            'payload_available': 'online',
+            'payload_not_available': 'offline'
         })
 
         # Client counts per SSID
@@ -376,7 +408,10 @@ class MeshMonitor:
                 'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                 'value_template': f'{{{{ value_json.clients.{ssid} }}}}',
                 'icon': 'mdi:devices',
-                'device': device
+                'device': device,
+                'availability_topic': availability_topic,
+                'payload_available': 'online',
+                'payload_not_available': 'offline'
             })
 
         # Uptime
@@ -388,7 +423,10 @@ class MeshMonitor:
             'unit_of_measurement': 's',
             'device_class': 'duration',
             'icon': 'mdi:clock-outline',
-            'device': device
+            'device': device,
+            'availability_topic': availability_topic,
+            'payload_available': 'online',
+            'payload_not_available': 'offline'
         })
 
         # Load average
@@ -398,7 +436,10 @@ class MeshMonitor:
             'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
             'value_template': '{{ value_json.system.load_avg }}',
             'icon': 'mdi:chip',
-            'device': device
+            'device': device,
+            'availability_topic': availability_topic,
+            'payload_available': 'online',
+            'payload_not_available': 'offline'
         })
 
         # Gateway-specific sensors
@@ -410,7 +451,10 @@ class MeshMonitor:
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.wan1_status }}',
                     'icon': 'mdi:wan',
-                    'device': device
+                    'device': device,
+                    'availability_topic': availability_topic,
+                    'payload_available': 'online',
+                    'payload_not_available': 'offline'
                 },
                 {
                     'name': 'WAN2 Status',
@@ -418,7 +462,10 @@ class MeshMonitor:
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.wan2_status }}',
                     'icon': 'mdi:wan',
-                    'device': device
+                    'device': device,
+                    'availability_topic': availability_topic,
+                    'payload_available': 'online',
+                    'payload_not_available': 'offline'
                 },
                 {
                     'name': 'Active WAN',
@@ -426,7 +473,10 @@ class MeshMonitor:
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.active_wan }}',
                     'icon': 'mdi:router-wireless',
-                    'device': device
+                    'device': device,
+                    'availability_topic': availability_topic,
+                    'payload_available': 'online',
+                    'payload_not_available': 'offline'
                 },
                 {
                     'name': 'Batman Mode',
@@ -434,7 +484,10 @@ class MeshMonitor:
                     'state_topic': f'{prefix}/sensor/mesh_node_{node_id}/state',
                     'value_template': '{{ value_json.gateway.batman_mode }}',
                     'icon': 'mdi:router-network',
-                    'device': device
+                    'device': device,
+                    'availability_topic': availability_topic,
+                    'payload_available': 'online',
+                    'payload_not_available': 'offline'
                 }
             ])
 
@@ -491,9 +544,15 @@ class MeshMonitor:
                 loop_start = time.time()
 
                 # Collect stats from all nodes
-                all_stats = self.collect_all_nodes()
+                all_stats, online_nodes, offline_nodes = self.collect_all_nodes()
 
-                # Publish stats
+                # Publish availability for all nodes
+                for node_name in online_nodes:
+                    self.publish_node_availability(node_name, True)
+                for node_name in offline_nodes:
+                    self.publish_node_availability(node_name, False)
+
+                # Publish stats for online nodes
                 for stats in all_stats:
                     self.publish_stats(stats)
 
@@ -501,7 +560,7 @@ class MeshMonitor:
                 elapsed = time.time() - loop_start
                 sleep_time = max(0, poll_interval - elapsed)
 
-                logger.info(f"Poll completed in {elapsed:.1f}s, sleeping {sleep_time:.1f}s")
+                logger.info(f"Poll completed in {elapsed:.1f}s ({len(online_nodes)} online, {len(offline_nodes)} offline), sleeping {sleep_time:.1f}s")
                 time.sleep(sleep_time)
 
         except KeyboardInterrupt:
