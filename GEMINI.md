@@ -290,32 +290,34 @@ Set up WireGuard to securely access your home network remotely. Requires IPv6 (s
 
 ### Remote Access with Tailscale
 
-Access your entire home network remotely using Tailscale VPN. Only the gateway needs Tailscale installed.
+Access your entire home network remotely using Tailscale VPN with subnet routing. Tailscale runs on the Debian box (deb), not the gateway.
 
-**Installation (Gateway only):**
+**Installation (on deb):**
 ```bash
-ssh root@192.168.1.1
-opkg update
-opkg install tailscale
-/etc/init.d/tailscale start
-/etc/init.d/tailscale enable
+# Install/update Tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# Enable IP forwarding
+echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+# Configure subnet routing
+sudo tailscale up --advertise-routes=192.168.1.0/24 --reset
 ```
 
-**Configuration:**
-```bash
-# Advertise all three networks as subnet routes
-tailscale up --advertise-routes=192.168.1.0/24,192.168.3.0/24,192.168.4.0/24 --accept-routes
-```
-(Follow authentication URL and approve subnet routes in Tailscale admin panel).
+**Approve subnet routes:**
+1. Go to https://login.tailscale.com/admin/machines
+2. Find "deb" and approve subnet route 192.168.1.0/24
 
-**Firewall configuration:**
+**Access from any Tailscale device:**
+- Home Assistant: http://192.168.1.151:8123
+- Gateway: ssh root@192.168.1.1
+- Deb: ssh adam@192.168.1.164
 
-```bash
-ssh root@192.168.1.1
-uci add_list firewall.@zone[0].network='tailscale'
-uci commit firewall
-/etc/init.d/firewall restart
-```
+**Important:**
+- **MUST use SNAT** (default) - do NOT add `--snat-subnet-routes=false`
+- **Only deb runs Tailscale** - gateway should NOT run Tailscale (causes IP conflicts)
+- Settings persist across reboots automatically
 
 ## Troubleshooting
 

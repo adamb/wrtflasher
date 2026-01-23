@@ -27,6 +27,7 @@ Three isolated networks using VLANs over a batman-adv mesh:
 - **WiFi**: Disabled (was 192.168.3.197, now down)
 - **Connection**: Wired via Switch Port 3 (VLANs 10,20 tagged)
 - **Purpose**: Management/automation server with dual-VLAN access
+- **Tailscale**: Runs subnet router for remote access to 192.168.1.0/24
 
 **Network Configuration:**
 - `enp1s0.10` - LAN interface (192.168.1.163, 192.168.1.164)
@@ -213,6 +214,42 @@ Use `mesh-exec.sh` to run commands on all nodes simultaneously:
 ```
 Device → SSID/wired port → VLAN (10/20/30) → switch/mesh → Gateway → mwan3 → Internet
 ```
+
+## Remote Access (Tailscale)
+
+Tailscale runs on the Debian box (deb) for subnet routing to the home network.
+
+### Setup
+
+```bash
+# Install/update Tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
+
+# Enable IP forwarding
+echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+
+# Configure subnet routing
+sudo tailscale up --advertise-routes=192.168.1.0/24 --reset
+```
+
+### Admin Console
+
+1. Go to https://login.tailscale.com/admin/machines
+2. Find "deb" and approve subnet route 192.168.1.0/24
+
+### Access
+
+From any Tailscale device, use local IPs:
+- Home Assistant: http://192.168.1.151:8123
+- Gateway: ssh root@192.168.1.1
+- Deb: ssh adam@192.168.1.164
+
+### Important Notes
+
+- **MUST use SNAT** (default) - do NOT add `--snat-subnet-routes=false`
+- **Only deb runs Tailscale** - gateway should NOT run Tailscale (causes IP conflicts)
+- Settings persist across reboots automatically
 
 ## Maintenance Tasks
 

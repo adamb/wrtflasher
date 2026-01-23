@@ -464,53 +464,36 @@ Even on WiFi 6, older devices can connect - they'll negotiate down to WiFi 4 spe
 
 ### Remote Access with Tailscale
 
-Access your entire home network remotely using Tailscale VPN. Only the gateway needs Tailscale installed.
+Access your entire home network remotely using Tailscale VPN with subnet routing. Tailscale runs on the Debian box (deb), not the gateway.
 
-**Installation (Gateway only):**
+**Installation (on deb):**
 ```bash
-ssh root@192.168.1.1
-opkg update
-opkg install tailscale
-/etc/init.d/tailscale start
-/etc/init.d/tailscale enable
-```
+# Install/update Tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
 
-**Configuration:**
-```bash
-# Advertise all three networks as subnet routes
-tailscale up --advertise-routes=192.168.1.0/24,192.168.3.0/24,192.168.4.0/24 --accept-routes
-```
+# Enable IP forwarding
+echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
 
-This will output an authentication URL. Visit it in your browser to authenticate.
+# Configure subnet routing
+sudo tailscale up --advertise-routes=192.168.1.0/24 --reset
+```
 
 **Approve subnet routes:**
 1. Go to https://login.tailscale.com/admin/machines
-2. Find your gateway device
-3. Click "..." menu → "Edit route settings"
-4. Approve the three subnet routes (192.168.1.0/24, 192.168.3.0/24, 192.168.4.0/24)
-
-**Firewall configuration:**
-
-Add Tailscale interface to WAN zone so it can access your networks:
-```bash
-ssh root@192.168.1.1
-uci add_list firewall.@zone[0].network='tailscale'
-uci commit firewall
-/etc/init.d/firewall restart
-```
+2. Find "deb" and approve subnet route 192.168.1.0/24
 
 **Testing:**
 
-From any device on your Tailscale network (phone, laptop, etc.), you can now access:
-- Gateway LuCI web interface: http://192.168.1.1
-- Any LAN device: 192.168.1.x
-- Any IoT device: 192.168.3.x
-- Any Guest device: 192.168.4.x
+From any device on your Tailscale network (phone, laptop, etc.), use local IPs:
+- Home Assistant: http://192.168.1.151:8123
+- Gateway LuCI: http://192.168.1.1
+- Deb: ssh adam@192.168.1.164
 
-**Notes:**
-- Tailscale state is stored in `/var/lib/tailscale` and persists across reboots
-- After reflashing gateway firmware, you'll need to reinstall and reconfigure Tailscale
-- Only the gateway needs Tailscale - APs do not
+**Important:**
+- **MUST use SNAT** (default) - do NOT add `--snat-subnet-routes=false`
+- **Only deb runs Tailscale** - gateway should NOT run Tailscale (causes IP conflicts)
+- Settings persist across reboots automatically
 
 ## Troubleshooting
 
