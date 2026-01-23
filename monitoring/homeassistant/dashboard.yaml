@@ -262,13 +262,129 @@ views:
         columns: 2
         square: false
         cards:
-          - type: gauge
-            entity: sensor.mesh_node_gw_office_best_signal
-            name: gw-office Best Signal
-            min: -90
-            max: -30
-            needle: true
-            segments:
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.mesh_node_gw_office_best_signal
+                state_not: unavailable
+            card:
+              type: gauge
+              entity: sensor.mesh_node_gw_office_best_signal
+              name: gw-office Best Signal
+              min: -90
+              max: -30
+              needle: true
+              segments:
+                - from: -90
+                  to: -80
+                  color: '#db4437'
+                - from: -80
+                  to: -70
+                  color: '#ffa600'
+                - from: -70
+                  to: -30
+                  color: '#43a047'
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.mesh_node_ap_ec54_best_signal
+                state_not: unavailable
+            card:
+              type: gauge
+              entity: sensor.mesh_node_ap_ec54_best_signal
+              name: ap-central Best Signal
+              min: -90
+              max: -30
+              needle: true
+              segments:
+                - from: -90
+                  to: -80
+                  color: '#db4437'
+                - from: -80
+                  to: -70
+                  color: '#ffa600'
+                - from: -70
+                  to: -30
+                  color: '#43a047'
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.mesh_node_ap_d74c_best_signal
+                state_not: unavailable
+            card:
+              type: gauge
+              entity: sensor.mesh_node_ap_d74c_best_signal
+              name: ap-jade Best Signal
+              min: -90
+              max: -30
+              needle: true
+              segments:
+                - from: -90
+                  to: -80
+                  color: '#db4437'
+                - from: -80
+                  to: -70
+                  color: '#ffa600'
+                - from: -70
+                  to: -30
+                  color: '#43a047'
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+                state_not: unavailable
+              - condition: state
+                entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+                state_not: unknown
+            card:
+              type: gauge
+              entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+              name: ap-repay-ruffled Best Signal
+              min: -90
+              max: -30
+              needle: true
+              segments:
+                - from: -90
+                  to: -80
+                  color: '#db4437'
+                - from: -80
+                  to: -70
+                  color: '#ffa600'
+                - from: -70
+                  to: -30
+                  color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+                    state: unavailable
+                  - condition: state
+                    entity: sensor.mesh_node_ap_repay_ruffled_best_signal
+                    state: unknown
+            card:
+              type: markdown
+              content: |
+                ## Offline
+                **ap-repay-ruffled**
+
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.mesh_node_ap_gate_best_signal
+                state_not: unavailable
+            card:
+              type: gauge
+              entity: sensor.mesh_node_ap_gate_best_signal
+              name: ap-casita Best Signal
+              min: -90
+              max: -30
+              needle: true
+              segments:
               - from: -90
                 to: -80
                 color: '#db4437'
@@ -279,107 +395,51 @@ views:
                 to: -30
                 color: '#43a047'
 
-          - type: gauge
-            entity: sensor.mesh_node_ap_ec54_best_signal
-            name: ap-central Best Signal
-            min: -90
-            max: -30
-            needle: true
-            segments:
-              - from: -90
-                to: -80
-                color: '#db4437'
-              - from: -80
-                to: -70
-                color: '#ffa600'
-              - from: -70
-                to: -30
-                color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.mesh_node_ap_repay_surrender_best_signal
+                state_not: unavailable
+            card:
+              type: gauge
+              entity: sensor.mesh_node_ap_repay_surrender_best_signal
+              name: ap-repay-surrender Best Signal
+              min: -90
+              max: -30
+              needle: true
+              segments:
+                - from: -90
+                  to: -80
+                  color: '#db4437'
+                - from: -80
+                  to: -70
+                  color: '#ffa600'
+                - from: -70
+                  to: -30
+                  color: '#43a047'
 
-          - type: gauge
-            entity: sensor.mesh_node_ap_d74c_best_signal
-            name: ap-jade Best Signal
-            min: -90
-            max: -30
-            needle: true
-            segments:
-              - from: -90
-                to: -80
-                color: '#db4437'
-              - from: -80
-                to: -70
-                color: '#ffa600'
-              - from: -70
-                to: -30
-                color: '#43a047'
-
-          - type: gauge
-            entity: sensor.mesh_node_ap_repay_ruffled_best_signal
-            name: ap-repay-ruffled Best Signal
-            min: -90
-            max: -30
-            needle: true
-            segments:
-              - from: -90
-                to: -80
-                color: '#db4437'
-              - from: -80
-                to: -70
-                color: '#ffa600'
-              - from: -70
-                to: -30
-                color: '#43a047'
-
-          - type: gauge
-            entity: sensor.mesh_node_ap_gate_best_signal
-            name: ap-casita Best Signal
-            min: -90
-            max: -30
-            needle: true
-            segments:
-              - from: -90
-                to: -80
-                color: '#db4437'
-              - from: -80
-                to: -70
-                color: '#ffa600'
-              - from: -70
-                to: -30
-                color: '#43a047'
-
-          - type: gauge
-            entity: sensor.mesh_node_ap_repay_surrender_best_signal
-            name: ap-repay-surrender Best Signal
-            min: -90
-            max: -30
-            needle: true
-            segments:
-              - from: -90
-                to: -80
-                color: '#db4437'
-              - from: -80
-                to: -70
-                color: '#ffa600'
-              - from: -70
-                to: -30
-                color: '#43a047'
-
-          - type: gauge
-            entity: sensor.mesh_node_ap_dc99_best_signal
-            name: ap-toilet Best Signal
-            min: -90
-            max: -30
-            needle: true
-            segments:
-              - from: -90
-                to: -80
-                color: '#db4437'
-              - from: -80
-                to: -70
-                color: '#ffa600'
-              - from: -70
-                to: -30
-                color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: sensor.mesh_node_ap_dc99_best_signal
+                state_not: unavailable
+            card:
+              type: gauge
+              entity: sensor.mesh_node_ap_dc99_best_signal
+              name: ap-toilet Best Signal
+              min: -90
+              max: -30
+              needle: true
+              segments:
+                - from: -90
+                  to: -80
+                  color: '#db4437'
+                - from: -80
+                  to: -70
+                  color: '#ffa600'
+                - from: -70
+                  to: -30
+                  color: '#43a047'
 
       # Signal Strength History
       - type: history-graph
