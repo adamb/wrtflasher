@@ -267,6 +267,9 @@ views:
               - condition: state
                 entity: sensor.mesh_node_gw_office_best_signal
                 state_not: unavailable
+              - condition: state
+                entity: sensor.mesh_node_gw_office_best_signal
+                state_not: unknown
             card:
               type: gauge
               entity: sensor.mesh_node_gw_office_best_signal
@@ -284,12 +287,30 @@ views:
                 - from: -70
                   to: -30
                   color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.mesh_node_gw_office_best_signal
+                    state: unavailable
+                  - condition: state
+                    entity: sensor.mesh_node_gw_office_best_signal
+                    state: unknown
+            card:
+              type: markdown
+              content: |
+                ## Offline
+                **gw-office**
 
           - type: conditional
             conditions:
               - condition: state
                 entity: sensor.mesh_node_ap_ec54_best_signal
                 state_not: unavailable
+              - condition: state
+                entity: sensor.mesh_node_ap_ec54_best_signal
+                state_not: unknown
             card:
               type: gauge
               entity: sensor.mesh_node_ap_ec54_best_signal
@@ -307,12 +328,30 @@ views:
                 - from: -70
                   to: -30
                   color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.mesh_node_ap_ec54_best_signal
+                    state: unavailable
+                  - condition: state
+                    entity: sensor.mesh_node_ap_ec54_best_signal
+                    state: unknown
+            card:
+              type: markdown
+              content: |
+                ## Offline
+                **ap-central**
 
           - type: conditional
             conditions:
               - condition: state
                 entity: sensor.mesh_node_ap_d74c_best_signal
                 state_not: unavailable
+              - condition: state
+                entity: sensor.mesh_node_ap_d74c_best_signal
+                state_not: unknown
             card:
               type: gauge
               entity: sensor.mesh_node_ap_d74c_best_signal
@@ -330,6 +369,21 @@ views:
                 - from: -70
                   to: -30
                   color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.mesh_node_ap_d74c_best_signal
+                    state: unavailable
+                  - condition: state
+                    entity: sensor.mesh_node_ap_d74c_best_signal
+                    state: unknown
+            card:
+              type: markdown
+              content: |
+                ## Offline
+                **ap-jade**
 
           - type: conditional
             conditions:
@@ -377,6 +431,9 @@ views:
               - condition: state
                 entity: sensor.mesh_node_ap_gate_best_signal
                 state_not: unavailable
+              - condition: state
+                entity: sensor.mesh_node_ap_gate_best_signal
+                state_not: unknown
             card:
               type: gauge
               entity: sensor.mesh_node_ap_gate_best_signal
@@ -385,21 +442,39 @@ views:
               max: -30
               needle: true
               segments:
-              - from: -90
-                to: -80
-                color: '#db4437'
-              - from: -80
-                to: -70
-                color: '#ffa600'
-              - from: -70
-                to: -30
-                color: '#43a047'
+                - from: -90
+                  to: -80
+                  color: '#db4437'
+                - from: -80
+                  to: -70
+                  color: '#ffa600'
+                - from: -70
+                  to: -30
+                  color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.mesh_node_ap_gate_best_signal
+                    state: unavailable
+                  - condition: state
+                    entity: sensor.mesh_node_ap_gate_best_signal
+                    state: unknown
+            card:
+              type: markdown
+              content: |
+                ## Offline
+                **ap-casita**
 
           - type: conditional
             conditions:
               - condition: state
                 entity: sensor.mesh_node_ap_repay_surrender_best_signal
                 state_not: unavailable
+              - condition: state
+                entity: sensor.mesh_node_ap_repay_surrender_best_signal
+                state_not: unknown
             card:
               type: gauge
               entity: sensor.mesh_node_ap_repay_surrender_best_signal
@@ -417,12 +492,30 @@ views:
                 - from: -70
                   to: -30
                   color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.mesh_node_ap_repay_surrender_best_signal
+                    state: unavailable
+                  - condition: state
+                    entity: sensor.mesh_node_ap_repay_surrender_best_signal
+                    state: unknown
+            card:
+              type: markdown
+              content: |
+                ## Offline
+                **ap-repay-surrender**
 
           - type: conditional
             conditions:
               - condition: state
                 entity: sensor.mesh_node_ap_dc99_best_signal
                 state_not: unavailable
+              - condition: state
+                entity: sensor.mesh_node_ap_dc99_best_signal
+                state_not: unknown
             card:
               type: gauge
               entity: sensor.mesh_node_ap_dc99_best_signal
@@ -440,6 +533,21 @@ views:
                 - from: -70
                   to: -30
                   color: '#43a047'
+          - type: conditional
+            conditions:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: sensor.mesh_node_ap_dc99_best_signal
+                    state: unavailable
+                  - condition: state
+                    entity: sensor.mesh_node_ap_dc99_best_signal
+                    state: unknown
+            card:
+              type: markdown
+              content: |
+                ## Offline
+                **ap-toilet**
 
       # Signal Strength History
       - type: history-graph
