@@ -208,7 +208,11 @@ Both devices use the mediatek/filogic platform.
 The `monitoring/` directory contains a Python script that polls mesh nodes via SSH and publishes stats to Home Assistant via MQTT.
 
 - **monitoring/main.py** - MQTT publisher script (runs on deb)
-- **monitoring/homeassistant/ha2/** - HA config files (automations, sensors, etc.)
+- **monitoring/homeassistant/** - HA config files from live instance:
+  - `automations.yaml`, `configuration.yaml`, `sensors.yaml`, `template_sensors.yaml`
+  - `dashboards/mesh.yaml` - Mesh network monitoring dashboard
+  - `dashboards/casita.yaml` - Casita guest house dashboard
+  - `blueprints/` - Automation blueprints
 - **Poll interval**: 60 seconds (configurable in config.yaml)
 
 ### HA UI Notes
@@ -221,10 +225,14 @@ The `monitoring/` directory contains a Python script that polls mesh nodes via S
 
 ```bash
 # Pull from HA
-scp 192.168.1.151:/homeassistant/automations.yaml monitoring/homeassistant/ha2/
+scp 192.168.1.151:/homeassistant/automations.yaml monitoring/homeassistant/
 
 # Push to HA
-scp monitoring/homeassistant/ha2/automations.yaml 192.168.1.151:/homeassistant/
+scp monitoring/homeassistant/automations.yaml 192.168.1.151:/homeassistant/
+
+# Push dashboards
+scp monitoring/homeassistant/dashboards/mesh.yaml 192.168.1.151:/homeassistant/dashboards/
+scp monitoring/homeassistant/dashboards/casita.yaml 192.168.1.151:/homeassistant/dashboards/
 ```
 
 HA Green config directory is `/homeassistant/` (not `/config/`).

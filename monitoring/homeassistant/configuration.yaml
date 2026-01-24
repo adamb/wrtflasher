@@ -1,0 +1,120 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+sensor: !include sensors.yaml
+
+template:
+  - sensor: !include template_sensors.yaml # Add this line
+  - sensor:
+      - name: TMobile In
+        unit_of_measurement: Mbps
+        state: >
+          {{ [((states('sensor.usb0_in_der')|float * 8) / 1000000)|round(2), 0] | max }}
+
+      - name: TMobile Out
+        unit_of_measurement: Mbps
+        state: >
+          {{ [((states('sensor.usb0_out_der')|float * 8) / 1000000)|round(2), 0] | max }}
+
+      - name: Starlink In
+        unit_of_measurement: Mbps
+        state: >
+          {{ [((states('sensor.star_in_der')|float * 8) / 1000000)|round(2), 0] | max }}
+
+      - name: Starlink Out
+        unit_of_measurement: Mbps
+        state: >
+          {{ [((states('sensor.star_out_der')|float * 8) / 1000000)|round(2), 0] | max }}
+
+      - name: "Tank Level"
+        unit_of_measurement: "%"
+        state: >
+          {% set depth = states('sensor.tank_depth') | float %}
+          {% set full = 0.1 %}
+          {% set empty = 1.52 %}
+          {{ (((empty - depth) / (empty - full)) * 100) | round(1) }}
+
+  - binary_sensor:
+      - name: "Freezer Alert"
+        state: "{{ states('sensor.freezer_temperature') | float > -5 }}"
+        device_class: problem
+
+      - name: "Humidity Alert"
+        state: "{{ states('sensor.storage_humidity') | float > 55 }}"
+        device_class: problem
+
+  - binary_sensor:
+      - name: "Thread - Tesla Room Light reachable"
+        unique_id: thread_tesla_room_light_reachable
+        device_class: connectivity
+        state: "{{ states('light.tesla_room_light') != 'unavailable' }}"
+
+      - name: "Thread - Thread Smart Plug reachable"
+        unique_id: thread_thread_smart_plug_reachable
+        device_class: connectivity
+        state: "{{ states('switch.thread_smart_plug') != 'unavailable' }}"
+
+      - name: "Thread - Cocina Bano reachable"
+        unique_id: thread_cocina_bano_reachable
+        device_class: connectivity
+        state: "{{ states('light.cocina_bano') != 'unavailable' }}"
+
+      - name: "Thread - Tesla Room Door reachable"
+        unique_id: thread_tesla_room_door_reachable
+        device_class: connectivity
+        state: "{{ states('binary_sensor.tesla_room_door') != 'unavailable' }}"
+
+      - name: "Thread - Gas Room Door reachable"
+        unique_id: thread_gas_room_door_reachable
+        device_class: connectivity
+        state: "{{ states('binary_sensor.gas_room_door') != 'unavailable' }}"
+
+      - name: "Thread - Costco Door reachable"
+        unique_id: thread_costco_door_reachable
+        device_class: connectivity
+        state: "{{ states('binary_sensor.costco_door') != 'unavailable' }}"
+
+      - name: "Thread - Front Door reachable"
+        unique_id: thread_front_door_reachable
+        device_class: connectivity
+        state: "{{ states('binary_sensor.front_door') != 'unavailable' }}"
+
+      - name: "Thread - Freezer Room Door reachable"
+        unique_id: thread_freezer_room_door_reachable
+        device_class: connectivity
+        state: "{{ states('binary_sensor.freezer_room_door') != 'unavailable' }}"
+
+      - name: "Thread - Bano Abajo Door reachable"
+        unique_id: thread_bano_abajo_door_reachable
+        device_class: connectivity
+        state: "{{ states('binary_sensor.bano_abajo_door') != 'unavailable' }}"
+
+lovelace:
+  mode: storage
+  dashboards:
+    la-casita:                                                                                                                                        
+      mode: yaml                                                                                                                                   
+      filename: dashboards/casita.yaml                                                                                                             
+      title: Casita                                                                                                                                
+      icon: mdi:home                                                                                                                               
+      require_admin: false    
+    mesh-network:
+      mode: yaml
+      filename: dashboards/mesh.yaml
+      title: Mesh Network
+      icon: mdi:wifi
+      require_admin: false
+
+      # start working on cloudflared
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
+    - 100.64.0.0/10  # This covers the entire Tailscale network range

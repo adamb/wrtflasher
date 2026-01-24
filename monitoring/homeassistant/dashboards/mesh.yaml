@@ -113,110 +113,149 @@ views:
   - title: Clients
     path: clients
     icon: mdi:devices
+    type: panel
     cards:
-      - type: markdown
-        content: |
-          # 📱 WiFi Client Monitoring
-          Client counts by SSID across all access points
-
-      # Total Clients by SSID
-      - type: horizontal-stack
+      - type: vertical-stack
         cards:
-          - type: tile
-            entity: sensor.mesh_total_clients_finca
-            name: Finca (LAN)
-            icon: mdi:home-wifi
-          - type: tile
-            entity: sensor.mesh_total_clients_iot
-            name: IoT
-            icon: mdi:devices
-          - type: tile
-            entity: sensor.mesh_total_clients_guest
-            name: Guest
-            icon: mdi:account-multiple
+          # Summary row - full width
+          - type: horizontal-stack
+            cards:
+              - type: tile
+                entity: sensor.mesh_total_clients
+                name: Total
+                icon: mdi:wifi
+              - type: tile
+                entity: sensor.mesh_total_clients_finca
+                name: Finca
+                icon: mdi:home-wifi
+              - type: tile
+                entity: sensor.mesh_total_clients_iot
+                name: IoT
+                icon: mdi:devices
+              - type: tile
+                entity: sensor.mesh_total_clients_guest
+                name: Guest
+                icon: mdi:account-multiple
 
-      # Gateway Clients
-      - type: entities
-        title: Gateway (gw-office)
-        show_header_toggle: false
-        entities:
-          - entity: sensor.mesh_node_gw_office_clients_total
-            name: Total
-            icon: mdi:sigma
-          - entity: sensor.mesh_node_gw_office_clients_finca
-            name: Finca
-            icon: mdi:home-wifi
-          - entity: sensor.mesh_node_gw_office_clients_iot
-            name: IoT
-            icon: mdi:devices
-          - entity: sensor.mesh_node_gw_office_clients_guest
-            name: Guest
-            icon: mdi:account-multiple
+          # AP cards - 4 columns
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: entities
+                title: gw-office
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_gw_office_clients_total
+                    name: Total
+                    icon: mdi:sigma
+                  - entity: sensor.mesh_node_gw_office_clients_finca
+                    name: Finca
+                  - entity: sensor.mesh_node_gw_office_clients_iot
+                    name: IoT
+                  - entity: sensor.mesh_node_gw_office_clients_guest
+                    name: Guest
 
-      # AP Clients Grid
-      - type: grid
-        columns: 2
-        square: false
-        cards:
-          - type: entities
-            title: ap-central
+              - type: entities
+                title: ap-central
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_ap_ec54_clients_total
+                    name: Total
+                    icon: mdi:sigma
+                  - entity: sensor.mesh_node_ap_ec54_clients_finca
+                    name: Finca
+                  - entity: sensor.mesh_node_ap_ec54_clients_iot
+                    name: IoT
+                  - entity: sensor.mesh_node_ap_ec54_clients_guest
+                    name: Guest
+
+              - type: entities
+                title: ap-jade
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_ap_d74c_clients_total
+                    name: Total
+                    icon: mdi:sigma
+                  - entity: sensor.mesh_node_ap_d74c_clients_finca
+                    name: Finca
+                  - entity: sensor.mesh_node_ap_d74c_clients_iot
+                    name: IoT
+                  - entity: sensor.mesh_node_ap_d74c_clients_guest
+                    name: Guest
+
+              - type: entities
+                title: ap-toilet
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_ap_dc99_clients_total
+                    name: Total
+                    icon: mdi:sigma
+                  - entity: sensor.mesh_node_ap_dc99_clients_finca
+                    name: Finca
+                  - entity: sensor.mesh_node_ap_dc99_clients_iot
+                    name: IoT
+                  - entity: sensor.mesh_node_ap_dc99_clients_guest
+                    name: Guest
+
+          # Casito APs - 3 columns
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: entities
+                title: ap-ruffled
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_ap_repay_ruffled_clients_total
+                    name: Total
+                    icon: mdi:sigma
+                  - entity: sensor.mesh_node_ap_repay_ruffled_clients_finca
+                    name: Finca
+                  - entity: sensor.mesh_node_ap_repay_ruffled_clients_iot
+                    name: IoT
+                  - entity: sensor.mesh_node_ap_repay_ruffled_clients_guest
+                    name: Guest
+
+              - type: entities
+                title: ap-casita
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_ap_gate_clients_total
+                    name: Total
+                    icon: mdi:sigma
+                  - entity: sensor.mesh_node_ap_gate_clients_finca
+                    name: Finca
+                  - entity: sensor.mesh_node_ap_gate_clients_iot
+                    name: IoT
+                  - entity: sensor.mesh_node_ap_gate_clients_guest
+                    name: Guest
+
+              - type: entities
+                title: ap-surrender
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_ap_repay_surrender_clients_total
+                    name: Total
+                    icon: mdi:sigma
+                  - entity: sensor.mesh_node_ap_repay_surrender_clients_finca
+                    name: Finca
+                  - entity: sensor.mesh_node_ap_repay_surrender_clients_iot
+                    name: IoT
+                  - entity: sensor.mesh_node_ap_repay_surrender_clients_guest
+                    name: Guest
+
+          # History graph - full width
+          - type: history-graph
+            title: Client Count History (24h)
+            hours_to_show: 24
             entities:
-              - sensor.mesh_node_ap_ec54_clients_total
-              - sensor.mesh_node_ap_ec54_clients_finca
-              - sensor.mesh_node_ap_ec54_clients_iot
-              - sensor.mesh_node_ap_ec54_clients_guest
-
-          - type: entities
-            title: ap-jade
-            entities:
-              - sensor.mesh_node_ap_d74c_clients_total
-              - sensor.mesh_node_ap_d74c_clients_finca
-              - sensor.mesh_node_ap_d74c_clients_iot
-              - sensor.mesh_node_ap_d74c_clients_guest
-
-          - type: entities
-            title: ap-repay-ruffled (Casito)
-            entities:
-              - sensor.mesh_node_ap_repay_ruffled_clients_total
-              - sensor.mesh_node_ap_repay_ruffled_clients_finca
-              - sensor.mesh_node_ap_repay_ruffled_clients_iot
-              - sensor.mesh_node_ap_repay_ruffled_clients_guest
-
-          - type: entities
-            title: ap-casita
-            entities:
-              - sensor.mesh_node_ap_gate_clients_total
-              - sensor.mesh_node_ap_gate_clients_finca
-              - sensor.mesh_node_ap_gate_clients_iot
-              - sensor.mesh_node_ap_gate_clients_guest
-
-          - type: entities
-            title: ap-repay-surrender (Casito)
-            entities:
-              - sensor.mesh_node_ap_repay_surrender_clients_total
-              - sensor.mesh_node_ap_repay_surrender_clients_finca
-              - sensor.mesh_node_ap_repay_surrender_clients_iot
-              - sensor.mesh_node_ap_repay_surrender_clients_guest
-
-          - type: entities
-            title: ap-toilet
-            entities:
-              - sensor.mesh_node_ap_dc99_clients_total
-              - sensor.mesh_node_ap_dc99_clients_finca
-              - sensor.mesh_node_ap_dc99_clients_iot
-              - sensor.mesh_node_ap_dc99_clients_guest
-
-      # Client Distribution History
-      - type: history-graph
-        title: Client Count History (24h)
-        hours_to_show: 24
-        entities:
-          - entity: sensor.mesh_total_clients_finca
-            name: Finca
-          - entity: sensor.mesh_total_clients_iot
-            name: IoT
-          - entity: sensor.mesh_total_clients_guest
-            name: Guest
+              - entity: sensor.mesh_total_clients_finca
+                name: Finca
+              - entity: sensor.mesh_total_clients_iot
+                name: IoT
+              - entity: sensor.mesh_total_clients_guest
+                name: Guest
 
   # ========================================
   # MESH HEALTH - Detailed mesh metrics

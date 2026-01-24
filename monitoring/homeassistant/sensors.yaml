@@ -1,0 +1,55 @@
+- platform: time_date
+  display_options:
+    - "date_time"
+- platform: derivative
+  name: usb0_in_der
+  source: sensor.usb0_in
+  unit_time: s
+  unit: B
+- platform: derivative
+  name: usb0_out_der
+  source: sensor.usb0_out
+  unit_time: s
+  unit: B
+- platform: derivative
+  name: star_in_der
+  source: sensor.star_in
+  unit_time: s
+  unit: B
+- platform: derivative
+  name: star_out_der
+  source: sensor.star_out
+  unit_time: s
+  unit: B
+
+  
+# Add these to sensors.yaml
+- platform: rest
+  name: "Freezer Temperature"
+  resource: "https://spider.dev.pr/api/probes/4c7525046c96-101252130008001E"
+  method: GET
+  scan_interval: 300
+  value_template: "{{ value_json.value }}"
+  unit_of_measurement: "°C"
+  device_class: temperature
+  state_class: measurement
+
+- platform: rest
+  name: "Storage Humidity"
+  resource: "https://spider.dev.pr/api/probes/4c7525046c96-0e76b286d29e_rh"
+  method: GET
+  scan_interval: 300
+  value_template: "{{ value_json.value }}"
+  unit_of_measurement: "%"
+  device_class: humidity
+  state_class: measurement
+
+- platform: rest
+  name: "Tank Depth"
+  resource: "https://spider.dev.pr/api/probes/44179312cc0f-range"
+  method: GET
+  scan_interval: 300
+  value_template: "{{ value_json.value }}"
+  unit_of_measurement: "m"
+  device_class: distance
+  state_class: measurement

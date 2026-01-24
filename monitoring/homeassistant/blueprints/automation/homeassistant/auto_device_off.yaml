@@ -1,0 +1,38 @@
+blueprint:
+  name: Auto turn off device after N minutes
+  description: Turns a light or switch off if it stays on longer than the configured time.
+  domain: automation
+  input:
+    target_device:
+      name: Device (Light or Switch)
+      selector:
+        entity:
+          domain:
+            - light
+            - switch
+    minutes_on:
+      name: Minutes before turning off
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 240
+          unit_of_measurement: minutes
+          mode: slider
+
+mode: restart
+
+trigger:
+  - platform: state
+    entity_id: !input target_device
+    to: "on"
+
+action:
+  - delay:
+      minutes: !input minutes_on
+  - condition: state
+    entity_id: !input target_device
+    state: "on"
+  - service: homeassistant.turn_off
+    target:
+      entity_id: !input target_device

@@ -1,0 +1,36 @@
+blueprint:
+  name: Auto turn off light after N minutes
+  description: Turns a light off if it stays on longer than the configured time.
+  domain: automation
+  input:
+    target_light:
+      name: Light
+      selector:
+        entity:
+          domain: light
+    minutes_on:
+      name: Minutes before turning off
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 240
+          unit_of_measurement: minutes
+          mode: slider
+
+mode: restart
+
+trigger:
+  - platform: state
+    entity_id: !input target_light
+    to: "on"
+
+action:
+  - delay:
+      minutes: !input minutes_on
+  - condition: state
+    entity_id: !input target_light
+    state: "on"
+  - service: light.turn_off
+    target:
+      entity_id: !input target_light
