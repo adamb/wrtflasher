@@ -2,7 +2,7 @@
   alias: Gate Trigger Cube Timer
   description: Turn on cube switch for 10 minutes when gate opens at night (if not already on)
   use_blueprint:
-    path: automation/gate_outdoor_switch_timer.yaml
+    path: gate_outdoor_switch_timer.yaml
     input:
       trigger_entity: cover.remootio_gate
       switch_entity: switch.cube
