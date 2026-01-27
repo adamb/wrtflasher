@@ -1,0 +1,17 @@
+- id: '1769000000020'
+  alias: Baño Door Light
+  description: Turn on the bathroom light when the door sensor opens, keep it on for 45 minutes, then turn it off.
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.bano_abajo_door
+      to: 'on'
+  condition: []
+  action:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.bano_abajo
+    - delay: 00:45:00
+    - service: switch.turn_off
+      target:
+        entity_id: switch.bano_abajo
+  mode: restart
