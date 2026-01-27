@@ -1,0 +1,59 @@
+blueprint:
+  name: Outdoor switch - temporary on (skip if already on)
+  description: >
+    Turns on an outdoor switch for a duration when triggered (sunset->sunrise),
+    but only if the switch was OFF. If it was already ON, no timer/off is applied.
+  domain: automation
+
+  input:
+    trigger_entity:
+      name: Trigger entity (e.g., gate contact)
+      selector:
+        entity:
+
+    switch_entity:
+      name: Switch to control
+      selector:
+        entity:
+          domain: switch
+
+    duration_minutes:
+      name: Minutes to keep on
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 120
+          step: 1
+          unit_of_measurement: minutes
+
+trigger:
+  - platform: state
+    entity_id: !input trigger_entity
+    to: "opening"
+
+condition:
+  - condition: sun
+    after: sunset
+    before: sunrise
+
+action:
+  - choose:
+      # Only act if the switch is currently OFF
+      - conditions:
+          - condition: state
+            entity_id: !input switch_entity
+            state: "off"
+        sequence:
+          - service: switch.turn_on
+            target:
+              entity_id: !input switch_entity
+
+          - delay:
+              minutes: !input duration_minutes
+
+          - service: switch.turn_off
+            target:
+              entity_id: !input switch_entity
+
+mode: single

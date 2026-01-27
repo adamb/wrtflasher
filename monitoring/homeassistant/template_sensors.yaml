@@ -56,6 +56,7 @@
 
 - name: "Mesh Total Clients Guest"
   unique_id: mesh_total_clients_guest
+  
   state: >
     {{
       states('sensor.mesh_node_gw_office_clients_guest')|int(0) +
