@@ -1,0 +1,9 @@
+- id: 'bano_ventilation_morning'
+  alias: Baño Morning Ventilation (9:30 AM for 45 min)
+  description: Turn on baño ventilation fan at 9:30 AM for 45 minutes if currently off
+  use_blueprint:
+    path: simple_ventilation_timer.yaml
+    input:
+      switch_entity: switch.bano_abajo
+      trigger_time: "09:30:00"
+      duration_minutes: 45
