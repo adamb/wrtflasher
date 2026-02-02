@@ -16,6 +16,9 @@ NODES=(
     "192.168.1.157:ap-casita"
     "192.168.1.159:ap-replay-surrender"
     "192.168.1.167:ap-toilet"
+    "192.168.1.117:ap-prov"
+    "192.168.1.175:ap-news"
+    "192.168.1.197:ap-cust"
 )
 
 for node in "${NODES[@]}"; do
@@ -75,6 +78,9 @@ check_node "192.168.1.125" "ap-repay-ruffled"
 check_node "192.168.1.157" "ap-casita"
 check_node "192.168.1.159" "ap-replay-surrender"
 check_node "192.168.1.167" "ap-toilet"
+check_node "192.168.1.117" "ap-prov"
+check_node "192.168.1.175" "ap-news"
+check_node "192.168.1.197" "ap-cust"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -124,6 +130,9 @@ check_signals "192.168.1.125" "ap-repay-ruffled"
 check_signals "192.168.1.157" "ap-casita"
 check_signals "192.168.1.159" "ap-replay-surrender"
 check_signals "192.168.1.167" "ap-toilet"
+check_signals "192.168.1.117" "ap-prov"
+check_signals "192.168.1.175" "ap-news"
+check_signals "192.168.1.197" "ap-cust"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -142,7 +151,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 weak=0
-for ip in 192.168.1.1 192.168.1.101 192.168.1.114 192.168.1.125 192.168.1.157 192.168.1.159 192.168.1.167; do
+for ip in 192.168.1.1 192.168.1.101 192.168.1.114 192.168.1.125 192.168.1.157 192.168.1.159 192.168.1.167 192.168.1.117 192.168.1.175 192.168.1.197; do
     # Count only neighbors with good or excellent signal (>= -70 dBm)
     count=$(ssh -o ConnectTimeout=2 root@$ip "
         batctl meshif bat0 n 2>/dev/null | grep phy1-mesh0 | while read line; do

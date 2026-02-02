@@ -236,3 +236,26 @@ scp monitoring/homeassistant/dashboards/casita.yaml 192.168.1.151:/homeassistant
 ```
 
 HA Green config directory is `/homeassistant/` (not `/config/`).
+
+## SSH Access to Home Assistant
+
+The repository includes a convenient shortcut for interacting with the Home Assistant VM via SSH. The default SSH alias is **`ha`**, which resolves to the appropriate host and user (typically `homeassistant` on the HA machine).
+
+Typical commands:
+
+- **List automations folder**:
+  ```bash
+  ssh ha 'ls -l /homeassistant/automations'
+  ```
+
+- **Copy a file to HA**:
+  ```bash
+  scp <local_path> ha:/homeassistant/automations/
+  ```
+
+- **Copy a file from HA**:
+  ```bash
+  scp ha:/homeassistant/automations/<remote_file> <local_dir>/
+  ```
+
+These commands assume the SSH key for the `ha` alias is set up on your workstation. Adjust the paths as needed for other HA directories (e.g., `/homeassistant/configuration.yaml`).

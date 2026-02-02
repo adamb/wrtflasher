@@ -17,6 +17,9 @@ NODES=(
     "192.168.1.125"    # ap-repay-ruffled
     "192.168.1.159"    # ap-replay-surrender
     "192.168.1.167"    # ap-toilet
+    "192.168.1.117"    # ap-prov
+    "192.168.1.175"    # ap-news
+    "192.168.1.197"    # ap-cust
 )
 
 for ip in "${NODES[@]}"; do

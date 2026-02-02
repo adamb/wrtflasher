@@ -51,7 +51,7 @@ LAST_SIGNAL=""
 
 while true; do
     FOUND=false
-    for node in "192.168.1.1:gw-office" "192.168.1.101:ap-central" "192.168.1.114:ap-jade" "192.168.1.157:ap-casita" "192.168.1.167:ap-toilet"; do
+    for node in "192.168.1.1:gw-office" "192.168.1.101:ap-central" "192.168.1.114:ap-jade" "192.168.1.157:ap-casita" "192.168.1.167:ap-toilet" "192.168.1.117:ap-prov" "192.168.1.175:ap-news" "192.168.1.197:ap-cust"; do
         ip=$(echo $node | cut -d: -f1)
         name=$(echo $node | cut -d: -f2)
 

@@ -4,7 +4,7 @@ echo ""
 printf "%-15s %10s %12s %12s %10s\n" "Node" "CPU" "2.4GHz" "5GHz Mesh" "Fan RPM"
 echo "────────────────────────────────────────────────────────────────"
 
-nodes="192.168.1.1:gw-office 192.168.1.101:ap-central 192.168.1.114:ap-jade 192.168.1.157:ap-casita 192.168.1.167:ap-toilet"
+nodes="192.168.1.1:gw-office 192.168.1.101:ap-central 192.168.1.114:ap-jade 192.168.1.157:ap-casita 192.168.1.167:ap-toilet 192.168.1.117:ap-prov 192.168.1.175:ap-news 192.168.1.197:ap-cust"
 
 for node in $nodes; do
     ip=$(echo $node | cut -d: -f1)

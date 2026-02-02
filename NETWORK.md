@@ -42,9 +42,9 @@ Three isolated networks using VLANs over a batman-adv mesh:
 | Port | Device | VLAN | Mode |
 |------|--------|------|------|
 | 1 | Gateway (eth0) | 10,20,30 | Tagged (trunk) |
-| 2 | Home Assistant | 10,20 | Tagged |
+| 2 | Spare | - | - |
 | 3 | Debian box | 10,20 | Tagged |
-| 4 | NAS | 10 | Untagged |
+| 4 | Home Assistant | 10 | Untagged |
 | 5 | Time Capsule | 10 | Untagged |
 | 6 | Power cable | 20 | Untagged |
 | 7 | Ring Alarm | 20 | Untagged |
@@ -223,7 +223,7 @@ Use `mesh-exec.sh` to run commands on all nodes simultaneously:
 |--------|----|----|-------|
 | Gateway | 192.168.1.1 | - | OpenWRT One |
 | Switch | 192.168.1.3 | - | Zyxel GS1200-8 |
-| Home Assistant | 192.168.1.151 | 20:f8:3b:00:03:e9 | Port 2, VLANs 10,20 |
+| Home Assistant | 192.168.1.151 | 20:f8:3b:00:03:e9 | Port 4, VLAN 10 (untagged) |
 | Debian (deb) | 192.168.1.163 | 84:47:09:1c:29:26 | Port 3, VLANs 10,20. Also has 192.168.3.164 (IoT) |
 | APs | 192.168.1.100+ | DHCP | Auto-generated hostnames |
 

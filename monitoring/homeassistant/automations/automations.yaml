@@ -355,14 +355,6 @@
       - light.balcony_light_1
       - switch.cube
   mode: single
-- id: '1768220368380'
-  alias: Baño off in 1 hour
-  description: ''
-  use_blueprint:
-    path: homeassistant/auto_device_off.yaml
-    input:
-      target_device: switch.bano_abajo
-      minutes_on: 60
 - id: '1768220426361'
   alias: Guest off after 1 hour
   description: ''

@@ -69,6 +69,9 @@ NODES=(
     "192.168.1.157:ap-gate"
     "192.168.1.159:ap-repay-surrender"
     "192.168.1.167:ap-dc99"
+    "192.168.1.117:ap-prov"
+    "192.168.1.175:ap-news"
+    "192.168.1.197:ap-cust"
 )
 
 SUCCESS=0

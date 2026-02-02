@@ -31,6 +31,15 @@ nodes:
   - name: "ap-dc99"
     ip: "192.168.1.167"
     type: "ap"
+  - name: "ap-prov"
+    ip: "192.168.1.117"
+    type: "ap"
+  - name: "ap-news"
+    ip: "192.168.1.175"
+    type: "ap"
+  - name: "ap-cust"
+    ip: "192.168.1.197"
+    type: "ap"
 
 ssh:
   key_file: "~/.ssh/mesh_nodes"      # SSH private key for mesh nodes
