@@ -1,0 +1,76 @@
+# AC Status Dashboard
+#
+# Copy to HA: scp monitoring/homeassistant/dashboards/ac.yaml ha:/homeassistant/dashboards/
+#
+
+title: AC Units
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:air-conditioner
+    cards:
+      - type: markdown
+        content: |
+          # AC Units
+
+      # Main House
+      - type: markdown
+        content: "## Main House"
+
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
+            entity: climate.master_ac
+            name: Master
+          - type: thermostat
+            entity: climate.gym_ac
+            name: Gym
+
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
+            entity: climate.jade_s_ac
+            name: Jade's
+          - type: thermostat
+            entity: climate.jared_s_ac
+            name: Jared's
+
+      # Casita
+      - type: markdown
+        content: "## Casita"
+
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
+            entity: climate.big_ac
+            name: Big AC
+          - type: thermostat
+            entity: climate.casita_kitchen
+            name: Kitchen
+
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
+            entity: climate.air_conditioner_2
+            name: Bedroom
+
+      # Quick glance - all units
+      - type: glance
+        title: Status at a Glance
+        columns: 4
+        show_state: true
+        entities:
+          - entity: climate.master_ac
+            name: Master
+          - entity: climate.gym_ac
+            name: Gym
+          - entity: climate.jade_s_ac
+            name: Jade's
+          - entity: climate.jared_s_ac
+            name: Jared's
+          - entity: climate.big_ac
+            name: Big AC
+          - entity: climate.casita_kitchen
+            name: Kitchen
+          - entity: climate.air_conditioner_2
+            name: Bedroom
