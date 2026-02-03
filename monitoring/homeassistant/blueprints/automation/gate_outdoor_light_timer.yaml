@@ -56,4 +56,4 @@ action:
             target:
               entity_id: !input light_entity
 
-mode: single
+mode: restart
