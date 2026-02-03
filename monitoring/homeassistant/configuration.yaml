@@ -111,6 +111,18 @@ lovelace:
       title: Mesh Network
       icon: mdi:wifi
       require_admin: false
+    climate-sensors:
+      mode: yaml
+      filename: dashboards/climate.yaml
+      title: Climate
+      icon: mdi:thermometer
+      require_admin: false
+    ac-units:
+      mode: yaml
+      filename: dashboards/ac.yaml
+      title: AC Units
+      icon: mdi:air-conditioner
+      require_admin: false
 
       # start working on cloudflared
 http:
