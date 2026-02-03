@@ -100,7 +100,8 @@ Three isolated networks using VLANs over a batman-adv mesh:
 | Guest | IoT | ❌ | Fully isolated |
 
 ### Special Rules
-- **Home Assistant exception**: Device at 192.168.1.151 can access IoT network (configured in config.sh)
+- **Home Assistant → IoT**: Device at 192.168.1.151 can access IoT network (configured in config.sh)
+- **IoT → Home Assistant MQTT**: IoT devices can connect to Home Assistant MQTT broker (port 1883) for sensor data publishing
 
 ### Security Model
 The firewall uses **stateful connection tracking**:

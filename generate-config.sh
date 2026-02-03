@@ -175,6 +175,15 @@ config rule
 	option target 'ACCEPT'
 
 config rule
+	option name 'Allow-IoT-to-HA-MQTT'
+	option src 'iot'
+	option dest 'lan'
+	option dest_ip '$HOME_ASSISTANT_IP'
+	option proto 'tcp'
+	option dest_port '1883'
+	option target 'ACCEPT'
+
+config rule
 	option name 'Allow-IoT-to-FTP-Server'
 	option src 'iot'
 	option dest 'lan'

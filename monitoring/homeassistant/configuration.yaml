@@ -7,6 +7,8 @@ homeassistant:
       temperature_unit: °F
     climate.air_conditioner_2:
       temperature_unit: °F
+    climate.lnlinkha_4100f2d7bcac0000b90460129f07:
+      temperature_unit: °F
 
 # Load frontend themes from the themes folder
 frontend:

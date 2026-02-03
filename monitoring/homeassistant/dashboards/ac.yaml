@@ -35,6 +35,12 @@ views:
             entity: climate.jared_s_ac
             name: Jared's
 
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
+            entity: climate.lnlinkha_4100f2d7bcac0000b90460129f07
+            name: Main
+
       # Casita
       - type: markdown
         content: "## Casita"
@@ -68,6 +74,8 @@ views:
             name: Jade's
           - entity: climate.jared_s_ac
             name: Jared's
+          - entity: climate.lnlinkha_4100f2d7bcac0000b90460129f07
+            name: Main
           - entity: climate.big_ac
             name: Big AC
           - entity: climate.casita_kitchen
