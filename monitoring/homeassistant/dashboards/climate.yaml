@@ -1,0 +1,164 @@
+# Climate & Temperature Dashboard
+#
+# Copy to HA: scp monitoring/homeassistant/dashboards/climate.yaml ha:/homeassistant/dashboards/
+#
+
+title: Climate
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:thermometer
+    cards:
+      # Header
+      - type: markdown
+        content: |
+          # Temperature & Humidity
+
+      # Current Readings
+      - type: glance
+        title: Current Temperature
+        columns: 5
+        entities:
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_temperature
+            name: Living Room
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_temperature
+            name: Cuarito
+          - entity: sensor.temp_temperature
+            name: Bedroom
+          - entity: sensor.temp_temperature_2
+            name: Casita
+          - entity: sensor.temp_temperature_3
+            name: Baño Abajo
+
+      - type: glance
+        title: Current Humidity
+        columns: 5
+        entities:
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_humidity
+            name: Living Room
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_humidity
+            name: Cuarito
+          - entity: sensor.temp_humidity
+            name: Bedroom
+          - entity: sensor.temp_humidity_2
+            name: Casita
+          - entity: sensor.temp_humidity_3
+            name: Baño Abajo
+
+      # Temperature History Graph
+      - type: history-graph
+        title: Temperature History
+        hours_to_show: 24
+        entities:
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_temperature
+            name: Living Room
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_temperature
+            name: Cuarito
+          - entity: sensor.temp_temperature
+            name: Bedroom
+          - entity: sensor.temp_temperature_2
+            name: Casita
+          - entity: sensor.temp_temperature_3
+            name: Baño Abajo
+
+      # Humidity History Graph
+      - type: history-graph
+        title: Humidity History
+        hours_to_show: 24
+        entities:
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_humidity
+            name: Living Room
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_humidity
+            name: Cuarito
+          - entity: sensor.temp_humidity
+            name: Bedroom
+          - entity: sensor.temp_humidity_2
+            name: Casita
+          - entity: sensor.temp_humidity_3
+            name: Baño Abajo
+
+      # Pool & Spa
+      - type: glance
+        title: Pool & Spa
+        entities:
+          - entity: sensor.finca_del_mar_air_temperature
+            name: Air Temp
+          - entity: sensor.finca_del_mar_spa_water_temperature
+            name: Spa Temp
+
+      # Freezer & Storage
+      - type: glance
+        title: Freezer & Storage
+        entities:
+          - entity: sensor.freezer_temperature
+            name: Freezer
+          - entity: sensor.storage_humidity
+            name: Storage Humidity
+
+  - title: Sensors
+    path: sensors
+    icon: mdi:access-point
+    cards:
+      - type: markdown
+        content: |
+          ## Sensor Status
+
+      - type: entities
+        title: Living Room (6089e8)
+        entities:
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_temperature
+            name: Temperature
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_humidity
+            name: Humidity
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_wifi_signal_percent
+            name: WiFi Signal
+          - entity: sensor.athom_temperature_humidity_sensor_6089e8_ip_address
+            name: IP Address
+
+      - type: entities
+        title: Cuarito (607f68)
+        entities:
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_temperature
+            name: Temperature
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_humidity
+            name: Humidity
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_wifi_signal_percent
+            name: WiFi Signal
+          - entity: sensor.athom_temperature_humidity_sensor_607f68_ip_address
+            name: IP Address
+
+      - type: entities
+        title: Bedroom (609ecc)
+        entities:
+          - entity: sensor.temp_temperature
+            name: Temperature
+          - entity: sensor.temp_humidity
+            name: Humidity
+          - entity: sensor.temp_wifi_signal_percent
+            name: WiFi Signal
+          - entity: sensor.temp_ip_address
+            name: IP Address
+
+      - type: entities
+        title: Casita (602e3c)
+        entities:
+          - entity: sensor.temp_temperature_2
+            name: Temperature
+          - entity: sensor.temp_humidity_2
+            name: Humidity
+          - entity: sensor.temp_wifi_signal_percent_2
+            name: WiFi Signal
+          - entity: sensor.temp_ip_address_2
+            name: IP Address
+
+      - type: entities
+        title: Baño Abajo (604bec)
+        entities:
+          - entity: sensor.temp_temperature_3
+            name: Temperature
+          - entity: sensor.temp_humidity_3
+            name: Humidity
+          - entity: sensor.temp_wifi_signal_percent_3
+            name: WiFi Signal
+          - entity: sensor.temp_ip_address_3
+            name: IP Address

@@ -1,0 +1,23 @@
+- id: 'casita_dehumidify_on'
+  alias: Casita Dehumidify - Turn On Big AC
+  description: Turn on Big AC in dry mode when casita humidity rises above 60%
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.temp_humidity_2
+      above: 60
+      for:
+        minutes: 5
+  conditions:
+    - condition: state
+      entity_id: climate.big_ac
+      state: 'off'
+  actions:
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.big_ac
+      data:
+        hvac_mode: dry
+    - action: notify.mobile_app_blue17
+      data:
+        title: Casita Humidity High
+        message: "Humidity is {{ states('sensor.temp_humidity_2') }}% — Big AC set to dry mode"

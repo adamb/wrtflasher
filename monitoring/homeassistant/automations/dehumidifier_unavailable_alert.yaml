@@ -1,0 +1,20 @@
+- id: 'dehumidifier_unavailable_alert'
+  alias: Dehumidifier Unavailable Alert
+  description: Send hourly phone notification while the dehumidifier smart plug is unavailable (breaker tripped)
+  triggers:
+    - trigger: state
+      entity_id: switch.s4_2
+      to: unavailable
+      for:
+        minutes: 5
+    - trigger: time_pattern
+      hours: /1
+  conditions:
+    - condition: state
+      entity_id: switch.s4_2
+      state: unavailable
+  actions:
+    - action: notify.mobile_app_blue17
+      data:
+        title: Dehumidifier Unavailable
+        message: "Freezer room dehumidifier plug is unavailable — check the breaker"

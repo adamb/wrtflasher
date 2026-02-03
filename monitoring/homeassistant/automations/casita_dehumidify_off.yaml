@@ -1,0 +1,23 @@
+- id: 'casita_dehumidify_off'
+  alias: Casita Dehumidify - Turn Off Big AC
+  description: Turn off Big AC when casita humidity drops below 55%
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.temp_humidity_2
+      below: 55
+      for:
+        minutes: 5
+  conditions:
+    - condition: state
+      entity_id: climate.big_ac
+      state: 'dry'
+  actions:
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.big_ac
+      data:
+        hvac_mode: 'off'
+    - action: notify.mobile_app_blue17
+      data:
+        title: Casita Humidity Normal
+        message: "Humidity is {{ states('sensor.temp_humidity_2') }}% — Big AC turned off"
