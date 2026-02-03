@@ -216,6 +216,7 @@
     - binary_sensor.costco_door
     - binary_sensor.myggbett_door_window_sensor_door
     - binary_sensor.bano_abajo_door
+    - binary_sensor.casita_door
     to: 'on'
   - trigger: state
     entity_id: cover.remootio_gate
@@ -274,6 +275,7 @@
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
     - binary_sensor.myggbett_door_window_sensor_door
+    - binary_sensor.casita_door
     to: 'on'
     for:
       minutes: 15
@@ -388,6 +390,7 @@
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
     - binary_sensor.myggbett_door_window_sensor_door
+    - binary_sensor.casita_door
     to: unavailable
     id: went_unavailable
   - trigger: state
@@ -396,6 +399,7 @@
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
     - binary_sensor.myggbett_door_window_sensor_door
+    - binary_sensor.casita_door
     from: unavailable
     id: came_back
   actions:
