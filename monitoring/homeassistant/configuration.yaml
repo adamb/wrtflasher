@@ -1,6 +1,13 @@
 # Loads default set of integrations. Do not remove.
 default_config:
 
+homeassistant:
+  customize:
+    climate.casita_kitchen:
+      temperature_unit: °F
+    climate.air_conditioner_2:
+      temperature_unit: °F
+
 # Load frontend themes from the themes folder
 frontend:
   themes: !include_dir_merge_named themes
