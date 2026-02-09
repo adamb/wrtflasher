@@ -312,3 +312,41 @@ Config file: `/homeassistant/.storage/backup`
 Matter device commissioning data is stored in the Matter Server addon. If this data is lost (e.g., power outage corruption), all Matter-over-Thread devices must be factory reset and re-commissioned. There is no way to recover without a backup that includes the `core_matter_server` addon data.
 
 **Do NOT press "Configure" on the ZBT-2 radio** in the HA UI unless you intend to re-flash its firmware. This can reset Thread network credentials and disconnect all Thread devices.
+
+### Re-commissioning Thread/Matter Devices
+
+If the Matter Server loses its node data, all devices must be factory reset and re-paired. Current inventory (12 Thread devices):
+
+**IKEA MYGGBETT Door/Window Sensors (7 total):**
+- Front Door, Casita Door, + 5 others
+- Factory reset: Open the back cover, press the small reset button and hold for 5+ seconds until the LED blinks rapidly
+- The reset button is a tiny pinhole next to the battery
+- After reset, the LED will blink slowly indicating pairing mode
+
+**Onvis S4 Smart Plugs (4 total):**
+- Dehumidifier (x2), Thread Smart Plug, Spare Plug
+- Factory reset: Press and hold the button on the plug for 10+ seconds until the LED flashes rapidly
+- LED will blink indicating pairing mode
+
+**Eve Light Switch 20ECE4101 (2 total):**
+- 1 unnamed + Cocina Baño
+- Factory reset: Press and hold the button on the switch for 10+ seconds until the LED flashes
+- Some Eve switches require pressing the reset button 3 times quickly, then holding on the 4th press
+
+**IKEA BILRESA Dual Button (1 total):**
+- Factory reset: Press the small reset button (pinhole on back) for 5+ seconds with a pin/paperclip until LED blinks
+
+**Re-commissioning steps (after factory reset):**
+1. Ensure OTBR addon is running and Thread network is healthy
+2. In HA: Settings -> Devices & Services -> Add Integration -> Add Matter device
+3. Use the device's Matter pairing code (QR code or 11-digit numeric code, usually on the device or in its packaging)
+4. HA will commission the device onto the Thread network via the OTBR
+5. The device should appear as a new Matter device in HA
+6. Rename the device and assign it to the correct area
+
+**Tips:**
+- Commission devices one at a time and verify each works before moving to the next
+- Keep the device close to the HA/OTBR during initial commissioning
+- If commissioning fails, try factory resetting the device again
+- The Matter pairing code is often on a sticker on the device itself or on the box/manual
+- IKEA devices: the code is on the box and on a small card inside the packaging
