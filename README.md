@@ -341,6 +341,19 @@ Watch ping times in Session 1 while load runs in Session 2. SQM is working if la
 
 ## Future Enhancements / TODO
 
+### SMB Backup Storage for Home Assistant
+
+Configure HA to back up to a network SMB share instead of (or in addition to) the local 28GB eMMC. This enables longer retention (30+ days) without disk space concerns.
+
+**Steps:**
+1. Add network storage in HA: Settings -> System -> Storage -> Add Network Storage
+2. Configure SMB share (server IP, share name, credentials)
+3. Set mount usage to "Backup"
+4. Update backup config to use the SMB agent in addition to `hassio.local`
+5. Increase retention from 10 to 30 days
+
+**Why:** The HA Green has limited eMMC storage (28GB). Currently backups are local-only with 10-day retention (~3.2GB). An SMB mount would allow 30+ days of backup history, providing better protection against data loss that isn't noticed immediately (e.g., Matter Server node data corruption after a power outage).
+
 ### IPv6 Support
 
 Enable IPv6 on your network for full dual-stack connectivity. Starlink provides native IPv6, which also enables WireGuard VPN access (since you're behind CGNAT on IPv4).

@@ -261,3 +261,54 @@ Typical commands:
   ```
 
 These commands assume the SSH key for the `ha` alias is set up on your workstation. Adjust the paths as needed for other HA directories (e.g., `/homeassistant/configuration.yaml`).
+
+## IoT VLAN Device Management
+
+### ESPHome DHCP Reservations
+
+The 5 Athom temperature/humidity sensors on the IoT VLAN (192.168.3.0/24) have DHCP static leases on the gateway to prevent IP changes after power outages. ESPHome devices are registered in HA by IP address, so if their IPs change, HA loses contact.
+
+| Sensor | MAC Address | Static IP |
+|--------|-------------|-----------|
+| athom-6089e8 | fc:01:2c:60:89:e8 | 192.168.3.217 |
+| athom-604bec | fc:01:2c:60:4b:ec | 192.168.3.207 |
+| athom-609ecc | fc:01:2c:60:9e:cc | 192.168.3.168 |
+| athom-602e3c | fc:01:2c:60:2e:3c | 192.168.3.110 |
+| athom-607f68 | fc:01:2c:60:7f:68 | 192.168.3.229 |
+
+These static leases are configured directly on the gateway via UCI (`dhcp.@host[]`), **not** via `generate-config.sh`. They persist across reboots but would be lost if the gateway is reflashed.
+
+To add a new DHCP reservation:
+```bash
+ssh root@192.168.1.1 "
+uci add dhcp host
+uci set dhcp.@host[-1].name='device-name'
+uci set dhcp.@host[-1].mac='xx:xx:xx:xx:xx:xx'
+uci set dhcp.@host[-1].ip='192.168.3.XXX'
+uci commit dhcp
+/etc/init.d/dnsmasq restart
+"
+```
+
+If ESPHome devices go offline after a power outage, check if their IPs changed:
+```bash
+ssh root@192.168.1.1 'cat /tmp/dhcp.leases' | grep -i athom
+```
+
+Then update the HA config entries at `/homeassistant/.storage/core.config_entries` with the new IPs and restart HA Core.
+
+## HA Backup Configuration
+
+Automatic backups are configured in HA (Settings -> System -> Backups):
+- **Schedule**: Daily
+- **Retention**: 10 copies
+- **Includes**: All addons (OTBR, Matter Server, Mosquitto, etc.) + HA Core + database
+- **Storage**: Local (`hassio.local`) - 28GB eMMC, ~320MB per backup
+
+Config file: `/homeassistant/.storage/backup`
+
+### Thread/Matter Recovery Notes
+
+Matter device commissioning data is stored in the Matter Server addon. If this data is lost (e.g., power outage corruption), all Matter-over-Thread devices must be factory reset and re-commissioned. There is no way to recover without a backup that includes the `core_matter_server` addon data.
+
+**Do NOT press "Configure" on the ZBT-2 radio** in the HA UI unless you intend to re-flash its firmware. This can reset Thread network credentials and disconnect all Thread devices.
