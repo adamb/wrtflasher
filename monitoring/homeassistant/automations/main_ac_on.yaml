@@ -1,0 +1,23 @@
+- id: 'main_ac_on'
+  alias: Main AC - Turn On (Temp High)
+  description: Turn on Main AC in dry mode when living room temperature rises above 78°F
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.athom_temperature_humidity_sensor_6089e8_temperature
+      above: 78
+      for:
+        minutes: 5
+  conditions:
+    - condition: state
+      entity_id: climate.lnlinkha_4100f2d7bcac0000b90460129f07
+      state: 'off'
+  actions:
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.lnlinkha_4100f2d7bcac0000b90460129f07
+      data:
+        hvac_mode: dry
+    - action: notify.mobile_app_blue17
+      data:
+        title: Main AC On
+        message: "Living room is {{ states('sensor.athom_temperature_humidity_sensor_6089e8_temperature') }}°F — Main AC set to dry mode"

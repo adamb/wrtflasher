@@ -1,0 +1,23 @@
+- id: 'main_ac_off'
+  alias: Main AC - Turn Off (Temp Normal)
+  description: Turn off Main AC when living room temperature drops below 75°F
+  triggers:
+    - trigger: numeric_state
+      entity_id: sensor.athom_temperature_humidity_sensor_6089e8_temperature
+      below: 75
+      for:
+        minutes: 5
+  conditions:
+    - condition: state
+      entity_id: climate.lnlinkha_4100f2d7bcac0000b90460129f07
+      state: 'dry'
+  actions:
+    - action: climate.set_hvac_mode
+      target:
+        entity_id: climate.lnlinkha_4100f2d7bcac0000b90460129f07
+      data:
+        hvac_mode: 'off'
+    - action: notify.mobile_app_blue17
+      data:
+        title: Main AC Off
+        message: "Living room is {{ states('sensor.athom_temperature_humidity_sensor_6089e8_temperature') }}°F — Main AC turned off"
