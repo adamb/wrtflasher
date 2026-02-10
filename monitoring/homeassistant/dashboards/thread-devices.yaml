@@ -37,12 +37,24 @@ views:
             name: Spare Plug
 
       # Door Sensors (IKEA MYGGBETT)
-      # 7 sensors currently all named "Front Door" in HA UI - need to identify which is which
+      # 7 sensors - renamed to descriptive names after identifying which sensor is on which door
       - type: entities
         title: Door Sensors
         entities:
-          - entity: binary_sensor.myggbett_door_window_sensor_door
-            name: Door Sensor
+          - entity: binary_sensor.front_door
+            name: Front Door
+          - entity: binary_sensor.casita_door
+            name: Casita Door
+          - entity: binary_sensor.tesla_door
+            name: Tesla Door
+          - entity: binary_sensor.gas_door
+            name: Gas Door
+          - entity: binary_sensor.costco_door
+            name: Costco Door
+          - entity: binary_sensor.bano_abajo_door
+            name: Baño Abajo
+          - entity: binary_sensor.freezer_door
+            name: Freezer Door
 
       # IKEA Button
       - type: entities
@@ -58,18 +70,18 @@ views:
         title: Battery Status
         entities:
           - entity: sensor.myggbett_door_window_sensor_battery_5
-            name: Door Sensor 1
+            name: Front Door
           - entity: sensor.myggbett_door_window_sensor_battery_6
-            name: Door Sensor 2
+            name: Casita Door
           - entity: sensor.myggbett_door_window_sensor_battery_7
-            name: Door Sensor 3
+            name: Tesla Door
           - entity: sensor.myggbett_door_window_sensor_battery_8
-            name: Door Sensor 4
+            name: Gas Door
           - entity: sensor.myggbett_door_window_sensor_battery_9
-            name: Door Sensor 5
+            name: Costco Door
           - entity: sensor.myggbett_door_window_sensor_battery_10
-            name: Door Sensor 6
+            name: Baño Abajo
           - entity: sensor.myggbett_door_window_sensor_battery_11
-            name: Door Sensor 7
+            name: Freezer Door
           - entity: sensor.bilresa_dual_button_battery_2
             name: BILRESA Button
