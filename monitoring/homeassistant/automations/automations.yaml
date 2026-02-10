@@ -75,27 +75,50 @@
   mode: single
 - id: '1767711547026'
   alias: Freezer Room Light – Door
-  description: 'Turn on the freezer room light when the door opens. After the door
-    closes, wait 10 minutes before turning the light off.
+  description: 'Turn on the freezer room light when the door opens. Announce when
+    door opens. After the door closes, wait 10 minutes before turning the light off.
 
     '
   triggers:
-  - entity_id: binary_sensor.myggbett_door_window_sensor_door
+  - entity_id: binary_sensor.front_door
     to: 'on'
     trigger: state
-  - entity_id: binary_sensor.myggbett_door_window_sensor_door
+  - entity_id: binary_sensor.front_door
     to: 'off'
     trigger: state
   actions:
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.myggbett_door_window_sensor_door
+        entity_id: binary_sensor.front_door
         state: 'on'
       sequence:
       - target:
           entity_id: switch.freezer_room_light
         action: switch.turn_on
+      - action: media_player.turn_on
+        target:
+          entity_id: media_player.garage_speaker
+      - delay:
+          seconds: 1
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.3
+      - action: tts.speak
+        target:
+          entity_id: tts.google_en_com
+        data:
+          media_player_entity_id: media_player.garage_speaker
+          message: '{{ trigger.to_state.attributes.friendly_name }} is open'
+      - delay:
+          seconds: 3
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.2
     default:
     - delay: 00:10:00
     - target:
@@ -104,8 +127,8 @@
   mode: restart
 - id: '1768001234567'
   alias: Costco Door Light
-  description: Turn on the Costco light when the door opens. After the door closes,
-    wait 10 minutes before turning the light off.
+  description: Turn on the Costco light when the door opens. Announce when door opens.
+    After the door closes, wait 10 minutes before turning the light off.
   triggers:
   - trigger: state
     entity_id: binary_sensor.costco_door
@@ -124,6 +147,29 @@
       - action: light.turn_on
         target:
           entity_id: light.costco_light_1
+      - action: media_player.turn_on
+        target:
+          entity_id: media_player.garage_speaker
+      - delay:
+          seconds: 1
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.3
+      - action: tts.speak
+        target:
+          entity_id: tts.google_en_com
+        data:
+          media_player_entity_id: media_player.garage_speaker
+          message: '{{ trigger.to_state.attributes.friendly_name }} is open'
+      - delay:
+          seconds: 3
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.2
     default:
     - delay: 00:10:00
     - action: light.turn_off
@@ -388,7 +434,8 @@
     - binary_sensor.gas_door
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
-    - binary_sensor.myggbett_door_window_sensor_door
+    - binary_sensor.front_door
+    - binary_sensor.bano_abajo_door
     - binary_sensor.casita_door
     to: unavailable
     id: went_unavailable
@@ -397,7 +444,8 @@
     - binary_sensor.gas_door
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
-    - binary_sensor.myggbett_door_window_sensor_door
+    - binary_sensor.front_door
+    - binary_sensor.bano_abajo_door
     - binary_sensor.casita_door
     from: unavailable
     id: came_back
