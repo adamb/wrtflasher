@@ -1,0 +1,86 @@
+# Thread Devices Dashboard
+#
+# All Matter-over-Thread devices: Eve switches, Onvis plugs, IKEA sensors/buttons
+#
+# Copy to HA: scp monitoring/homeassistant/dashboards/thread-devices.yaml ha:/homeassistant/dashboards/
+
+title: Thread Devices
+views:
+  - title: Overview
+    path: overview
+    icon: mdi:access-point
+    cards:
+      # Lights (Eve Switches)
+      - type: entities
+        title: Lights
+        entities:
+          - entity: light.master_bedroom
+            name: Master Bedroom
+          - entity: light.tesla_room_light
+            name: Tesla Room
+          - entity: light.cocina_bano
+            name: Cocina Baño
+
+      # Plugs (Onvis S4)
+      - type: entities
+        title: Smart Plugs
+        entities:
+          - entity: switch.thread_smart_plug
+            name: Thread Smart Plug
+          - entity: switch.s4
+            name: Dehumidifier 1
+          - entity: switch.s4_2
+            name: Dehumidifier 2
+          - entity: switch.s4_3
+            name: S4
+          - entity: switch.s4_4
+            name: Spare Plug
+
+      # Door Sensors (IKEA MYGGBETT)
+      - type: entities
+        title: Door Sensors
+        entities:
+          - entity: binary_sensor.front_door
+            name: Front Door
+          - entity: binary_sensor.casita_door
+            name: Casita Door
+          - entity: binary_sensor.tesla_door
+            name: Tesla Door
+          - entity: binary_sensor.gas_door
+            name: Gas Door
+          - entity: binary_sensor.costco_door
+            name: Costco Door
+          - entity: binary_sensor.bano_abajo_door
+            name: Baño Abajo
+          - entity: binary_sensor.myggbett_door_window_sensor_door
+            name: Door Sensor
+
+      # IKEA Button
+      - type: entities
+        title: Buttons
+        entities:
+          - entity: event.button1
+            name: BILRESA Button 1
+          - entity: event.button2
+            name: BILRESA Button 2
+
+      # Battery Status
+      - type: entities
+        title: Battery Status
+        entities:
+          - entity: sensor.front_door_battery_3
+            name: Front Door
+          - entity: sensor.casita_door_battery
+            name: Casita Door
+          - entity: sensor.myggbett_door_window_sensor_battery
+            name: Costco Door
+          - entity: sensor.myggbett_door_window_sensor_battery_2
+            name: Door Sensor
+          - entity: sensor.myggbett_door_window_sensor_battery_3
+            name: Tesla Door
+          - entity: sensor.myggbett_door_window_sensor_battery_4
+            name: Gas Door
+          - entity: sensor.door_battery
+            name: Baño Abajo
+          - entity: sensor.bilresa_dual_button_battery
+            name: BILRESA Button

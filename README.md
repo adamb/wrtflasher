@@ -341,6 +341,15 @@ Watch ping times in Session 1 while load runs in Session 2. SQM is working if la
 
 ## Future Enhancements / TODO
 
+### Matter/Thread Entity Cleanup
+
+After the Feb 7, 2026 power outage, all Matter devices were factory reset and re-commissioned. Remaining cleanup:
+- Remove duplicate entities on Onvis/Eve devices (re-commissioning created second entities alongside originals)
+- Rename Kasa KS225 dimmer entity from `light.light_2` to `light.master_bedroom`
+- Name 6 MYGGBETT door sensors (open/close each door to identify, then rename)
+- Remove orphaned old entities from deleted devices
+- Finalize thread-devices YAML dashboard in `configuration.yaml`
+
 ### SMB Backup Storage for Home Assistant
 
 Configure HA to back up to a network SMB share instead of (or in addition to) the local 28GB eMMC. This enables longer retention (30+ days) without disk space concerns.

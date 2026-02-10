@@ -214,6 +214,7 @@ The `monitoring/` directory contains a Python script that polls mesh nodes via S
   - `automations.yaml`, `configuration.yaml`, `sensors.yaml`, `template_sensors.yaml`
   - `dashboards/mesh.yaml` - Mesh network monitoring dashboard
   - `dashboards/casita.yaml` - Casita guest house dashboard
+  - `dashboards/thread-devices.yaml` - Thread/Matter device dashboard (lights, plugs, door sensors, batteries)
   - `blueprints/` - Automation blueprints
 - **Poll interval**: 60 seconds (configurable in config.yaml)
 
@@ -235,6 +236,7 @@ scp monitoring/homeassistant/automations.yaml 192.168.1.151:/homeassistant/
 # Push dashboards
 scp monitoring/homeassistant/dashboards/mesh.yaml 192.168.1.151:/homeassistant/dashboards/
 scp monitoring/homeassistant/dashboards/casita.yaml 192.168.1.151:/homeassistant/dashboards/
+scp monitoring/homeassistant/dashboards/thread-devices.yaml 192.168.1.151:/homeassistant/dashboards/
 ```
 
 HA Green config directory is `/homeassistant/` (not `/config/`).
@@ -315,25 +317,31 @@ Matter device commissioning data is stored in the Matter Server addon. If this d
 
 ### Re-commissioning Thread/Matter Devices
 
-If the Matter Server loses its node data, all devices must be factory reset and re-paired. Current inventory (12 Thread devices):
+If the Matter Server loses its node data, all devices must be factory reset and re-paired.
+
+Last re-commissioning: Feb 9, 2026 (power outage Feb 7 wiped Matter Server node data). All devices re-commissioned on new fabric `0CC6CDD83C99E0F0`. A post-recommission backup was created (`Post-Thread-recommission-2026-02-09`).
+
+Current inventory (13 Thread devices + 1 WiFi Matter device):
 
 **IKEA MYGGBETT Door/Window Sensors (7 total):**
-- Front Door, Casita Door, + 5 others
+- Front Door (named at device level, entity: binary_sensor.myggbett_door_window_sensor_door_8)
+- 6 unnamed (binary_sensor.myggbett_door_window_sensor_door_2 thru _7) - need identification by opening/closing each door
 - Factory reset: Open the back cover, press the small reset button and hold for 5+ seconds until the LED blinks rapidly
 - The reset button is a tiny pinhole next to the battery
 - After reset, the LED will blink slowly indicating pairing mode
 
-**Onvis S4 Smart Plugs (4 total):**
-- Dehumidifier (x2), Thread Smart Plug, Spare Plug
+**Onvis S4 Smart Plugs (5 total):**
+- Dehumidifier 1 (switch.s4), Dehumidifier 2 (switch.s4_2), S4 (switch.s4_3), Thread Smart Plug (switch.thread_smart_plug), Spare Plug (switch.s4_4)
 - Factory reset: Press and hold the button on the plug for 10+ seconds until the LED flashes rapidly
 - LED will blink indicating pairing mode
 
 **Eve Light Switch 20ECE4101 (2 total):**
-- 1 unnamed + Cocina Baño
+- Tesla Room (light.tesla_room_light), Cocina Baño (light.cocina_bano)
 - Factory reset: Press and hold the button on the switch for 10+ seconds until the LED flashes
 - Some Eve switches require pressing the reset button 3 times quickly, then holding on the 4th press
 
 **IKEA BILRESA Dual Button (1 total):**
+- Entities: event.bilresa_dual_button_button_1, event.bilresa_dual_button_button_2
 - Factory reset: Press the small reset button (pinhole on back) for 5+ seconds with a pin/paperclip until LED blinks
 
 **Re-commissioning steps (after factory reset):**
@@ -344,9 +352,26 @@ If the Matter Server loses its node data, all devices must be factory reset and 
 5. The device should appear as a new Matter device in HA
 6. Rename the device and assign it to the correct area
 
+**Kasa KS225 WiFi Dimmer (1 total, WiFi Matter - not Thread):**
+- Master Bedroom dimmer, currently on tplink integration
+- Matter code: `1642-030-5693`
+- Needs factory reset: remove from Kasa app, hold dimmer button 10s until LED blinks amber/green
+- Re-commission via Matter in HA (must be on LAN WiFi, same subnet as HA for mDNS discovery)
+- Direct Matter is preferred over Kasa/tplink integration (fully local, no cloud dependency)
+
 **Tips:**
 - Commission devices one at a time and verify each works before moving to the next
 - Keep the device close to the HA/OTBR during initial commissioning
 - If commissioning fails, try factory resetting the device again
 - The Matter pairing code is often on a sticker on the device itself or on the box/manual
 - IKEA devices: the code is on the box and on a small card inside the packaging
+
+### Pending Thread/Matter Tasks
+
+All 16 Matter devices are commissioned (Feb 9, 2026). Remaining cleanup:
+
+- **Duplicate entities on serial-matched devices**: Re-commissioning Onvis/Eve devices created a second entity on each (e.g., `switch.thread_smart_plug` + `switch.thread_smart_plug_2`). The duplicates (`_2` suffixed on Onvis/Eve, plus `switch.dehumidifier`/`switch.dehumidifier_2`, `light.light`, `light.cocina_bano_2`, `switch.s4_5`) should be removed from the entity registry.
+- **Kasa KS225 dimmer entity rename**: Currently `light.light_2` - should be renamed to `light.master_bedroom`.
+- **6 MYGGBETT door sensors need naming**: Re-commissioned with default names (`binary_sensor.myggbett_door_window_sensor_door_2` thru `_7`). Open/close each door to identify which entity corresponds to which physical door, then rename in HA UI.
+- **Orphaned old entities**: Old door sensor entities from deleted devices still exist in entity registry (e.g., `binary_sensor.front_door`, `binary_sensor.costco_door`, `binary_sensor.tesla_door`, etc.) with no device attached. Should be removed.
+- **Thread-devices dashboard**: YAML file created and SCPed to HA at `/homeassistant/dashboards/thread-devices.yaml`. Needs to be registered in `configuration.yaml` under `lovelace.dashboards` and old storage-mode entry removed from `/homeassistant/.storage/lovelace.thread_devices`. Wait until all devices are named/cleaned up before finalizing.
