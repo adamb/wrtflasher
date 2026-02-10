@@ -214,7 +214,6 @@
     - binary_sensor.gas_door
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
-    - binary_sensor.myggbett_door_window_sensor_door
     - binary_sensor.bano_abajo_door
     - binary_sensor.casita_door
     to: 'on'
@@ -274,7 +273,7 @@
     - binary_sensor.gas_door
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
-    - binary_sensor.myggbett_door_window_sensor_door
+    - binary_sensor.bano_abajo_door
     - binary_sensor.casita_door
     to: 'on'
     for:
