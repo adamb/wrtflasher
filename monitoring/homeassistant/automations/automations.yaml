@@ -80,17 +80,17 @@
 
     '
   triggers:
-  - entity_id: binary_sensor.front_door
+  - entity_id: binary_sensor.freezer_door
     to: 'on'
     trigger: state
-  - entity_id: binary_sensor.front_door
+  - entity_id: binary_sensor.freezer_door
     to: 'off'
     trigger: state
   actions:
   - choose:
     - conditions:
       - condition: state
-        entity_id: binary_sensor.front_door
+        entity_id: binary_sensor.freezer_door
         state: 'on'
       sequence:
       - target:
