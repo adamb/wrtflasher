@@ -212,8 +212,11 @@ The `monitoring/` directory contains a Python script that polls mesh nodes via S
 - **monitoring/main.py** - MQTT publisher script (runs on deb)
 - **monitoring/homeassistant/** - HA config files from live instance:
   - `automations.yaml`, `configuration.yaml`, `sensors.yaml`, `template_sensors.yaml`
+  - `automations/` - Individual automation YAML files (loaded via `!include_dir_merge_list`)
   - `dashboards/mesh.yaml` - Mesh network monitoring dashboard
   - `dashboards/casita.yaml` - Casita guest house dashboard
+  - `dashboards/ac.yaml` - AC units dashboard (all 8 units, with Tuya setpoint workarounds)
+  - `dashboards/climate.yaml` - Temperature & humidity sensor dashboard
   - `dashboards/thread-devices.yaml` - Thread/Matter device dashboard (lights, plugs, door sensors, batteries)
   - `blueprints/` - Automation blueprints
 - **Poll interval**: 60 seconds (configurable in config.yaml)
@@ -236,7 +239,11 @@ scp monitoring/homeassistant/automations.yaml 192.168.1.151:/homeassistant/
 # Push dashboards
 scp monitoring/homeassistant/dashboards/mesh.yaml 192.168.1.151:/homeassistant/dashboards/
 scp monitoring/homeassistant/dashboards/casita.yaml 192.168.1.151:/homeassistant/dashboards/
+scp monitoring/homeassistant/dashboards/ac.yaml 192.168.1.151:/homeassistant/dashboards/
 scp monitoring/homeassistant/dashboards/thread-devices.yaml 192.168.1.151:/homeassistant/dashboards/
+
+# Push automations
+scp monitoring/homeassistant/automations/*.yaml 192.168.1.151:/homeassistant/automations/
 ```
 
 HA Green config directory is `/homeassistant/` (not `/config/`).
@@ -365,6 +372,44 @@ Current inventory (13 Thread devices + 1 WiFi Matter device):
 - If commissioning fails, try factory resetting the device again
 - The Matter pairing code is often on a sticker on the device itself or on the box/manual
 - IKEA devices: the code is on the box and on a small card inside the packaging
+
+## AC Unit Temperature Fixes (Feb 10, 2026)
+
+### Problem
+
+AC integrations report temperatures with mixed units, causing incorrect displays:
+
+- **Main AC** (`climate.lnlinkha_4100f2d7bcac0000b90460129f07`) — MQTT/LinknLink eRemote, platform: `mqtt`. Reports ALL temperatures in °C (current_temp, setpoint, min/max 16-32°C). Without a unit override, HA assumes system unit (°F) and displays raw Celsius values labeled as °F.
+- **Cocina** (`climate.casita_kitchen`) and **Cuarito** (`climate.air_conditioner_2`) — Tuya integration. Current temperature is correctly reported in °C (HA auto-converts to °F). But Tuya **pre-converts setpoints to °F** while telling HA they're °C, causing HA to double-convert (e.g., 73°F treated as 73°C → 163°F).
+
+### Solution
+
+**Main AC**: `temperature_unit: °C` override in `configuration.yaml` under `homeassistant.customize`. Tells HA the entity reports in °C → HA correctly converts all values to °F. Thermostat card works normally.
+
+**Cocina/Cuarito**: Template sensors in `template_sensors.yaml` reverse the double-conversion for setpoints:
+- `sensor.cocina_ac_setpoint` — `((attr_temp - 32) * 5/9)` recovers the correct °F value
+- `sensor.cuarito_ac_setpoint` — same formula
+- Current temperatures are correct without any override
+- Dashboard uses entities cards (not thermostat cards) to display corrected values
+
+### AC Automations
+
+Two automations for the Main AC, triggered by the **living room Athom sensor** (`sensor.athom_temperature_humidity_sensor_6089e8_temperature`):
+- `automations/main_ac_on.yaml` — Living room temp above 78°F for 5 min + AC is off → set to **dry mode** + mobile notification
+- `automations/main_ac_off.yaml` — Living room temp below 75°F for 5 min + AC is in dry mode → turn off + mobile notification
+
+### AC Entity Reference
+
+| Name | Entity ID | Platform | Unit Issues |
+|------|-----------|----------|-------------|
+| Master | climate.master_ac | ? | None (works correctly) |
+| Gym | climate.gym_ac | ? | None |
+| Jade's | climate.jade_s_ac | ? | None |
+| Jared's | climate.jared_s_ac | ? | None |
+| Main | climate.lnlinkha_4100f2d7bcac0000b90460129f07 | mqtt (LinknLink eRemote) | Fixed via °C override |
+| Big AC | climate.big_ac | ? | Unknown (not investigated) |
+| Cocina | climate.casita_kitchen | tuya | Setpoint double-conversion, fixed via template sensor |
+| Cuarito | climate.air_conditioner_2 | tuya | Setpoint double-conversion, fixed via template sensor |
 
 ### Pending Thread/Matter Tasks
 

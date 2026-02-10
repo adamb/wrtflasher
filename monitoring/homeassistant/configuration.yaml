@@ -3,12 +3,9 @@ default_config:
 
 homeassistant:
   customize:
-    climate.casita_kitchen:
-      temperature_unit: °F
-    climate.air_conditioner_2:
-      temperature_unit: °F
+    # Main AC (MQTT/LinknLink eRemote) reports all temps in °C
     climate.lnlinkha_4100f2d7bcac0000b90460129f07:
-      temperature_unit: °F
+      temperature_unit: °C
 
 # Load frontend themes from the themes folder
 frontend:

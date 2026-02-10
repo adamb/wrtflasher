@@ -69,3 +69,29 @@
     }}
   unit_of_measurement: "clients"
   icon: mdi:account-multiple
+
+# AC Temperature Corrections
+#
+# Main AC (MQTT/LinknLink): Fixed via temperature_unit: °C in configuration.yaml
+#
+# Cocina/Cuarito (Tuya): Current temps are correct, but Tuya pre-converts
+# setpoints to °F while telling HA they're °C, causing double-conversion.
+# These template sensors reverse the double-conversion to show correct °F setpoints.
+
+# Cocina AC: setpoint is °F but HA double-converts it (treats °F as °C → °F)
+- name: "Cocina AC Setpoint"
+  unique_id: cocina_ac_setpoint
+  device_class: temperature
+  unit_of_measurement: "°F"
+  state: >
+    {% set temp = state_attr('climate.casita_kitchen', 'temperature') %}
+    {{ ((temp - 32) * 5/9) | round(0) if temp is not none else None }}
+
+# Cuarito AC: same double-conversion issue as Cocina
+- name: "Cuarito AC Setpoint"
+  unique_id: cuarito_ac_setpoint
+  device_class: temperature
+  unit_of_measurement: "°F"
+  state: >
+    {% set temp = state_attr('climate.air_conditioner_2', 'temperature') %}
+    {{ ((temp - 32) * 5/9) | round(0) if temp is not none else None }}
