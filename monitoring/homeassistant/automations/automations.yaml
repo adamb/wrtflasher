@@ -176,6 +176,57 @@
       target:
         entity_id: light.costco_light_1
   mode: restart
+- id: '1768001234568'
+  alias: Tesla Room Light – Door
+  description: Turn on the Tesla room light when the door opens. Announce when door opens.
+    After the door closes, wait 5 minutes before turning the light off.
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.tesla_door
+    to: 'on'
+  - trigger: state
+    entity_id: binary_sensor.tesla_door
+    to: 'off'
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.tesla_door
+        state: 'on'
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: light.tesla_room_light
+      - action: media_player.turn_on
+        target:
+          entity_id: media_player.garage_speaker
+      - delay:
+          seconds: 1
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.3
+      - action: tts.speak
+        target:
+          entity_id: tts.google_en_com
+        data:
+          media_player_entity_id: media_player.garage_speaker
+          message: '{{ trigger.to_state.attributes.friendly_name }} is open'
+      - delay:
+          seconds: 3
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.2
+    default:
+    - delay: 00:05:00
+    - action: light.turn_off
+      target:
+        entity_id: light.tesla_room_light
+  mode: restart
 - id: '1767735071677'
   alias: 'Cube On '
   description: Turn on stairs and driveway when cube is turned on
