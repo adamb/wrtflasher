@@ -7,7 +7,7 @@ Build custom OpenWRT firmware for a self-healing wireless mesh network using bat
 This project builds custom OpenWRT firmware that creates a **mesh network** where multiple access points work together as one seamless WiFi network:
 
 - **Self-healing mesh**: APs automatically route traffic through each other using batman-adv (Better Approach To Mobile Ad-hoc Networking)
-- **VLAN isolation**: Three separate networks (LAN, IoT, Guest) with firewall rules
+- **VLAN isolation**: che separate networks (LAN, IoT, Guest) with firewall rules
 - **WiFi 6 (802.11ax)**: Modern wireless standard on both 2.4GHz (HE20) and 5GHz (HE80) for better performance
 - **Seamless roaming**: Devices move between APs without disconnection using 802.11r/k/v (Fast Roaming + Neighbor Reports + BSS Transition)
 - **Single configuration**: Configure once, flash many APs

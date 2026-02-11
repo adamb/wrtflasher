@@ -50,15 +50,37 @@ views:
           - type: thermostat
             entity: climate.big_ac
             name: Big AC
-          - type: thermostat
-            entity: climate.casita_kitchen
-            name: Cocina
 
-      - type: horizontal-stack
-        cards:
-          - type: thermostat
+          # Cocina - thermostat shows wrong setpoint due to Tuya bug,
+          # so use entities card with corrected template sensor
+          - type: vertical-stack
+            cards:
+              - type: entities
+                title: Cocina
+                entities:
+                  - entity: climate.casita_kitchen
+                    name: Mode
+                  - type: attribute
+                    entity: climate.casita_kitchen
+                    attribute: current_temperature
+                    name: Current Temp
+                    suffix: "°F"
+                  - entity: sensor.cocina_ac_setpoint
+                    name: Set Point
+
+      # Cuarito - same Tuya setpoint bug as Cocina
+      - type: entities
+        title: Cuarito
+        entities:
+          - entity: climate.air_conditioner_2
+            name: Mode
+          - type: attribute
             entity: climate.air_conditioner_2
-            name: Cuarito
+            attribute: current_temperature
+            name: Current Temp
+            suffix: "°F"
+          - entity: sensor.cuarito_ac_setpoint
+            name: Set Point
 
       # Quick glance - all units
       - type: glance
@@ -78,7 +100,7 @@ views:
             name: Main
           - entity: climate.big_ac
             name: Big AC
-          - entity: climate.casita_kitchen
+          - entity: sensor.cocina_ac_setpoint
             name: Cocina
-          - entity: climate.air_conditioner_2
+          - entity: sensor.cuarito_ac_setpoint
             name: Cuarito
