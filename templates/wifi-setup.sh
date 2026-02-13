@@ -14,7 +14,8 @@ set wireless.radio0.noscan='1'
 set wireless.radio1.disabled='0'
 set wireless.radio1.country='US'
 set wireless.radio1.channel='36'
-set wireless.radio1.htmode='HE80'
+set wireless.radio1.htmode='HE20'
+set wireless.radio1.txpower='27'
 
 set wireless.mesh0=wifi-iface
 set wireless.mesh0.device='radio1'

@@ -20,6 +20,20 @@ Three isolated networks using VLANs over a batman-adv mesh:
 - Hostnames auto-generated as `ap-XXXX` from MAC
 - eth0/eth1 bridged to br-lan for wired devices
 
+**AP Locations:**
+| Hostname | IP | Location |
+|----------|-----|----------|
+| gw-office | 192.168.1.1 | Office (gateway) |
+| ap-central | 192.168.1.101 | Main living room |
+| ap-jade | 192.168.1.114 | Gate |
+| ap-repay-ruffled | 192.168.1.125 | Porche |
+| ap-casita | 192.168.1.157 | Cuarito |
+| ap-repay-surrender | 192.168.1.159 | Carport |
+| ap-toilet | 192.168.1.167 | Master toilet |
+| ap-prov | 192.168.1.117 | Bedroom |
+| ap-news | 192.168.1.175 | Tesla room |
+| ap-cust | 192.168.1.197 | Jade bedroom |
+
 ### Debian Box (deb)
 - **Hostname**: deb (via /etc/hosts on Mac)
 - **LAN IP**: 192.168.1.163 (VLAN 10) - Primary management interface
