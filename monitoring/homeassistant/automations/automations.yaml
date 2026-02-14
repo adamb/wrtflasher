@@ -12,7 +12,7 @@
       seconds: 0
   conditions: []
   actions:
-  - action: notify.mobile_app_a15
+  - action: notify.mobile_app_blue17
     data:
       title: Starlink down
       message: Starlink down for over a minute
