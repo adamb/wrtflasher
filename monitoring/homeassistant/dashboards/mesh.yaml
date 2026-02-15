@@ -1,132 +1,291 @@
-# Home Assistant Dashboard for Mesh Network Monitor
+# Home Assistant Dashboard for Finca del Mar
+# Mesh Network + Powerwall 2 Monitoring
 #
 # To import:
 # 1. Settings → Dashboards → Add Dashboard
 # 2. Name it "Mesh Network"
 # 3. Click the three dots → Edit Dashboard → Raw configuration editor
 # 4. Paste this YAML
-#
 
 title: Mesh Network Monitor
 views:
   # ========================================
-  # OVERVIEW - Quick glance at mesh health
+  # OVERVIEW - Powerwall + Mesh Status
   # ========================================
   - title: Overview
     path: overview
     icon: mdi:wifi-star
     cards:
-      # Mesh Health Status
+      # Title and Date/Time
+      - type: markdown
+        content: |
+          # 🏡 Finca del Mar
+          Powerwall 2 + Mesh Network Monitoring
+        columns: 1
+
+      - type: markdown
+        content: >
+          Last updated: {{ as_timestamp(now()) | timestamp_custom('%Y-%m-%d %H:%M') }}
+
+      # ========================================
+      # POWERWALL 2 SECTION
+      # ========================================
       - type: vertical-stack
         cards:
           - type: markdown
             content: |
-              # 🌐 Mesh Network Status
-              Live monitoring of 10-node batman-adv mesh network
+              # 🔋 Powerwall 2
+              Solar energy and battery storage
 
+          # Powerwall Key Metrics
           - type: grid
-            columns: 4
+            columns: 3
             square: false
             cards:
+              # Battery State of Charge
+              - type: gauge
+                entity: sensor.powerwall_energy_percent_remaining
+                name: Battery Charge
+                min: 0
+                max: 100
+                needle: true
+                segments:
+                  - from: 0
+                    to: 20
+                    color: '#db4437'
+                  - from: 20
+                    to: 50
+                    color: '#ffa600'
+                  - from: 50
+                    to: 100
+                    color: '#43a047'
+                chart: history
+                chart_hours: 24
+
+              # Grid Status
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.powerwall_grid_status
+                    state: 'active'
+                card:
+                  type: tile
+                  entity: sensor.powerwall_grid_status
+                  name: Grid Status
+                  icon: mdi:transmission-tower-export
+                  color: green
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.powerwall_grid_status
+                    state_not: 'active'
+                card:
+                  type: tile
+                  entity: sensor.powerwall_grid_status
+                  name: Grid Status
+                  icon: mdi:transmission-tower-off
+                  color: red
+
+              # Battery Power (kw)
               - type: tile
-                entity: sensor.mesh_node_gw_office_neighbor_count
-                name: Gateway
+                entity: sensor.powerwall_battery_power
+                name: Battery Power
+                icon: mdi:battery-plus
+                format_value: true
+
+          # Power Flow Card
+          - type: entities
+            title: Power Flow
+            show_header_toggle: false
+            entities:
+              - entity: sensor.powerwall_solar_power
+                name: Solar
+                icon: mdi:solar-power
+                format_value: true
+              - entity: sensor.powerwall_grid_power
+                name: Grid
+                icon: mdi:transmission-tower
+                format_value: true
+              - entity: sensor.powerwall_load_power
+                name: Load
+                icon: mdi:home-lightning-bolt
+                format_value: true
+              - entity: sensor.powerwall_battery_power
+                name: Battery
+                icon: mdi:battery-positive
+                format_value: true
+
+          # Powerwall History Graph
+          - type: history-graph
+            title: Power Flow (24h)
+            hours_to_show: 24
+            entities:
+              - entity: sensor.powerwall_solar_power
+                name: Solar
+              - entity: sensor.powerwall_grid_power
+                name: Grid
+              - entity: sensor.powerwall_battery_power
+                name: Battery
+              - entity: sensor.powerwall_load_power
+                name: Load
+
+      # ========================================
+      # CONNECTIVITY SECTION
+      # ========================================
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              # 📡 Connectivity
+              Internet WAN status
+
+          # WAN Status Grid
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              # Starlink
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: binary_sensor.starlink_connectivity
+                    state: 'on'
+                card:
+                  type: tile
+                  entity: binary_sensor.starlink_connectivity
+                  name: Starlink
+                  icon: mdi:satellite-variant
+                  color: green
+                  details: true
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: binary_sensor.starlink_connectivity
+                    state: 'off'
+                card:
+                  type: tile
+                  entity: binary_sensor.starlink_connectivity
+                  name: Starlink
+                  icon: mdi:satellite-variant-off
+                  color: red
+                  details: true
+
+              # T-Mobile
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: binary_sensor.tmobile_connectivity
+                    state: 'on'
+                card:
+                  type: tile
+                  entity: binary_sensor.tmobile_connectivity
+                  name: T-Mobile
+                  icon: mdi:cellphone-wireless
+                  color: green
+                  details: true
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: binary_sensor.tmobile_connectivity
+                    state: 'off'
+                card:
+                  type: tile
+                  entity: binary_sensor.tmobile_connectivity
+                  name: T-Mobile
+                  icon: mdi:cellphone-wireless-off
+                  color: red
+                  details: true
+
+          # Detailed WAN Status
+          - type: entities
+            title: WAN Status Details
+            show_header_toggle: false
+            entities:
+              - entity: sensor.mesh_node_gw_office_active_wan
+                name: Active WAN
+                icon: mdi:wan
+              - entity: sensor.mesh_node_gw_office_wan1_status
+                name: Starlink (eth1)
+                icon: mdi:satellite-variant
+              - entity: sensor.mesh_node_gw_office_wan2_status
+                name: T-Mobile (eth2)
+                icon: mdi:cellphone-wireless
+
+      # ========================================
+      # MESH HEALTH SECTION
+      # ========================================
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              # 🔗 Mesh Network
+              batman-adv mesh status
+
+          # Total Clients
+          - type: gauge
+            entity: sensor.mesh_total_clients
+            name: Total WiFi Clients
+            min: 0
+            max: 100
+            needle: true
+            severity:
+              green: 0
+              yellow: 50
+              red: 80
+
+          # Gateway Node
+          - type: entities
+            title: Gateway (gw-office)
+            show_header_toggle: false
+            entities:
+              - entity: sensor.mesh_node_gw_office_neighbor_count
+                name: Mesh Neighbors
                 icon: mdi:router-wireless
-              - type: tile
-                entity: sensor.mesh_node_ap_ec54_neighbor_count
-                name: Central
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_d74c_neighbor_count
-                name: Jade
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
-                name: Ruffled
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_gate_neighbor_count
-                name: Casita
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
-                name: Surrender
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_dc99_neighbor_count
-                name: Toilet
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_prov_neighbor_count
-                name: Prov
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_news_neighbor_count
-                name: News
-                icon: mdi:access-point
-              - type: tile
-                entity: sensor.mesh_node_ap_cust_neighbor_count
-                name: Cust
-                icon: mdi:access-point
+              - entity: sensor.mesh_node_gw_office_best_signal
+                name: Best Signal
+                icon: mdi:wifi-strength
+              - entity: sensor.mesh_node_gw_office_uptime
+                name: Uptime
 
-      # Total Clients Across Network
-      - type: gauge
-        entity: sensor.mesh_total_clients
-        name: Total WiFi Clients
-        min: 0
-        max: 100
-        needle: true
-        severity:
-          green: 0
-          yellow: 50
-          red: 80
-
-      # WAN Status
-      - type: entities
-        title: 🌍 Gateway WAN Status
-        show_header_toggle: false
-        entities:
-          - entity: sensor.mesh_node_gw_office_active_wan
-            name: Active WAN
-            icon: mdi:wan
-          - entity: sensor.mesh_node_gw_office_wan1_status
-            name: Starlink (eth1)
-            icon: mdi:satellite-variant
-          - entity: sensor.mesh_node_gw_office_wan2_status
-            name: T-Mobile (eth2)
-            icon: mdi:cellphone-wireless
-          - entity: sensor.mesh_node_gw_office_batman_mode
-            name: Batman Mode
-            icon: mdi:router-network
-
-      # Best Signal Strength
-      - type: entities
-        title: 📡 Mesh Signal Strength (dBm)
-        show_header_toggle: false
-        entities:
-          - entity: sensor.mesh_node_gw_office_best_signal
-            name: gw-office
-          - entity: sensor.mesh_node_ap_ec54_best_signal
-            name: ap-central
-          - entity: sensor.mesh_node_ap_d74c_best_signal
-            name: ap-jade
-          - entity: sensor.mesh_node_ap_repay_ruffled_best_signal
-            name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_best_signal
-            name: ap-casita
-          - entity: sensor.mesh_node_ap_repay_surrender_best_signal
-            name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_best_signal
-            name: ap-toilet
-          - entity: sensor.mesh_node_ap_prov_best_signal
-            name: ap-prov
-          - entity: sensor.mesh_node_ap_news_best_signal
-            name: ap-news
-          - entity: sensor.mesh_node_ap_cust_best_signal
-            name: ap-cust
+          # AP Nodes Grid
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: entities
+                title: AP Nodes
+                show_header_toggle: false
+                entities:
+                  - entity: sensor.mesh_node_ap_ec54_neighbor_count
+                    name: Central
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_d74c_neighbor_count
+                    name: Jade
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
+                    name: Ruffled
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_gate_neighbor_count
+                    name: Casita
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
+                    name: Surrender
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_dc99_neighbor_count
+                    name: Toilet
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_prov_neighbor_count
+                    name: Prov
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_news_neighbor_count
+                    name: News
+                    icon: mdi:access-point
+                  - entity: sensor.mesh_node_ap_cust_neighbor_count
+                    name: Cust
+                    icon: mdi:access-point
 
   # ========================================
-  # CLIENT MONITORING - WiFi client details
+  # CLIENTS - WiFi client details
   # ========================================
   - title: Clients
     path: clients
@@ -135,7 +294,7 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          # Summary row - full width
+          # Summary row
           - type: horizontal-stack
             cards:
               - type: tile
@@ -310,7 +469,7 @@ views:
                   - entity: sensor.mesh_node_ap_cust_clients_guest
                     name: Guest
 
-          # History graph - full width
+          # History graph
           - type: history-graph
             title: Client Count History (24h)
             hours_to_show: 24
@@ -323,7 +482,7 @@ views:
                 name: Guest
 
   # ========================================
-  # MESH HEALTH - Detailed mesh metrics
+  # MESH HEALTH - Signal strength details
   # ========================================
   - title: Mesh Health
     path: mesh_health
@@ -331,46 +490,10 @@ views:
     cards:
       - type: markdown
         content: |
-          # 🔗 Mesh Health & Topology
+          # 🔗 Mesh Signal Strength
           Batman-adv mesh backhaul monitoring (5GHz 802.11s)
 
-      # Neighbor Counts (Mesh Redundancy)
-      - type: entities
-        title: Mesh Neighbor Count (Redundancy)
-        show_header_toggle: false
-        entities:
-          - entity: sensor.mesh_node_gw_office_neighbor_count
-            name: gw-office
-            icon: mdi:router-wireless
-          - entity: sensor.mesh_node_ap_ec54_neighbor_count
-            name: ap-central
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_d74c_neighbor_count
-            name: ap-jade
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
-            name: ap-repay-ruffled
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_gate_neighbor_count
-            name: ap-casita
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
-            name: ap-repay-surrender
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_dc99_neighbor_count
-            name: ap-toilet
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_prov_neighbor_count
-            name: ap-prov
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_news_neighbor_count
-            name: ap-news
-            icon: mdi:access-point
-          - entity: sensor.mesh_node_ap_cust_neighbor_count
-            name: ap-cust
-            icon: mdi:access-point
-
-      # Signal Strength Details
+      # Signal Strength Grid
       - type: grid
         columns: 2
         square: false
@@ -785,7 +908,7 @@ views:
                 ## Offline
                 **ap-cust**
 
-      # Signal Strength History
+      # Signal History
       - type: history-graph
         title: Mesh Signal Strength (24h)
         hours_to_show: 24
