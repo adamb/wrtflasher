@@ -197,7 +197,7 @@
       sequence:
       - action: light.turn_on
         target:
-          entity_id: light.tesla_room_light
+          entity_id: light.light_2
       - action: media_player.turn_on
         target:
           entity_id: media_player.garage_speaker
@@ -225,7 +225,7 @@
     - delay: 00:05:00
     - action: light.turn_off
       target:
-        entity_id: light.tesla_room_light
+        entity_id: light.light_2
   mode: restart
 - id: '1767735071677'
   alias: 'Cube On '
