@@ -1,0 +1,23 @@
+- id: bar_lights_button_up
+  alias: Bar Lights Button - Turn On
+  description: Turn on bar lights when button UP is pressed
+  trigger:
+    - platform: event
+      event_type: event.bar_lights_button_up
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.bar_bulbs
+  mode: single
+
+- id: bar_lights_button_down
+  alias: Bar Lights Button - Turn Off
+  description: Turn off bar lights when button DOWN is pressed
+  trigger:
+    - platform: event
+      event_type: event.bar_lights_button_down
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.bar_bulbs
+  mode: single
