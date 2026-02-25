@@ -281,8 +281,8 @@
     target:
       entity_id: light.master_bedroom
   mode: single
-- id: button2_toggle_gym
-  alias: Bedside Button2 → Toggle Gym Light
+- id: button2_toggle_bathroom
+  alias: Bedside Button2 → Toggle Tub & Vanity
   trigger:
   - platform: state
     entity_id: event.button2
@@ -293,7 +293,9 @@
   action:
   - service: light.toggle
     target:
-      entity_id: light.gym_light
+      entity_id:
+        - light.tub
+        - light.vanity
   mode: single
 - id: '1767927944559'
   alias: Auto turn off laundry light after 10 minutes
