@@ -4,11 +4,11 @@
   trigger:
     - platform: event
       event_type: event
-      event_data:
-        entity_id: event.bar_lights_button_up
   condition:
     - condition: template
-      value_template: "{{ trigger.event.data.get('event_type') in ['multi_press_1', 'long_press'] }}"
+      value_template: >
+        {{ trigger.event.data.entity_id == 'event.bar_lights_button_up'
+           and trigger.event.data.get('event_type') in ['multi_press_1', 'long_press'] }}
   action:
     - service: light.turn_on
       target:
@@ -21,11 +21,11 @@
   trigger:
     - platform: event
       event_type: event
-      event_data:
-        entity_id: event.bar_lights_button_down
   condition:
     - condition: template
-      value_template: "{{ trigger.event.data.get('event_type') in ['multi_press_1', 'long_press'] }}"
+      value_template: >
+        {{ trigger.event.data.entity_id == 'event.bar_lights_button_down'
+           and trigger.event.data.get('event_type') in ['multi_press_1', 'long_press'] }}
   action:
     - service: light.turn_off
       target:
