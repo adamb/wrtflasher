@@ -3,7 +3,9 @@
   description: Turn on bar lights when button UP is pressed
   trigger:
     - platform: event
-      event_type: event.bar_lights_button_up
+      event_type: event
+      event_data:
+        entity_id: event.bar_lights_button_up
   action:
     - service: light.turn_on
       target:
@@ -15,7 +17,9 @@
   description: Turn off bar lights when button DOWN is pressed
   trigger:
     - platform: event
-      event_type: event.bar_lights_button_down
+      event_type: event
+      event_data:
+        entity_id: event.bar_lights_button_down
   action:
     - service: light.turn_off
       target:
