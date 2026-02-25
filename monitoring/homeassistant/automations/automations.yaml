@@ -288,8 +288,7 @@
     entity_id: event.button2
   condition:
   - condition: template
-    value_template: "{{ trigger.to_state is not none\n   and trigger.to_state.attributes.event_type
-      == 'multi_press_1' }}\n"
+    value_template: "{{ trigger.to_state.attributes.event_type == 'multi_press_1' }}"
   action:
   - service: light.toggle
     target:
