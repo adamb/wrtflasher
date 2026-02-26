@@ -55,6 +55,7 @@ This prevents compromised IoT devices from attacking trusted LAN devices.
 - WPA3-SAE encryption
 - Hidden SSID (batmesh_network)
 - Automatic multi-hop routing via batman-adv
+- Optional wired backhaul: gw↔ap-prov also connected via VLAN 99 over Zyxel switch; batman prefers wired automatically, falls back to WiFi if cable is removed (see NETWORK.md)
 
 **Roaming Features:**
 - **802.11r (Fast Roaming)**: Instant handoff between APs without disconnection
