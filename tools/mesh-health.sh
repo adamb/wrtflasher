@@ -145,7 +145,14 @@ echo ""
 echo "TQ scores: 255 = perfect, 200+ = good, <150 = poor"
 echo ""
 
-ssh -o ConnectTimeout=3 -o BatchMode=yes root@192.168.1.1 "batctl meshif bat0 o 2>/dev/null | grep '\\*'" 2>/dev/null || true
+# Bat topology with MAC to name mapping
+# Create sed script to replace all MACs at once
+sed_script=""
+while IFS='|' read -r mac name; do
+  sed_script="${sed_script}s|${mac}|${name}|g;"
+done < "$MAC_MAP_FILE"
+
+ssh -o ConnectTimeout=3 -o BatchMode=yes root@192.168.1.1 "batctl meshif bat0 o 2>/dev/null | grep '\\*'" 2>/dev/null | sed "$sed_script" || true
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
