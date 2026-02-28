@@ -152,7 +152,11 @@ while IFS='|' read -r mac name; do
   sed_script="${sed_script}s|${mac}|${name}|g;"
 done < "$MAC_MAP_FILE"
 
-ssh -o ConnectTimeout=3 -o BatchMode=yes root@192.168.1.1 "batctl meshif bat0 o 2>/dev/null | grep '\\*'" 2>/dev/null | sed "$sed_script" || true
+# Bat topology sorted by TQ score (descending - highest TQ first)
+# TQ is field 4 in the batctl output (after last-seen and parentheses)
+ssh -o ConnectTimeout=3 -o BatchMode=yes root@192.168.1.1 "batctl meshif bat0 o 2>/dev/null | grep '\\*'" 2>/dev/null | \
+  sed "$sed_script" | \
+  sort -t'(' -k2 -rn || true
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
