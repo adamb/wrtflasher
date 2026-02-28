@@ -22,18 +22,46 @@ NODES=(
   "192.168.1.197:ap-cust"
 )
 
+# Collect MACs from all nodes
+echo "Collecting node MAC addresses..."
 for node in "${NODES[@]}"; do
   ip="${node%%:*}"
   name="${node##*:}"
+
+  # Get wireless mesh MAC (phy1)
   mac=$(ssh -o ConnectTimeout=2 -o BatchMode=yes root@"$ip" \
     "cat /sys/class/ieee80211/phy1/macaddress 2>/dev/null | tr -d '\n'" 2>/dev/null || true)
   if [ -n "${mac:-}" ]; then
     echo "$mac|$name" >> "$MAC_MAP_FILE"
   fi
+
+  # Get wired interface MAC (eth1) if available - used for wired backhaul
+  eth1_mac=$(ssh -o ConnectTimeout=2 -o BatchMode=yes root@"$ip" \
+    "cat /sys/class/net/eth1/address 2>/dev/null | tr -d '\n'" 2>/dev/null || true)
+  if [ -n "${eth1_mac:-}" ] && [ "$eth1_mac" != "$mac" ]; then
+    echo "$eth1_mac|$name" >> "$MAC_MAP_FILE"
+  fi
 done
 
+# Get batctl originator output to find all nodes in mesh (including unreachable ones)
+echo "Querying mesh topology..."
+BATCTL_OUTPUT=$(ssh -o ConnectTimeout=3 -o BatchMode=yes root@192.168.1.1 \
+  "batctl meshif bat0 o 2>/dev/null" 2>/dev/null || true)
+
+# Extract MACs from batctl output and add generic names for unknown ones
+# Use process substitution to avoid subshell issues
+while read -r mac; do
+  [ -z "${mac:-}" ] && continue
+  if ! grep -q "^${mac}|" "$MAC_MAP_FILE" 2>/dev/null; then
+    # Generate generic name from last 4 hex chars of MAC
+    last_octet="${mac##*:}"
+    generic_name="ap-${last_octet}"
+    echo "$mac|$generic_name" >> "$MAC_MAP_FILE"
+  fi
+done < <(echo "$BATCTL_OUTPUT" | awk '/^\*/ {print $1}' | sort -u)
+
 mac_to_name() {
-  local mac=$1
+  local mac="${1:-}"
   local name
   name=$(grep "^${mac}|" "$MAC_MAP_FILE" 2>/dev/null | head -1 | cut -d'|' -f2 || true)
   if [ -n "${name:-}" ]; then
@@ -43,9 +71,13 @@ mac_to_name() {
   fi
 }
 
+export -f mac_to_name
+export MAC_MAP_FILE
+
 # Configurable threshold
 GOOD_DBM=-75
 
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "1. NEIGHBOR COUNT (Redundancy Check)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -105,12 +137,15 @@ check_signals() {
   local from_ip=$1
   local from_name=$2
 
-  ssh -o ConnectTimeout=3 -o BatchMode=yes root@"$from_ip" "
+  local station_dump
+  station_dump=$(ssh -o ConnectTimeout=3 -o BatchMode=yes root@"$from_ip" "
     iw dev phy1-mesh0 station dump 2>/dev/null | awk '
       /^Station/    { mac=\$2 }
       /signal avg:/ { print mac \"|\" \$3 }
     '
-  " 2>/dev/null | while IFS='|' read -r mac signal; do
+  " 2>/dev/null || true)
+
+  echo "$station_dump" | while IFS='|' read -r mac signal; do
     [ -z "${mac:-}" ] && continue
     [[ ! "${signal:-}" =~ ^-?[0-9]+$ ]] && continue
 
@@ -149,14 +184,15 @@ echo ""
 # Create sed script to replace all MACs at once
 sed_script=""
 while IFS='|' read -r mac name; do
+  [ -z "${mac:-}" ] && continue
   sed_script="${sed_script}s|${mac}|${name}|g;"
 done < "$MAC_MAP_FILE"
 
 # Bat topology sorted by TQ score (descending - highest TQ first)
-# TQ is field 4 in the batctl output (after last-seen and parentheses)
-ssh -o ConnectTimeout=3 -o BatchMode=yes root@192.168.1.1 "batctl meshif bat0 o 2>/dev/null | grep '\\*'" 2>/dev/null | \
-  sed "$sed_script" | \
-  sort -t'(' -k2 -rn || true
+# Note: batctl output has " *" (space before asterisk) so we grep for " \*"
+if [ -n "${BATCTL_OUTPUT:-}" ]; then
+  echo "$BATCTL_OUTPUT" | awk '/ \*/' | sed "$sed_script" | sort -t'(' -k2 -rn
+fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
