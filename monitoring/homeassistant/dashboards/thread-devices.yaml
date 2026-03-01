@@ -65,6 +65,17 @@ views:
           - entity: event.button2
             name: BILRESA Button 2
 
+      # Air Quality Monitors (IKEA Vindriktning)
+      - type: entities
+        title: Air Quality Monitors
+        entities:
+          - entity: sensor.alpstuga_air_quality_monitor_carbon_dioxide
+            name: CO2 (alpstuga)
+          - entity: sensor.alpstuga_air_quality_monitor_pm2_5
+            name: PM2.5 (alpstuga)
+          - entity: sensor.alpstuga_air_quality_monitor_air_quality
+            name: Air Quality (alpstuga)
+
       # Battery Status
       - type: entities
         title: Battery Status
