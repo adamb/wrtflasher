@@ -246,6 +246,10 @@
     device_id: 96720349fc8644fab65970f726e96047
     entity_id: 472222c70cae9813082dbb8fbabaea8b
     domain: light
+  - type: turn_on
+    device_id: 78f03df4823f7bc0b2db2104aea70c68
+    entity_id: f23e52713d9759c70d535aa1a41317cb
+    domain: switch
   mode: single
 - id: '1767735161605'
   alias: Cube Off
@@ -266,6 +270,10 @@
     device_id: 96720349fc8644fab65970f726e96047
     entity_id: 472222c70cae9813082dbb8fbabaea8b
     domain: light
+  - type: turn_off
+    device_id: 78f03df4823f7bc0b2db2104aea70c68
+    entity_id: f23e52713d9759c70d535aa1a41317cb
+    domain: switch
   mode: single
 - id: button1_toggle_bedroom
   alias: Bedside Button1 → Toggle Master Bedroom Light

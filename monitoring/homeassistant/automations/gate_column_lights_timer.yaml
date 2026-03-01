@@ -1,0 +1,9 @@
+- id: 'gate_column_lights_timer'
+  alias: Gate Trigger Column Lights Timer
+  description: Turn on column lights for 10 minutes when gate opens at night (if not already on)
+  use_blueprint:
+    path: gate_outdoor_switch_timer.yaml
+    input:
+      trigger_entity: cover.remootio_gate
+      switch_entity: switch.column_lights_switch_load_control
+      duration_minutes: 10

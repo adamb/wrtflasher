@@ -317,8 +317,8 @@ echo "→ Setting up batman-adv mesh attachment init script..."
 mkdir -p files-gateway/etc/init.d files-gateway/etc/rc.d
 mkdir -p files-ap/etc/init.d files-ap/etc/rc.d
 
-cp templates/batman-attach.sh files-gateway/etc/init.d/batman-attach
-cp templates/batman-attach.sh files-ap/etc/init.d/batman-attach
+cp templates/batman-attach-gateway.sh files-gateway/etc/init.d/batman-attach
+cp templates/batman-attach-ap.sh files-ap/etc/init.d/batman-attach
 chmod +x files-gateway/etc/init.d/batman-attach
 chmod +x files-ap/etc/init.d/batman-attach
 ln -sf ../init.d/batman-attach files-gateway/etc/rc.d/S99batman-attach
