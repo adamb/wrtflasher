@@ -9,6 +9,9 @@ This repository builds custom OpenWRT firmware images for a batman-adv mesh netw
 - **Gateway node** (OpenWRT One): Runs DHCP servers, firewall, and acts as the mesh gateway
 - **AP nodes** (GL-MT3000 BerylAX): Mesh clients that extend the wireless network
 
+### CRITICAL OPERATIONAL RULE
+- **NEVER** run `/etc/init.d/network restart` on mesh AP nodes. It will reliably lock up the device and require a physical power cycle. **ALWAYS** use `reboot` instead.
+
 ## Architecture
 
 ### Configuration Flow

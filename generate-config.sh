@@ -278,6 +278,14 @@ config interface 'iot'
 config interface 'guest'
 	option device 'br-guest'
 	option proto 'none'
+
+config device
+	option name 'eth1'
+	option mtu '1532'
+
+config interface 'mesh_eth1'
+	option device 'eth1'
+	option proto 'none'
 EOF
 
 # Set root password for AP if configured

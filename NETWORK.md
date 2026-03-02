@@ -246,15 +246,31 @@ start() {
     batctl meshif bat0 if add eth0.99 2>/dev/null || true
 }
 ```
-
 #### AP (ap-prov) Configuration
 
 **IMPORTANT:** The AP's `eth1` is used directly for the mesh - no VLAN sub-interface. The bridge should NOT include `eth1` or `eth1.10` - LAN traffic goes through the mesh (`bat0.10`).
 
 ```bash
+# UCI network config for eth1 (ensures interface is UP with correct MTU)
+uci set network.eth1=device
+uci set network.eth1.name='eth1'
+uci set network.eth1.mtu='1532'
+uci set network.mesh_eth1=interface
+uci set network.mesh_eth1.device='eth1'
+uci set network.mesh_eth1.proto='none'
+uci commit network
+
+# /etc/init.d/batman-attach (Automatic via templates/batman-attach-ap.sh)
+# The script automatically identifies ap-prov by its MAC (94:83:c4:7f:bb:ec)
+# and attaches eth1 + sets hp 60.
+```
+
+**Bridge configuration:**
+```bash
 # UCI config for br-lan - note NO eth1 or eth1.10 in ports
 config device
 	option name 'br-lan'
+...
 	option type 'bridge'
 	list ports 'bat0.10'      # LAN goes over mesh
 	list ports 'eth0'          # Local wired ports
@@ -382,7 +398,7 @@ From any Tailscale device, use local IPs:
 
 APs auto-generate hostnames as `ap-XXXX` from MAC addresses. To rename an AP:
 
-**IMPORTANT:** DO NOT use `/etc/init.d/network restart` on mesh APs - it breaks batman-adv mesh connectivity and requires physical reboot to recover.
+**CRITICAL: NEVER use `/etc/init.d/network restart` on mesh APs.** This command disrupts the `batman-adv` interfaces and bridge, consistently causing the device to lock up and become unreachable. If you need to apply network changes or restart the stack, **ALWAYS use `reboot`**.
 
 **Correct Method (using reboot):**
 

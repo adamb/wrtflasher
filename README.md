@@ -539,7 +539,7 @@ Shows all devices below -75 dBm. Solutions:
 
 ### Renaming Access Points
 
-**IMPORTANT**: Never use `/etc/init.d/network restart` on mesh APs - it breaks batman-adv and requires physical reboot.
+**CRITICAL: NEVER use `/etc/init.d/network restart` on mesh APs.** This command disrupts the `batman-adv` interfaces and bridge, consistently causing the device to lock up and become unreachable. If you need to apply network changes or restart the stack, **ALWAYS use `reboot`**.
 
 **Correct method:**
 ```bash
