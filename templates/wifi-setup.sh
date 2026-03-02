@@ -87,8 +87,16 @@ if [ "$(uci get network.bat0.gw_mode 2>/dev/null)" = "client" ]; then
     # Set hostname
     uci set system.@system[0].hostname="ap-$WORD1-$WORD2"
     uci set network.bat0.macaddr="$ETH_MAC"
+    
+    # Disable IOT SSID on specific high-interference APs
+    # ap-casita (94:83:c4:65:00:a9) and ap-cust (94:83:c4:7f:bd:44)
+    if [ "$ETH_MAC" = "94:83:c4:65:00:a9" ] || [ "$ETH_MAC" = "94:83:c4:7f:bd:44" ]; then
+        uci set wireless.iot0.disabled='1'
+    fi
+
     uci commit system
     uci commit network
+    uci commit wireless
 fi
 
 wifi
