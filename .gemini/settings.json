@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "homeassistant": {
+      "httpUrl": "$HA_URL",
+      "headers": {
+        "Authorization": "Bearer $HA_TOKEN"
+      },
+      "timeout": 30000,
+      "trust": true
+    }
+  }
+}
