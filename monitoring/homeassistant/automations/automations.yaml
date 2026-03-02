@@ -229,7 +229,7 @@
   mode: restart
 - id: '1767735071677'
   alias: 'Cube On '
-  description: Turn on stairs and driveway when cube is turned on
+  description: Turn on stairs, driveway, and column lights when cube is turned on
   triggers:
   - type: turned_on
     device_id: cac2a6a1c75902c5c2097a3b17315b8c
@@ -247,13 +247,12 @@
     entity_id: 472222c70cae9813082dbb8fbabaea8b
     domain: light
   - type: turn_on
-    device_id: 78f03df4823f7bc0b2db2104aea70c68
-    entity_id: f23e52713d9759c70d535aa1a41317cb
+    entity_id: switch.column_lights_switch_load_control
     domain: switch
   mode: single
 - id: '1767735161605'
   alias: Cube Off
-  description: Turn off stairs and driveway when cube off
+  description: Turn off stairs, driveway, and column lights when cube off
   triggers:
   - type: turned_off
     device_id: cac2a6a1c75902c5c2097a3b17315b8c
@@ -271,8 +270,7 @@
     entity_id: 472222c70cae9813082dbb8fbabaea8b
     domain: light
   - type: turn_off
-    device_id: 78f03df4823f7bc0b2db2104aea70c68
-    entity_id: f23e52713d9759c70d535aa1a41317cb
+    entity_id: switch.column_lights_switch_load_control
     domain: switch
   mode: single
 - id: button1_toggle_bedroom
@@ -320,7 +318,6 @@
     - binary_sensor.tesla_door
     - binary_sensor.costco_door
     - binary_sensor.bano_abajo_door
-    - binary_sensor.casita_door
     to: 'on'
   - trigger: state
     entity_id: cover.remootio_gate
