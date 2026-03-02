@@ -384,6 +384,19 @@ ssh root@<AP-IP> "
     └── toggle-ssid.sh        # SSID management
 ```
 
+## Home Assistant Best Practices
+
+### Workflow
+- Always edit local files in the repository first.
+- Validate changes via MCP tools (e.g., `ha_reload_core`, `ha_get_states`).
+- Deploy to the hub (e.g., via service calls or informing the user to sync/SCP).
+
+### Context Efficiency
+- When asked about device states, prefer using `ha_get_entities` with specific `area_id` or `domain_filters` rather than `ha_get_overview` to save context space.
+
+## Notes
+- `climate.big_ac` is physically disconnected due to a leak. Do not attempt to turn it on via automations or scripts until further notice.
+
 ## Security Considerations
 
 -   **Mesh encryption**: WPA3-SAE on backhaul prevents unauthorized mesh joining.
