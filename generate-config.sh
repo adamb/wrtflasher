@@ -283,8 +283,14 @@ config device
 	option name 'eth1'
 	option mtu '1532'
 
-config interface 'mesh_eth1'
-	option device 'eth1'
+config device 'vlan99'
+	option type '8021q'
+	option ifname 'eth1'
+	option vid '99'
+	option name 'eth1.99'
+
+config interface 'mesh_wired'
+	option device 'eth1.99'
 	option proto 'none'
 EOF
 
