@@ -11,7 +11,7 @@ start() {
     ETH0_MAC=$(cat /sys/class/net/eth0/address 2>/dev/null)
     if [ "$ETH0_MAC" = "94:83:c4:7f:bb:ec" ]; then
         batctl meshif bat0 if add eth1.99 2>/dev/null || true
-        batctl meshif bat0 hp 60  # Optimized penalty for G.hn link
+        batctl meshif bat0 hp 30  # Same as wireless nodes now that G.hn link is stable
     else
         batctl meshif bat0 hp 30  # Standard penalty for all-wireless nodes
     fi
