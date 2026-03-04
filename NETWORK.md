@@ -341,8 +341,8 @@ Use `mesh-exec.sh` to run commands on all nodes simultaneously:
 | Switch | 192.168.1.3 | - | Zyxel GS1200-8 |
 | Home Assistant | 192.168.1.151 | 20:f8:3b:00:03:e9 | Port 4, VLAN 10 (untagged) |
 | Debian (deb) | 192.168.1.163 | 84:47:09:1c:29:26 | Port 3, VLANs 10,20. Also has 192.168.3.164 (IoT) |
-| G.hn Adapter 1 | 192.168.1.241 | - | VLAN 10 untagged via switch port 8 |
-| G.hn Adapter 2 | 192.168.1.243 | - | VLAN 10 untagged via switch port 8 |
+| ghn-gw | 192.168.1.241 | 1c:64:99:a1:3c:cb | G.hn adapter, gateway side, VLAN 10 via switch port 8 |
+| ghn-prov | 192.168.1.243 | 1c:64:99:a1:3c:cd | G.hn adapter, ap-prov side, VLAN 10 via switch port 8 |
 | APs | 192.168.1.100+ | DHCP | Auto-generated hostnames |
 
 ## Traffic Flow
