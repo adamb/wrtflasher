@@ -36,10 +36,25 @@ config interface 'wan2'
 	option device 'eth2'
 	option proto 'dhcp'
 
+config device 'eth0dev'
+	option name 'eth0'
+	option mtu '1532'
+
+config device 'vlan99'
+	option type '8021q'
+	option ifname 'eth0'
+	option vid '99'
+	option name 'eth0.99'
+	option mtu '1532'
+
 config interface 'bat0'
 	option proto 'batadv'
 	option routing_algo 'BATMAN_IV'
 	option gw_mode 'server'
+
+config interface 'mesh_wired'
+	option device 'eth0.99'
+	option proto 'none'
 
 config device
 	option name 'br-lan'
