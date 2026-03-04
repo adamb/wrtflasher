@@ -290,6 +290,32 @@ start() {
 }
 ```
 
+### MTU Configuration (Critical)
+
+batman-adv adds a 32-byte header to every frame. All interfaces attached to bat0 (`phy1-mesh0`, `eth0.99`, `eth1.99`) **must** have MTU 1532 so that bat0 can carry 1500-byte frames. If an underlying interface has MTU 1500, large packets (TCP segments for SSH, HTTP, etc.) are silently dropped — small pings work but SSH and web browsing hang or time out.
+
+**Symptoms of MTU mismatch:**
+- Small pings work, large pings (1400+ bytes) fail or time out
+- SSH connections hang after initial handshake
+- LuCI web interface partially loads then freezes (HTML loads, JS/CSS assets never complete)
+- `batctl tp` throughput tests show near-zero throughput
+
+**Fix (runtime, lost on reboot):**
+```bash
+ip link set phy1-mesh0 mtu 1532
+```
+
+**Fix (permanent):** Ensure `/etc/init.d/batman-attach` includes the MTU line before adding interfaces to bat0:
+```bash
+ip link set phy1-mesh0 mtu 1532 2>/dev/null || true
+```
+
+**Verify MTU on all nodes:**
+```bash
+./mesh-exec.sh "ip link show phy1-mesh0 | head -1"
+# All nodes should show mtu 1532
+```
+
 ### Troubleshooting
 
 **If the AP becomes unreachable when Ethernet is connected:**
