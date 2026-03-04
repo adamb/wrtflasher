@@ -3,6 +3,7 @@ START=99
 
 start() {
     sleep 10
+    ip link set phy1-mesh0 mtu 1532 2>/dev/null || true
     batctl meshif bat0 if add phy1-mesh0 2>/dev/null || true
     
     # Identify ap-prov by its MAC address (94:83:c4:7f:bb:ec)
