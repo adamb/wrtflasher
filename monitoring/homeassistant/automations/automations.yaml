@@ -586,3 +586,75 @@
         {% if trigger.id == 'starlink' %}Starlink (eth1){% else %}T-Mobile (eth2){% endif %} is back online
   mode: queued
   max: 5
+- id: '1770000000001'
+  alias: Gym Motion Light
+  description: Turn on gym light when motion detected if dark, turn off after 1 hour no motion
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.gym_motion
+    from: 'off'
+    to: 'on'
+    id: motion_on
+  - trigger: state
+    entity_id: binary_sensor.gym_motion
+    from: 'on'
+    to: 'off'
+    id: motion_off
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: motion_on
+      - condition: numeric_state
+        entity_id: sensor.gym_luma
+        below: 100
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.gym_light
+    - conditions:
+      - condition: trigger
+        id: motion_off
+      sequence:
+      - delay:
+          minutes: 60
+      - service: light.turn_off
+        target:
+          entity_id: light.gym_light
+  mode: restart
+- id: '1770000000001'
+  alias: Gym Motion Light
+  description: Turn on gym light when motion detected if dark, turn off after 1 hour no motion
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.gym_motion
+    from: 'off'
+    to: 'on'
+    id: motion_on
+  - trigger: state
+    entity_id: binary_sensor.gym_motion
+    from: 'on'
+    to: 'off'
+    id: motion_off
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: motion_on
+      - condition: numeric_state
+        entity_id: sensor.gym_luma
+        below: 100
+      sequence:
+      - service: light.turn_on
+        target:
+          entity_id: light.gym_light
+    - conditions:
+      - condition: trigger
+        id: motion_off
+      sequence:
+      - delay:
+          hours: 1
+      - service: light.turn_off
+        target:
+          entity_id: light.gym_light
+  mode: restart
