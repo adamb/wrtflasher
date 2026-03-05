@@ -195,9 +195,9 @@
         entity_id: binary_sensor.tesla_door
         state: 'on'
       sequence:
-      - action: light.turn_on
+      - action: switch.turn_on
         target:
-          entity_id: light.light_2
+          entity_id: switch.tesla_room_light
       - action: media_player.turn_on
         target:
           entity_id: media_player.garage_speaker
@@ -223,9 +223,9 @@
           volume_level: 0.2
     default:
     - delay: 00:05:00
-    - action: light.turn_off
+    - action: switch.turn_off
       target:
-        entity_id: light.light_2
+        entity_id: switch.tesla_room_light
   mode: restart
 - id: '1767735071677'
   alias: 'Cube On '
@@ -246,9 +246,9 @@
     device_id: 96720349fc8644fab65970f726e96047
     entity_id: 472222c70cae9813082dbb8fbabaea8b
     domain: light
-  - type: turn_on
-    entity_id: switch.column_lights_switch_load_control
-    domain: switch
+  - service: switch.turn_on
+    target:
+      entity_id: switch.column_lights_switch_load_control
   mode: single
 - id: '1767735161605'
   alias: Cube Off
@@ -269,9 +269,9 @@
     device_id: 96720349fc8644fab65970f726e96047
     entity_id: 472222c70cae9813082dbb8fbabaea8b
     domain: light
-  - type: turn_off
-    entity_id: switch.column_lights_switch_load_control
-    domain: switch
+  - service: switch.turn_off
+    target:
+      entity_id: switch.column_lights_switch_load_control
   mode: single
 - id: button1_toggle_bedroom
   alias: Bedside Button1 → Toggle Master Bedroom Light
