@@ -265,14 +265,8 @@ views:
                   - entity: sensor.mesh_node_ap_repay_ruffled_neighbor_count
                     name: Ruffled
                     icon: mdi:access-point
-                  - entity: sensor.mesh_node_ap_gate_neighbor_count
-                    name: Casita
-                    icon: mdi:access-point
                   - entity: sensor.mesh_node_ap_repay_surrender_neighbor_count
                     name: Surrender
-                    icon: mdi:access-point
-                  - entity: sensor.mesh_node_ap_dc99_neighbor_count
-                    name: Toilet
                     icon: mdi:access-point
                   - entity: sensor.mesh_node_ap_prov_neighbor_count
                     name: Prov
@@ -314,9 +308,9 @@ views:
                 name: Guest
                 icon: mdi:account-multiple
 
-          # AP cards - 4 columns
+          # AP cards - 3 columns
           - type: grid
-            columns: 4
+            columns: 3
             square: false
             cards:
               - type: entities
@@ -361,23 +355,10 @@ views:
                   - entity: sensor.mesh_node_ap_d74c_clients_guest
                     name: Guest
 
-              - type: entities
-                title: ap-toilet
-                show_header_toggle: false
-                entities:
-                  - entity: sensor.mesh_node_ap_dc99_clients_total
-                    name: Total
-                    icon: mdi:sigma
-                  - entity: sensor.mesh_node_ap_dc99_clients_finca
-                    name: Finca
-                  - entity: sensor.mesh_node_ap_dc99_clients_iot
-                    name: IoT
-                  - entity: sensor.mesh_node_ap_dc99_clients_guest
-                    name: Guest
 
-          # Casito APs - 3 columns
+          # Casito APs - 2 columns
           - type: grid
-            columns: 3
+            columns: 2
             square: false
             cards:
               - type: entities
@@ -392,20 +373,6 @@ views:
                   - entity: sensor.mesh_node_ap_repay_ruffled_clients_iot
                     name: IoT
                   - entity: sensor.mesh_node_ap_repay_ruffled_clients_guest
-                    name: Guest
-
-              - type: entities
-                title: ap-casita
-                show_header_toggle: false
-                entities:
-                  - entity: sensor.mesh_node_ap_gate_clients_total
-                    name: Total
-                    icon: mdi:sigma
-                  - entity: sensor.mesh_node_ap_gate_clients_finca
-                    name: Finca
-                  - entity: sensor.mesh_node_ap_gate_clients_iot
-                    name: IoT
-                  - entity: sensor.mesh_node_ap_gate_clients_guest
                     name: Guest
 
               - type: entities
@@ -665,47 +632,6 @@ views:
           - type: conditional
             conditions:
               - condition: state
-                entity: sensor.mesh_node_ap_gate_best_signal
-                state_not: unavailable
-              - condition: state
-                entity: sensor.mesh_node_ap_gate_best_signal
-                state_not: unknown
-            card:
-              type: gauge
-              entity: sensor.mesh_node_ap_gate_best_signal
-              name: ap-casita Best Signal
-              min: -90
-              max: -30
-              needle: true
-              segments:
-                - from: -90
-                  to: -80
-                  color: '#db4437'
-                - from: -80
-                  to: -70
-                  color: '#ffa600'
-                - from: -70
-                  to: -30
-                  color: '#43a047'
-          - type: conditional
-            conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity: sensor.mesh_node_ap_gate_best_signal
-                    state: unavailable
-                  - condition: state
-                    entity: sensor.mesh_node_ap_gate_best_signal
-                    state: unknown
-            card:
-              type: markdown
-              content: |
-                ## Offline
-                **ap-casita**
-
-          - type: conditional
-            conditions:
-              - condition: state
                 entity: sensor.mesh_node_ap_repay_surrender_best_signal
                 state_not: unavailable
               - condition: state
@@ -743,47 +669,6 @@ views:
               content: |
                 ## Offline
                 **ap-repay-surrender**
-
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.mesh_node_ap_dc99_best_signal
-                state_not: unavailable
-              - condition: state
-                entity: sensor.mesh_node_ap_dc99_best_signal
-                state_not: unknown
-            card:
-              type: gauge
-              entity: sensor.mesh_node_ap_dc99_best_signal
-              name: ap-toilet Best Signal
-              min: -90
-              max: -30
-              needle: true
-              segments:
-                - from: -90
-                  to: -80
-                  color: '#db4437'
-                - from: -80
-                  to: -70
-                  color: '#ffa600'
-                - from: -70
-                  to: -30
-                  color: '#43a047'
-          - type: conditional
-            conditions:
-              - condition: or
-                conditions:
-                  - condition: state
-                    entity: sensor.mesh_node_ap_dc99_best_signal
-                    state: unavailable
-                  - condition: state
-                    entity: sensor.mesh_node_ap_dc99_best_signal
-                    state: unknown
-            card:
-              type: markdown
-              content: |
-                ## Offline
-                **ap-toilet**
 
           - type: conditional
             conditions:
@@ -921,12 +806,8 @@ views:
             name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_best_signal
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_best_signal
-            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_best_signal
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_best_signal
-            name: ap-toilet
           - entity: sensor.mesh_node_ap_prov_best_signal
             name: ap-prov
           - entity: sensor.mesh_node_ap_news_best_signal
@@ -959,12 +840,8 @@ views:
             name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_uptime
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_uptime
-            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_uptime
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_uptime
-            name: ap-toilet
           - entity: sensor.mesh_node_ap_prov_uptime
             name: ap-prov
           - entity: sensor.mesh_node_ap_news_uptime
@@ -985,12 +862,8 @@ views:
             name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_load
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_load
-            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_load
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_load
-            name: ap-toilet
           - entity: sensor.mesh_node_ap_prov_load
             name: ap-prov
           - entity: sensor.mesh_node_ap_news_load
@@ -1011,12 +884,8 @@ views:
             name: ap-jade
           - entity: sensor.mesh_node_ap_repay_ruffled_load
             name: ap-repay-ruffled
-          - entity: sensor.mesh_node_ap_gate_load
-            name: ap-casita
           - entity: sensor.mesh_node_ap_repay_surrender_load
             name: ap-repay-surrender
-          - entity: sensor.mesh_node_ap_dc99_load
-            name: ap-toilet
           - entity: sensor.mesh_node_ap_prov_load
             name: ap-prov
           - entity: sensor.mesh_node_ap_news_load

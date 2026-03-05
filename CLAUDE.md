@@ -210,6 +210,10 @@ Both devices use the mediatek/filogic platform.
 
 ## Home Assistant Integration
 
+### Workflow
+
+HA config files (automations, dashboards, sensors, template sensors) are version-controlled in this repo under `monitoring/homeassistant/`. This repo is the source of truth — edit files here, commit to git, then deploy to HA via `scp`. After deploying automations, reload them in HA: Developer Tools → YAML → Reload Automations.
+
 The `monitoring/` directory contains a Python script that polls mesh nodes via SSH and publishes stats to Home Assistant via MQTT.
 
 - **monitoring/main.py** - MQTT publisher script (runs on deb)
