@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import paho.mqtt.client as mqtt
+import requests
 
 # Configure logging
 logging.basicConfig(
@@ -208,6 +209,91 @@ class MeshMonitor:
 
         return stats
 
+    def collect_ghn_stats(self, device: Dict[str, str]) -> Dict[str, Any]:
+        """Collect G.hn PLC connection stats from web interface"""
+        from requests.auth import HTTPBasicAuth
+
+        ghn_name = device['name']
+        ghn_ip = device['ip']
+        username = device.get('username', 'admin')
+
+        # Get password from environment variable
+        password_env = device.get('password_env', '')
+        password = os.environ.get(password_env, '')
+        if not password:
+            logger.warning(f"G.hn device {ghn_name}: password environment variable '{password_env}' not set")
+            return {'connected': False, 'error': 'password_missing'}
+
+        # Fetch the ghn.html page to get connection data
+        url = f"http://{ghn_ip}/ghn.html"
+        try:
+            response = requests.get(url, auth=HTTPBasicAuth(username, password), timeout=5)
+            response.raise_for_status()
+        except requests.RequestException as e:
+            logger.warning(f"G.hn device {ghn_name}: Failed to fetch: {e}")
+            return {'connected': False, 'error': str(e)}
+
+        # Parse the JavaScript variables from the response
+        # Extract pcdids (device IDs), pcmastr (MACs), pcptx (Tx rates), pcprx (Rx rates)
+        import re
+
+        content = response.text
+
+        # Extract pcdids array
+        pcdids_match = re.search(r'var pcdids=new Array\(([^)]+)\)', content)
+        # Extract pcmastr array
+        pcmastr_match = re.search(r'var pcmastr="([^"]+)"', content)
+        # Extract pcptx array
+        pcptx_match = re.search(r'var pcptx=new Array\(([^)]+)\)', content)
+        # Extract pcprx array
+        pcprx_match = re.search(r'var pcprx=new Array\(([^)]+)\)', content)
+
+        if not all([pcdids_match, pcmastr_match, pcptx_match, pcprx_match]):
+            logger.warning(f"G.hn device {ghn_name}: Could not parse connection data")
+            return {'connected': False, 'error': 'parse_failed'}
+
+        # Parse arrays
+        try:
+            pcdids = [int(x.strip()) for x in pcdids_match.group(1).split(',')]
+            pcmastr = pcmastr_match.group(1).split(',')
+            pcptx = [int(x.strip()) for x in pcptx_match.group(1).split(',')]
+            pcprx = [int(x.strip()) for x in pcprx_match.group(1).split(',')]
+
+            # Parse own MAC and DID
+            mymac_match = re.search(r"var mymac='([^']+)'", content)
+            mydid_match = re.search(r"var mydid='([^']+)'", content)
+            mymac = mymac_match.group(1) if mymac_match else ''
+            mydid = int(mydid_match.group(1)) if mydid_match else 0
+
+            # Build list of connected devices (excluding self and empty entries)
+            connections = []
+            for i in range(len(pcdids)):
+                did = pcdids[i]
+                mac = pcmastr[i].strip()
+                # Skip self, empty entries
+                if did == mydid or mac == mymac or mac == '00:00:00:00:00:00':
+                    continue
+                # Calculate Tx/Rx rates (values are in 32kbps units)
+                tx_mbps = round(pcptx[i] * 32 / 1000, 1)
+                rx_mbps = round(pcprx[i] * 32 / 1000, 1)
+                connections.append({
+                    'device_id': did,
+                    'mac': mac,
+                    'tx_mbps': tx_mbps,
+                    'rx_mbps': rx_mbps
+                })
+
+            return {
+                'connected': True,
+                'my_device_id': mydid,
+                'my_mac': mymac,
+                'connections': connections,
+                'connection_count': len(connections)
+            }
+        except (ValueError, IndexError) as e:
+            logger.warning(f"G.hn device {ghn_name}: Error parsing data: {e}")
+            return {'connected': False, 'error': 'parse_error'}
+
     def collect_node_stats(self, node: Dict[str, str]) -> Dict[str, Any]:
         """Collect all statistics for a single node"""
         node_name = node['name']
@@ -241,6 +327,28 @@ class MeshMonitor:
             stats['gateway'] = gateway
 
         return stats
+
+    def collect_all_ghn_stats(self) -> List[Dict[str, Any]]:
+        """Collect statistics from all G.hn devices"""
+        ghn_stats = []
+
+        ghn_devices = self.config.get('ghn_devices', [])
+        if not ghn_devices:
+            logger.debug("No G.hn devices configured")
+            return ghn_stats
+
+        for device in ghn_devices:
+            try:
+                stats = self.collect_ghn_stats(device)
+                stats['name'] = device['name']
+                stats['ip'] = device['ip']
+                ghn_stats.append(stats)
+                if stats.get('connected'):
+                    logger.info(f"Collected G.hn stats from {device['name']}")
+            except Exception as e:
+                logger.error(f"Failed to collect G.hn stats from {device['name']}: {e}")
+
+        return ghn_stats
 
     def collect_all_nodes(self) -> tuple[List[Dict[str, Any]], List[str], List[str]]:
         """Collect statistics from all nodes in parallel
@@ -516,6 +624,105 @@ class MeshMonitor:
             retain=False
         )
 
+    def publish_ghn_discovery(self, device: Dict[str, str]):
+        """Publish Home Assistant MQTT Discovery configs for a G.hn device"""
+        prefix = self.config['mqtt']['discovery_prefix']
+        device_id = device['name'].replace('-', '_')
+
+        # Per-device availability topic
+        availability_topic = f'{prefix}/sensor/ghn_{device_id}/availability'
+
+        # Base device info
+        device_info = {
+            'identifiers': [f'ghn_{device_id}'],
+            'name': f'G.hn PLC {device["name"]}',
+            'model': 'PG-9182S4',
+            'manufacturer': 'MaxLinear',
+            'sw_version': 'G.hn PLC Firmware'
+        }
+
+        sensors = []
+
+        # Connection count
+        sensors.append({
+            'name': 'Connected Devices',
+            'unique_id': f'ghn_{device_id}_connected_devices',
+            'state_topic': f'{prefix}/sensor/ghn_{device_id}/state',
+            'value_template': '{{ value_json.connection_count }}',
+            'icon': 'mdi:ethernet',
+            'device': device_info,
+            'availability_topic': availability_topic,
+            'payload_available': 'online',
+            'payload_not_available': 'offline'
+        })
+
+        # Tx Rate sensor for each connection
+        for i in range(5):  # Support up to 5 connections
+            sensors.append({
+                'name': f'Tx Rate {i+1}',
+                'unique_id': f'ghn_{device_id}_tx_rate_{i}',
+                'state_topic': f'{prefix}/sensor/ghn_{device_id}/state',
+                'value_template': f'{{{{ value_json.connections[{i}].tx_mbps if value_json.connections|length > {i} else none }}}}',
+                'unit_of_measurement': 'Mbps',
+                'device_class': 'data_rate',
+                'icon': 'mdi:upload',
+                'device': device_info,
+                'availability_topic': availability_topic,
+                'payload_available': 'online',
+                'payload_not_available': 'offline'
+            })
+
+        # Rx Rate sensor for each connection
+        for i in range(5):
+            sensors.append({
+                'name': f'Rx Rate {i+1}',
+                'unique_id': f'ghn_{device_id}_rx_rate_{i}',
+                'state_topic': f'{prefix}/sensor/ghn_{device_id}/state',
+                'value_template': f'{{{{ value_json.connections[{i}].rx_mbps if value_json.connections|length > {i} else none }}}}',
+                'unit_of_measurement': 'Mbps',
+                'device_class': 'data_rate',
+                'icon': 'mdi:download',
+                'device': device_info,
+                'availability_topic': availability_topic,
+                'payload_available': 'online',
+                'payload_not_available': 'offline'
+            })
+
+        # Publish discovery configs
+        for sensor in sensors:
+            config_topic = f'{prefix}/sensor/{sensor["unique_id"]}/config'
+            self.mqtt_client.publish(
+                config_topic,
+                json.dumps(sensor),
+                qos=1,
+                retain=True
+            )
+
+        logger.info(f"Published G.hn discovery for {device['name']}")
+
+    def publish_ghn_stats(self, stats: Dict[str, Any]):
+        """Publish G.hn device statistics to MQTT"""
+        prefix = self.config['mqtt']['discovery_prefix']
+        device_id = stats['name'].replace('-', '_')
+
+        # Publish availability
+        availability_topic = f'{prefix}/sensor/ghn_{device_id}/availability'
+        self.mqtt_client.publish(
+            availability_topic,
+            'online',
+            qos=1,
+            retain=True
+        )
+
+        # Publish state
+        state_topic = f'{prefix}/sensor/ghn_{device_id}/state'
+        self.mqtt_client.publish(
+            state_topic,
+            json.dumps(stats),
+            qos=0,
+            retain=False
+        )
+
     def run(self):
         """Main monitoring loop"""
         logger.info("Starting Mesh Network Monitor")
@@ -533,6 +740,10 @@ class MeshMonitor:
             }
             self.publish_discovery(node_data)
 
+        # Publish discovery configs for all G.hn devices
+        for ghn_device in self.config.get('ghn_devices', []):
+            self.publish_ghn_discovery(ghn_device)
+
         time.sleep(1)  # Give HA time to process discovery
 
         # Main polling loop
@@ -546,6 +757,9 @@ class MeshMonitor:
                 # Collect stats from all nodes
                 all_stats, online_nodes, offline_nodes = self.collect_all_nodes()
 
+                # Collect G.hn stats
+                all_ghn_stats = self.collect_all_ghn_stats()
+
                 # Publish availability for all nodes
                 for node_name in online_nodes:
                     self.publish_node_availability(node_name, True)
@@ -555,6 +769,10 @@ class MeshMonitor:
                 # Publish stats for online nodes
                 for stats in all_stats:
                     self.publish_stats(stats)
+
+                # Publish G.hn stats
+                for ghn_stats in all_ghn_stats:
+                    self.publish_ghn_stats(ghn_stats)
 
                 # Calculate sleep time
                 elapsed = time.time() - loop_start

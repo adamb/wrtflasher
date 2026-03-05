@@ -1,6 +1,10 @@
 # Mesh Network Monitor Configuration
 # Copy this file to config.yaml and edit with your values
 
+# Environment Variables (export before running):
+#   GHN_GW_PASSWORD      - Password for G.hn gateway (http://ghn-gw)
+#   GHNProv_PASSWORD     - Password for G.hn provisioning node (http://ghn-prov)
+
 mqtt:
   broker: "192.168.1.151"           # Home Assistant IP address
   port: 1883
@@ -40,6 +44,16 @@ nodes:
   - name: "ap-cust"
     ip: "192.168.1.197"
     type: "ap"
+
+ghn_devices:
+  - name: "ghn-gw"
+    ip: "192.168.1.198"
+    username: "admin"
+    password_env: "GHN_GW_PASSWORD"  # Password from Bitwarden
+  - name: "ghn-prov"
+    ip: "192.168.1.199"
+    username: "admin"
+    password_env: "GHNProv_PASSWORD"  # Password from Bitwarden
 
 ssh:
   key_file: "~/.ssh/mesh_nodes"      # SSH private key for mesh nodes

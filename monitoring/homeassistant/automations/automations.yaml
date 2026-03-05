@@ -32,19 +32,17 @@
     after: sunset
     enabled: true
   actions:
-  - type: turn_on
-    device_id: 79b4998523fb7f0aaec751079f380f31
-    entity_id: 20eaf35d7fc098e488f75e1e7cfdbe22
-    domain: switch
+  - action: switch.turn_on
+    target:
+      entity_id: switch.cube
   - delay:
       hours: 0
       minutes: 10
       seconds: 0
       milliseconds: 0
-  - type: turn_off
-    device_id: 79b4998523fb7f0aaec751079f380f31
-    entity_id: 20eaf35d7fc098e488f75e1e7cfdbe22
-    domain: switch
+  - action: switch.turn_off
+    target:
+      entity_id: switch.cube
   mode: single
 - id: '1767147416914'
   alias: Yard & Porche lights on at sunset
@@ -238,17 +236,14 @@
     trigger: device
   conditions: []
   actions:
-  - type: turn_on
-    device_id: 2ecb4ff5960709c8f2cdfc8b103c1cd9
-    entity_id: d0e1901526d2ea9d56e87247970296a9
-    domain: light
-  - type: turn_on
-    device_id: 96720349fc8644fab65970f726e96047
-    entity_id: 472222c70cae9813082dbb8fbabaea8b
-    domain: light
-  - type: turn_on
-    entity_id: switch.column_lights_switch_load_control
-    domain: switch
+  - action: light.turn_on
+    target:
+      entity_id:
+        - light.stairs_light_1
+        - light.driveway_light_1
+  - action: switch.turn_on
+    target:
+      entity_id: switch.column_lights_switch_load_control
   mode: single
 - id: '1767735161605'
   alias: Cube Off
@@ -261,17 +256,14 @@
     trigger: device
   conditions: []
   actions:
-  - type: turn_off
-    device_id: 2ecb4ff5960709c8f2cdfc8b103c1cd9
-    entity_id: d0e1901526d2ea9d56e87247970296a9
-    domain: light
-  - type: turn_off
-    device_id: 96720349fc8644fab65970f726e96047
-    entity_id: 472222c70cae9813082dbb8fbabaea8b
-    domain: light
-  - type: turn_off
-    entity_id: switch.column_lights_switch_load_control
-    domain: switch
+  - action: light.turn_off
+    target:
+      entity_id:
+        - light.stairs_light_1
+        - light.driveway_light_1
+  - action: switch.turn_off
+    target:
+      entity_id: switch.column_lights_switch_load_control
   mode: single
 - id: button1_toggle_bedroom
   alias: Bedside Button1 → Toggle Master Bedroom Light
@@ -586,3 +578,36 @@
         {% if trigger.id == 'starlink' %}Starlink (eth1){% else %}T-Mobile (eth2){% endif %} is back online
   mode: queued
   max: 5
+- id: master_bathroom_sync
+  alias: Master Bathroom Lights Sync
+  description: Keep vanity and tub lights in sync (on/off and brightness)
+  mode: parallel
+  triggers:
+    - trigger: state
+      entity_id:
+        - light.vanity
+        - light.tub
+  actions:
+    - variables:
+        target_entity: "{{ 'light.tub' if trigger.entity_id == 'light.vanity' else 'light.vanity' }}"
+    - if:
+        - condition: template
+          value_template: "{{ trigger.to_state.state != states(target_entity) or (trigger.to_state.state == 'on' and state_attr(trigger.entity_id, 'brightness') != state_attr(target_entity, 'brightness')) }}"
+      then:
+        - choose:
+            - conditions:
+                - condition: template
+                  value_template: "{{ trigger.to_state.state == 'on' }}"
+              sequence:
+                - action: light.turn_on
+                  target:
+                    entity_id: "{{ target_entity }}"
+                  data:
+                    brightness: "{{ state_attr(trigger.entity_id, 'brightness') }}"
+            - conditions:
+                - condition: template
+                  value_template: "{{ trigger.to_state.state == 'off' }}"
+              sequence:
+                - action: light.turn_off
+                  target:
+                    entity_id: "{{ target_entity }}"

@@ -1,0 +1,45 @@
+=== Mesh Benchmark: 2-ghn-orange-2 ===
+Date: Wed Mar  4 22:47:52 AST 2026
+
+--- Routing Table ---
+ * 94:83:c4:7f:bd:44    0.110s   (190) 94:83:c4:7f:bd:44 [phy1-mesh0]
+ * 94:83:c4:72:ec:54    0.480s   (230) 94:83:c4:72:ec:54 [phy1-mesh0]
+ * 94:83:c4:7f:a1:44    0.450s   (237) 94:83:c4:7f:a1:44 [phy1-mesh0]
+ * 94:83:c4:72:d7:4c    0.760s   (228) 94:83:c4:72:d7:4c [phy1-mesh0]
+ * 94:83:c4:7f:bb:ed    0.470s   (255) 94:83:c4:7f:bb:ed [   eth0.99]
+ * 94:83:c4:7f:c5:cc    0.140s   (191) 94:83:c4:7f:bb:ed [   eth0.99]
+ * 94:83:c4:7f:c5:ec    0.070s   (174) 94:83:c4:72:ec:54 [phy1-mesh0]
+ * 94:83:c4:7f:bb:ec    0.510s   (255) 94:83:c4:7f:bb:ed [   eth0.99]
+
+--- Wired Neighbors ---
+      eth0.99	  94:83:c4:7f:bb:ed    0.790s
+
+--- ap-prov (192.168.1.117) ---
+  Latency: round-trip min/avg/max = 1.471/4.556/11.721 ms
+  Throughput: Throughput: 112.62 KB/s (922.57 Kbps)
+
+--- ap-news (192.168.1.175) ---
+  Latency: round-trip min/avg/max = 0.963/11.760/40.235 ms
+  Throughput: Throughput: 3.12 MB/s (26.13 Mbps)
+
+--- ap-central (192.168.1.101) ---
+  Latency: round-trip min/avg/max = 4.557/30.415/60.972 ms
+  Throughput: Throughput: 4.73 MB/s (39.67 Mbps)
+
+--- ap-jade (192.168.1.114) ---
+  Latency: round-trip min/avg/max = 0.904/3.447/15.257 ms
+  Throughput: Throughput: 3.51 MB/s (29.47 Mbps)
+
+--- ap-cust (192.168.1.197) ---
+  Latency: round-trip min/avg/max = 1.108/3.771/8.004 ms
+  Throughput: Throughput: 462.31 KB/s (3787.25 Kbps)
+
+--- ap-ruffled (192.168.1.125) ---
+  Latency: round-trip min/avg/max = 1.803/4.541/8.459 ms
+  Throughput: Throughput: 879.74 KB/s (7206.82 Kbps)
+
+--- ap-surrender (192.168.1.159) ---
+  Latency: round-trip min/avg/max = 1.856/3.235/7.302 ms
+  Throughput: Throughput: 2.45 MB/s (20.59 Mbps)
+
+=== Done ===

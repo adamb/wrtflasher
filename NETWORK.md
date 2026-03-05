@@ -371,6 +371,114 @@ Use `mesh-exec.sh` to run commands on all nodes simultaneously:
 ./mesh-exec.sh "batctl meshif bat0 gw"
 ```
 
+## Tesla Energy Gateway (TEG) Local API Access
+
+The Tesla Powerwall gateway (TEG-H57, serial TG119313000H57, firmware 25.42.1) exposes voltage/string-level data only via its local TEDAPI, which requires connecting to its WiFi network (TEG-H57) at `192.168.91.1`.
+
+**Status:** Blocked on TEDAPI password. The gateway password (printed on a QR/DataMatrix sticker on the physical unit) is required for TEDAPI auth (`Tesla_Energy_Device:<gw_pwd>`). The default serial-based password (`00H57`) is disabled on firmware 25.x. The web UI login page has been removed and replaced with a static redirect page.
+
+### TEG Network Details
+
+| Field | Value |
+|-------|-------|
+| SSID | TEG-H57 |
+| WiFi Password | STG119313000H57 |
+| TEG IP (on its WiFi) | 192.168.91.1 |
+| Firmware | 25.42.1 |
+| Serial (TSN) | TG119313000H57 |
+| TPN | 1118431-00-L |
+| LAN IP (via DHCP) | 192.168.1.227 |
+
+### How to Connect ap-news to TEG WiFi
+
+ap-news is in the same room as the TEG. To bridge the TEG WiFi to the LAN, repurpose ap-news's radio0 (2.4GHz) from AP mode to STA (client) mode. The 5 clients on ap-news will roam to other APs.
+
+**1. Configure ap-news (SSH to 192.168.1.175):**
+
+```bash
+# Remove AP interfaces
+uci delete wireless.lan0
+uci delete wireless.iot0
+uci delete wireless.guest0
+
+# Add STA interface for TEG
+uci set wireless.teg=wifi-iface
+uci set wireless.teg.device=radio0
+uci set wireless.teg.mode=sta
+uci set wireless.teg.ssid=TEG-H57
+uci set wireless.teg.encryption=psk2
+uci set wireless.teg.key=STG119313000H57
+uci set wireless.teg.network=teg
+
+# Network interface (DHCP client on TEG subnet)
+uci set network.teg=interface
+uci set network.teg.proto=dhcp
+
+# Firewall zone for TEG traffic
+uci add firewall zone
+uci set firewall.@zone[-1].name=teg
+uci set firewall.@zone[-1].input=ACCEPT
+uci set firewall.@zone[-1].output=ACCEPT
+uci set firewall.@zone[-1].forward=REJECT
+uci set firewall.@zone[-1].network=teg
+
+# Allow LAN to reach TEG
+uci add firewall forwarding
+uci set firewall.@forwarding[-1].src=lan
+uci set firewall.@forwarding[-1].dest=teg
+
+uci commit wireless && uci commit network && uci commit firewall
+reboot  # NEVER use /etc/init.d/network restart on APs
+```
+
+ap-news gets IP ~192.168.91.177 on the TEG WiFi subnet. Mesh backhaul (radio1, 5GHz) is unaffected.
+
+**2. Add masquerade on ap-news (required — TEG rejects non-local source IPs):**
+
+```bash
+ssh root@192.168.1.175 'nft add table ip nat; \
+  nft add chain ip nat postrouting { type nat hook postrouting priority 100 \; }; \
+  nft add rule ip nat postrouting oifname "phy0-sta0" masquerade'
+```
+
+**3. Add static route on gateway:**
+
+```bash
+ssh root@192.168.1.1 'ip route add 192.168.91.0/24 via 192.168.1.175'
+```
+
+To make persistent, add to gateway UCI config:
+```bash
+uci set network.teg_route=route
+uci set network.teg_route.interface=lan
+uci set network.teg_route.target=192.168.91.0/24
+uci set network.teg_route.gateway=192.168.1.175
+uci commit network
+```
+
+**4. Test connectivity:**
+
+```bash
+ping 192.168.91.1                    # Should work from any LAN device
+curl -sk https://192.168.91.1/api/status  # Returns gateway info (no auth needed)
+```
+
+**5. TEDAPI auth (once password is known):**
+
+```bash
+curl -sk -u "Tesla_Energy_Device:<GW_PASSWORD>" https://192.168.91.1/tedapi/din
+```
+
+### Reverting ap-news to Normal AP Mode
+
+Restore AP interfaces, remove TEG config, and remove the firewall zone/forwarding. See git history for the exact UCI commands.
+
+### References
+
+- [pypowerwall TEDAPI docs](https://github.com/jasonacox/pypowerwall/blob/main/tools/tedapi/README.md)
+- [Powerwall firmware 25.10.0+ local access workarounds](https://github.com/jasonacox/Powerwall-Dashboard/issues/637)
+- [Powerwall 2 local API docs](https://github.com/vloschiavo/powerwall2)
+
 ## IP Reservations
 
 | Device | IP | MAC | Notes |
