@@ -224,10 +224,21 @@ class MeshMonitor:
             logger.warning(f"G.hn device {ghn_name}: password environment variable '{password_env}' not set")
             return {'connected': False, 'error': 'password_missing'}
 
-        # Fetch the ghn.html page to get connection data
+        # Use a session to handle cookies (G.hn devices require session cookies)
+        session = requests.Session()
+
+        # First, fetch the root page to establish a session and get cookies
+        root_url = f"http://{ghn_ip}/"
+        try:
+            session.get(root_url, auth=HTTPBasicAuth(username, password), timeout=5)
+        except requests.RequestException as e:
+            logger.warning(f"G.hn device {ghn_name}: Failed to establish session: {e}")
+            return {'connected': False, 'error': 'session_failed'}
+
+        # Now fetch the ghn.html page with the session (including cookies)
         url = f"http://{ghn_ip}/ghn.html"
         try:
-            response = requests.get(url, auth=HTTPBasicAuth(username, password), timeout=5)
+            response = session.get(url, timeout=5)
             response.raise_for_status()
         except requests.RequestException as e:
             logger.warning(f"G.hn device {ghn_name}: Failed to fetch: {e}")
