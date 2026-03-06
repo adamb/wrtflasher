@@ -227,10 +227,11 @@ class MeshMonitor:
         # Use a session to handle cookies (G.hn devices require session cookies)
         session = requests.Session()
 
-        # First, fetch the root page to establish a session and get cookies
+        # First, POST the password to establish a session and get cookies
         root_url = f"http://{ghn_ip}/"
         try:
-            session.get(root_url, auth=HTTPBasicAuth(username, password), timeout=5)
+            # The G.hn device requires a POST with .PASSWORD field to establish session
+            session.post(root_url, data={'.PASSWORD': password}, timeout=10)
         except requests.RequestException as e:
             logger.warning(f"G.hn device {ghn_name}: Failed to establish session: {e}")
             return {'connected': False, 'error': 'session_failed'}
@@ -238,7 +239,7 @@ class MeshMonitor:
         # Now fetch the ghn.html page with the session (including cookies)
         url = f"http://{ghn_ip}/ghn.html"
         try:
-            response = session.get(url, timeout=5)
+            response = session.get(url, timeout=10)
             response.raise_for_status()
         except requests.RequestException as e:
             logger.warning(f"G.hn device {ghn_name}: Failed to fetch: {e}")
