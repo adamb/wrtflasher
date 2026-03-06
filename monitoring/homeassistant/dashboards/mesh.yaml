@@ -212,6 +212,29 @@ views:
                 icon: mdi:cellphone-wireless
 
       # ========================================
+      # G.hn PLC SECTION
+      # ========================================
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: |
+              # ⚡ G.hn PLC
+              Powerline backhaul between gateway and provisioning closet
+
+          - type: history-graph
+            title: G.hn PLC Throughput (24h)
+            hours_to_show: 24
+            entities:
+              - entity: sensor.g_hn_plc_ghn_gw_tx_rate_1
+                name: ghn-gw Tx
+              - entity: sensor.g_hn_plc_ghn_gw_rx_rate_1
+                name: ghn-gw Rx
+              - entity: sensor.g_hn_plc_ghn_prov_tx_rate_1
+                name: ghn-prov Tx
+              - entity: sensor.g_hn_plc_ghn_prov_rx_rate_1
+                name: ghn-prov Rx
+
+      # ========================================
       # MESH HEALTH SECTION
       # ========================================
       - type: vertical-stack
