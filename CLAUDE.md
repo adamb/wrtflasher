@@ -236,21 +236,24 @@ The `monitoring/` directory contains a Python script that polls mesh nodes via S
 
 ### Syncing HA Config
 
-```bash
-# Pull from HA
-scp 192.168.1.151:/homeassistant/automations.yaml monitoring/homeassistant/
+**IMPORTANT:** Do NOT edit automations in the HA UI. The UI writes to `/homeassistant/automations.yaml` (root), but HA loads from `/homeassistant/automations/` (directory via `!include_dir_merge_list`). UI edits will appear to save but won't take effect. The root `automations.yaml` is set to `[]` to prevent stale data.
 
-# Push to HA
-scp monitoring/homeassistant/automations.yaml 192.168.1.151:/homeassistant/
+**Automation deployment workflow:**
+1. Edit YAML files in `monitoring/homeassistant/automations/`
+2. Push to HA: `scp monitoring/homeassistant/automations/*.yaml ha:/homeassistant/automations/`
+3. Validate config: use `ha_check_config` (MCP tool) or `ssh ha 'ha core check'`
+4. Reload: use `ha_reload_core(target="automations")` (MCP tool) or HA UI → Developer Tools → YAML → Reload Automations
+5. Verify: check the automation entity exists and state is `on`
+
+```bash
+# Push automations
+scp monitoring/homeassistant/automations/*.yaml ha:/homeassistant/automations/
 
 # Push dashboards
-scp monitoring/homeassistant/dashboards/mesh.yaml 192.168.1.151:/homeassistant/dashboards/
-scp monitoring/homeassistant/dashboards/casita.yaml 192.168.1.151:/homeassistant/dashboards/
-scp monitoring/homeassistant/dashboards/ac.yaml 192.168.1.151:/homeassistant/dashboards/
-scp monitoring/homeassistant/dashboards/thread-devices.yaml 192.168.1.151:/homeassistant/dashboards/
+scp monitoring/homeassistant/dashboards/*.yaml ha:/homeassistant/dashboards/
 
-# Push automations
-scp monitoring/homeassistant/automations/*.yaml 192.168.1.151:/homeassistant/automations/
+# Pull automations from HA (if needed to sync back)
+scp ha:/homeassistant/automations/*.yaml monitoring/homeassistant/automations/
 ```
 
 HA Green config directory is `/homeassistant/` (not `/config/`).

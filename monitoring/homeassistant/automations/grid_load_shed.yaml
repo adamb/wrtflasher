@@ -1,0 +1,207 @@
+- id: grid_load_shed
+  alias: Grid Load Shed – Battery Low
+  description: >
+    When off-grid and battery drops below 50%, save state and turn off non-essential loads.
+    When grid returns and stays for 5 minutes, restore only loads that were on before shedding.
+  mode: restart
+  triggers:
+  - trigger: numeric_state
+    entity_id: sensor.finca_del_mar_percentage_charged_2
+    below: 50
+    id: battery_low
+  - trigger: time_pattern
+    minutes: '/15'
+    id: periodic_check
+  - trigger: state
+    entity_id: sensor.finca_del_mar_grid_status
+    to: on_grid
+    for:
+      minutes: 5
+    id: grid_back
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - battery_low
+        - periodic_check
+      - condition: numeric_state
+        entity_id: sensor.finca_del_mar_percentage_charged_2
+        below: 50
+      - condition: not
+        conditions:
+        - condition: state
+          entity_id: sensor.finca_del_mar_grid_status
+          state: on_grid
+      sequence:
+      # Save state of each load before turning off
+      - action: input_boolean.turn_{{ 'on' if is_state('switch.finca_del_mar_spa_filter_pump', 'on') else 'off' }}
+        target:
+          entity_id: input_boolean.shed_pool_pump_was_on
+      - action: input_boolean.turn_{{ 'on' if is_state('switch.s4', 'on') else 'off' }}
+        target:
+          entity_id: input_boolean.shed_dehumidifier_1_was_on
+      - action: input_boolean.turn_{{ 'on' if is_state('switch.s4_2', 'on') else 'off' }}
+        target:
+          entity_id: input_boolean.shed_dehumidifier_2_was_on
+      - action: input_boolean.turn_{{ 'on' if is_state('switch.spare_plug', 'on') else 'off' }}
+        target:
+          entity_id: input_boolean.shed_bano_dehumidifier_was_on
+      - action: input_boolean.turn_{{ 'on' if not is_state('climate.casita_kitchen', 'off') else 'off' }}
+        target:
+          entity_id: input_boolean.shed_cocina_ac_was_on
+      - action: input_boolean.turn_{{ 'on' if not is_state('climate.air_conditioner_2', 'off') else 'off' }}
+        target:
+          entity_id: input_boolean.shed_cuarito_ac_was_on
+      - action: input_boolean.turn_{{ 'on' if not is_state('climate.big_ac', 'off') else 'off' }}
+        target:
+          entity_id: input_boolean.shed_big_ac_was_on
+      # Shed loads
+      - action: switch.turn_off
+        target:
+          entity_id:
+          - switch.finca_del_mar_spa_filter_pump
+          - switch.s4
+          - switch.s4_2
+          - switch.spare_plug
+      - action: climate.turn_off
+        target:
+          entity_id:
+          - climate.casita_kitchen
+          - climate.air_conditioner_2
+          - climate.big_ac
+      # Notify
+      - action: notify.mobile_app_blue17
+        data:
+          title: Load Shed Active
+          message: >
+            Grid offline, battery below 50%. Turned off pool pump, dehumidifiers, and casita/big ACs.
+      - action: media_player.turn_on
+        target:
+          entity_id: media_player.garage_speaker
+      - delay:
+          seconds: 1
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.3
+      - action: tts.speak
+        target:
+          entity_id: tts.google_en_com
+        data:
+          media_player_entity_id: media_player.garage_speaker
+          message: Battery below 50 percent. Shedding non-essential loads.
+      - delay:
+          seconds: 3
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.2
+    - conditions:
+      - condition: trigger
+        id: grid_back
+      sequence:
+      # Announce
+      - action: notify.mobile_app_blue17
+        data:
+          title: Grid Restored
+          message: Grid stable for 5 minutes. Restoring loads that were on before shedding.
+      - action: media_player.turn_on
+        target:
+          entity_id: media_player.garage_speaker
+      - delay:
+          seconds: 1
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.3
+      - action: tts.speak
+        target:
+          entity_id: tts.google_en_com
+        data:
+          media_player_entity_id: media_player.garage_speaker
+          message: Grid is back. Restoring loads.
+      - delay:
+          seconds: 3
+      - action: media_player.volume_set
+        target:
+          entity_id: media_player.garage_speaker
+        data:
+          volume_level: 0.2
+      # Restore only loads that were on, staggered 30s apart
+      - if:
+        - condition: state
+          entity_id: input_boolean.shed_dehumidifier_1_was_on
+          state: 'on'
+        then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.s4
+      - delay:
+          seconds: 30
+      - if:
+        - condition: state
+          entity_id: input_boolean.shed_dehumidifier_2_was_on
+          state: 'on'
+        then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.s4_2
+      - delay:
+          seconds: 30
+      - if:
+        - condition: state
+          entity_id: input_boolean.shed_bano_dehumidifier_was_on
+          state: 'on'
+        then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.spare_plug
+      - delay:
+          seconds: 30
+      - if:
+        - condition: state
+          entity_id: input_boolean.shed_cocina_ac_was_on
+          state: 'on'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: climate.casita_kitchen
+      - delay:
+          seconds: 30
+      - if:
+        - condition: state
+          entity_id: input_boolean.shed_cuarito_ac_was_on
+          state: 'on'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: climate.air_conditioner_2
+      - delay:
+          seconds: 30
+      - if:
+        - condition: state
+          entity_id: input_boolean.shed_big_ac_was_on
+          state: 'on'
+        then:
+        - action: climate.turn_on
+          target:
+            entity_id: climate.big_ac
+      - delay:
+          seconds: 30
+      - if:
+        - condition: state
+          entity_id: input_boolean.shed_pool_pump_was_on
+          state: 'on'
+        then:
+        - action: switch.turn_on
+          target:
+            entity_id: switch.finca_del_mar_spa_filter_pump
+      - action: notify.mobile_app_blue17
+        data:
+          title: Loads Restored
+          message: Restored previously-active loads.

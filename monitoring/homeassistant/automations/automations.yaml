@@ -32,17 +32,19 @@
     after: sunset
     enabled: true
   actions:
-  - action: switch.turn_on
-    target:
-      entity_id: switch.cube
+  - type: turn_on
+    device_id: 79b4998523fb7f0aaec751079f380f31
+    entity_id: 20eaf35d7fc098e488f75e1e7cfdbe22
+    domain: switch
   - delay:
       hours: 0
       minutes: 10
       seconds: 0
       milliseconds: 0
-  - action: switch.turn_off
-    target:
-      entity_id: switch.cube
+  - type: turn_off
+    device_id: 79b4998523fb7f0aaec751079f380f31
+    entity_id: 20eaf35d7fc098e488f75e1e7cfdbe22
+    domain: switch
   mode: single
 - id: '1767147416914'
   alias: Yard & Porche lights on at sunset
@@ -176,8 +178,8 @@
   mode: restart
 - id: '1768001234568'
   alias: Tesla Room Light – Door
-  description: Turn on the Tesla room light when the door opens. Announce when door opens.
-    After the door closes, wait 5 minutes before turning the light off.
+  description: Turn on the Tesla room light when the door opens. Announce when door
+    opens. After the door closes, wait 5 minutes before turning the light off.
   triggers:
   - trigger: state
     entity_id: binary_sensor.tesla_door
@@ -193,9 +195,9 @@
         entity_id: binary_sensor.tesla_door
         state: 'on'
       sequence:
-      - action: light.turn_on
+      - action: switch.turn_on
         target:
-          entity_id: light.light_2
+          entity_id: switch.tesla_room_light
       - action: media_player.turn_on
         target:
           entity_id: media_player.garage_speaker
@@ -221,9 +223,9 @@
           volume_level: 0.2
     default:
     - delay: 00:05:00
-    - action: light.turn_off
+    - action: switch.turn_off
       target:
-        entity_id: light.light_2
+        entity_id: switch.tesla_room_light
   mode: restart
 - id: '1767735071677'
   alias: 'Cube On '
@@ -236,11 +238,14 @@
     trigger: device
   conditions: []
   actions:
-  - action: light.turn_on
-    target:
-      entity_id:
-        - light.stairs_light_1
-        - light.driveway_light_1
+  - type: turn_on
+    device_id: 2ecb4ff5960709c8f2cdfc8b103c1cd9
+    entity_id: d0e1901526d2ea9d56e87247970296a9
+    domain: light
+  - type: turn_on
+    device_id: 96720349fc8644fab65970f726e96047
+    entity_id: 472222c70cae9813082dbb8fbabaea8b
+    domain: light
   - action: switch.turn_on
     target:
       entity_id: switch.column_lights_switch_load_control
@@ -256,11 +261,14 @@
     trigger: device
   conditions: []
   actions:
-  - action: light.turn_off
-    target:
-      entity_id:
-        - light.stairs_light_1
-        - light.driveway_light_1
+  - type: turn_off
+    device_id: 2ecb4ff5960709c8f2cdfc8b103c1cd9
+    entity_id: d0e1901526d2ea9d56e87247970296a9
+    domain: light
+  - type: turn_off
+    device_id: 96720349fc8644fab65970f726e96047
+    entity_id: 472222c70cae9813082dbb8fbabaea8b
+    domain: light
   - action: switch.turn_off
     target:
       entity_id: switch.column_lights_switch_load_control
@@ -272,26 +280,27 @@
     entity_id: event.button1
   condition:
   - condition: template
-    value_template: "{{ trigger.to_state.attributes.event_type == 'multi_press_1' }}"
+    value_template: '{{ trigger.to_state.attributes.event_type == ''multi_press_1''
+      }}'
   action:
   - service: light.toggle
     target:
       entity_id: light.master_bedroom
   mode: single
 - id: button2_toggle_bathroom
-  alias: Bedside Button2 → Toggle Tub & Vanity
-  trigger:
-  - platform: state
-    entity_id: event.button2
-  condition:
+  alias: Bedside Button2 → Toggle Vanity (tub goes along)
+  triggers:
+  - entity_id: event.button2
+    trigger: state
+  conditions:
   - condition: template
-    value_template: "{{ trigger.to_state.attributes.event_type == 'multi_press_1' }}"
-  action:
-  - service: light.toggle
-    target:
+    value_template: '{{ trigger.to_state.attributes.event_type == ''multi_press_1''
+      }}'
+  actions:
+  - target:
       entity_id:
-        - light.tub
-        - light.vanity
+      - light.vanity
+    action: light.toggle
   mode: single
 - id: '1767927944559'
   alias: Auto turn off laundry light after 10 minutes
@@ -373,7 +382,7 @@
     for:
       minutes: 15
   - trigger: state
-    entity_id: cover.remootio_gate_none
+    entity_id: cover.remootio_gate
     to: open
     for:
       minutes: 15
@@ -519,14 +528,15 @@
   max: 10
 - id: '1769300000001'
   alias: WAN Starlink Offline Notification
-  description: Notify when Starlink (wan1) goes offline or unknown for more than 1 minute
+  description: Notify when Starlink (wan1) goes offline or unknown for more than 1
+    minute
   triggers:
   - trigger: state
     entity_id:
     - sensor.mesh_node_gw_office_wan1_status
     to:
-    - 'offline'
-    - 'unknown'
+    - offline
+    - unknown
     for:
       minutes: 1
   conditions: []
@@ -534,18 +544,20 @@
   - action: notify.mobile_app_blue17
     data:
       title: Starlink Offline
-      message: "Starlink (eth1) is {{ states('sensor.mesh_node_gw_office_wan1_status') }} for over 1 minute"
+      message: Starlink (eth1) is {{ states('sensor.mesh_node_gw_office_wan1_status')
+        }} for over 1 minute
   mode: single
 - id: '1769300000002'
   alias: WAN T-Mobile Offline Notification
-  description: Notify when T-Mobile (wan2) goes offline or unknown for more than 1 minute
+  description: Notify when T-Mobile (wan2) goes offline or unknown for more than 1
+    minute
   triggers:
   - trigger: state
     entity_id:
     - sensor.mesh_node_gw_office_wan2_status
     to:
-    - 'offline'
-    - 'unknown'
+    - offline
+    - unknown
     for:
       minutes: 1
   conditions: []
@@ -553,7 +565,8 @@
   - action: notify.mobile_app_blue17
     data:
       title: T-Mobile Offline
-      message: "T-Mobile (eth2) is {{ states('sensor.mesh_node_gw_office_wan2_status') }} for over 1 minute"
+      message: T-Mobile (eth2) is {{ states('sensor.mesh_node_gw_office_wan2_status')
+        }} for over 1 minute
   mode: single
 - id: '1769300000003'
   alias: WAN Back Online Notification
@@ -562,52 +575,73 @@
   - trigger: state
     entity_id:
     - sensor.mesh_node_gw_office_wan1_status
-    to: 'online'
+    to: online
     id: starlink
   - trigger: state
     entity_id:
     - sensor.mesh_node_gw_office_wan2_status
-    to: 'online'
+    to: online
     id: tmobile
   conditions: []
   actions:
   - action: notify.mobile_app_blue17
     data:
       title: WAN Back Online
-      message: >-
-        {% if trigger.id == 'starlink' %}Starlink (eth1){% else %}T-Mobile (eth2){% endif %} is back online
+      message: '{% if trigger.id == ''starlink'' %}Starlink (eth1){% else %}T-Mobile
+        (eth2){% endif %} is back online'
   mode: queued
   max: 5
-- id: master_bathroom_sync
-  alias: Master Bathroom Lights Sync
-  description: Keep vanity and tub lights in sync (on/off and brightness)
-  mode: parallel
+- id: master_bathroom_sync_v3
+  alias: Master Bathroom Sync V3
+  description: Bidirectional sync for vanity and tub lights
   triggers:
-    - trigger: state
-      entity_id:
-        - light.vanity
-        - light.tub
+  - entity_id:
+    - light.vanity
+    - light.tub
+    platform: state
   actions:
-    - variables:
-        target_entity: "{{ 'light.tub' if trigger.entity_id == 'light.vanity' else 'light.vanity' }}"
-    - if:
+  - variables:
+      target_entity: '{{ ''light.tub'' if trigger.entity_id == ''light.vanity'' else
+        ''light.vanity'' }}'
+  - if:
+    - condition: template
+      value_template: '{{ trigger.to_state.state != states(target_entity) or (trigger.to_state.state
+        == ''on'' and state_attr(trigger.entity_id, ''brightness'') != state_attr(target_entity,
+        ''brightness'')) }}'
+    then:
+    - choose:
+      - conditions:
         - condition: template
-          value_template: "{{ trigger.to_state.state != states(target_entity) or (trigger.to_state.state == 'on' and state_attr(trigger.entity_id, 'brightness') != state_attr(target_entity, 'brightness')) }}"
-      then:
-        - choose:
-            - conditions:
-                - condition: template
-                  value_template: "{{ trigger.to_state.state == 'on' }}"
-              sequence:
-                - action: light.turn_on
-                  target:
-                    entity_id: "{{ target_entity }}"
-                  data:
-                    brightness: "{{ state_attr(trigger.entity_id, 'brightness') }}"
-            - conditions:
-                - condition: template
-                  value_template: "{{ trigger.to_state.state == 'off' }}"
-              sequence:
-                - action: light.turn_off
-                  target:
-                    entity_id: "{{ target_entity }}"
+          value_template: '{{ trigger.to_state.state == ''on'' }}'
+        sequence:
+        - target:
+            entity_id: '{{ target_entity }}'
+          data:
+            brightness: '{{ state_attr(trigger.entity_id, ''brightness'') }}'
+          action: light.turn_on
+      - conditions:
+        - condition: template
+          value_template: '{{ trigger.to_state.state == ''off'' }}'
+        sequence:
+        - target:
+            entity_id: '{{ target_entity }}'
+          action: light.turn_off
+  mode: parallel
+- id: gym_motion_light
+  alias: Gym Light – Motion
+  description: Turn on gym light on motion, turn off after 30 min of no motion. Resets timer on each motion event.
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.gym_motion
+    to: 'on'
+  conditions: []
+  actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.gym_light
+  - delay:
+      minutes: 30
+  - action: light.turn_off
+    target:
+      entity_id: light.gym_light
+  mode: restart

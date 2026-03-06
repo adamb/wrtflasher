@@ -11,6 +11,14 @@
     - condition: state
       entity_id: climate.lnlinkha_4100f2d7bcac0000b90460129f07
       state: 'off'
+    - condition: or
+      conditions:
+      - condition: state
+        entity_id: sensor.finca_del_mar_grid_status
+        state: on_grid
+      - condition: numeric_state
+        entity_id: sensor.finca_del_mar_percentage_charged_2
+        above: 50
   actions:
     - action: climate.set_hvac_mode
       target:

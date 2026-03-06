@@ -12,6 +12,22 @@ frontend:
   themes: !include_dir_merge_named themes
 
 automation: !include_dir_merge_list automations/
+
+input_boolean:
+  shed_pool_pump_was_on:
+    name: "Shed: Pool pump was on"
+  shed_dehumidifier_1_was_on:
+    name: "Shed: Dehumidifier 1 was on"
+  shed_dehumidifier_2_was_on:
+    name: "Shed: Dehumidifier 2 was on"
+  shed_bano_dehumidifier_was_on:
+    name: "Shed: Baño dehumidifier was on"
+  shed_cocina_ac_was_on:
+    name: "Shed: Cocina AC was on"
+  shed_cuarito_ac_was_on:
+    name: "Shed: Cuarito AC was on"
+  shed_big_ac_was_on:
+    name: "Shed: Big AC was on"
 script: !include scripts.yaml
 scene: !include scenes.yaml
 sensor: !include sensors.yaml
