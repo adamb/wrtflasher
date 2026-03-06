@@ -1,5 +1,5 @@
 # Home Assistant Dashboard for Finca del Mar
-# Mesh Network + Powerwall 2 Monitoring
+# Mesh Network Monitoring
 #
 # To import:
 # 1. Settings → Dashboards → Add Dashboard
@@ -10,7 +10,7 @@
 title: Mesh Network Monitor
 views:
   # ========================================
-  # OVERVIEW - Powerwall + Mesh Status
+  # OVERVIEW - Mesh Status
   # ========================================
   - title: Overview
     path: overview
@@ -20,114 +20,12 @@ views:
       - type: markdown
         content: |
           # 🏡 Finca del Mar
-          Powerwall 2 + Mesh Network Monitoring
+          Mesh Network Monitoring
         columns: 1
 
       - type: markdown
         content: >
           Last updated: {{ as_timestamp(now()) | timestamp_custom('%Y-%m-%d %H:%M') }}
-
-      # ========================================
-      # POWERWALL 2 SECTION
-      # ========================================
-      - type: vertical-stack
-        cards:
-          - type: markdown
-            content: |
-              # 🔋 Powerwall 2
-              Solar energy and battery storage
-
-          # Powerwall Key Metrics
-          - type: grid
-            columns: 3
-            square: false
-            cards:
-              # Battery State of Charge
-              - type: gauge
-                entity: sensor.powerwall_energy_percent_remaining
-                name: Battery Charge
-                min: 0
-                max: 100
-                needle: true
-                segments:
-                  - from: 0
-                    to: 20
-                    color: '#db4437'
-                  - from: 20
-                    to: 50
-                    color: '#ffa600'
-                  - from: 50
-                    to: 100
-                    color: '#43a047'
-                chart: history
-                chart_hours: 24
-
-              # Grid Status
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.powerwall_grid_status
-                    state: 'active'
-                card:
-                  type: tile
-                  entity: sensor.powerwall_grid_status
-                  name: Grid Status
-                  icon: mdi:transmission-tower-export
-                  color: green
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.powerwall_grid_status
-                    state_not: 'active'
-                card:
-                  type: tile
-                  entity: sensor.powerwall_grid_status
-                  name: Grid Status
-                  icon: mdi:transmission-tower-off
-                  color: red
-
-              # Battery Power (kw)
-              - type: tile
-                entity: sensor.powerwall_battery_power
-                name: Battery Power
-                icon: mdi:battery-plus
-                format_value: true
-
-          # Power Flow Card
-          - type: entities
-            title: Power Flow
-            show_header_toggle: false
-            entities:
-              - entity: sensor.powerwall_solar_power
-                name: Solar
-                icon: mdi:solar-power
-                format_value: true
-              - entity: sensor.powerwall_grid_power
-                name: Grid
-                icon: mdi:transmission-tower
-                format_value: true
-              - entity: sensor.powerwall_load_power
-                name: Load
-                icon: mdi:home-lightning-bolt
-                format_value: true
-              - entity: sensor.powerwall_battery_power
-                name: Battery
-                icon: mdi:battery-positive
-                format_value: true
-
-          # Powerwall History Graph
-          - type: history-graph
-            title: Power Flow (24h)
-            hours_to_show: 24
-            entities:
-              - entity: sensor.powerwall_solar_power
-                name: Solar
-              - entity: sensor.powerwall_grid_power
-                name: Grid
-              - entity: sensor.powerwall_battery_power
-                name: Battery
-              - entity: sensor.powerwall_load_power
-                name: Load
 
       # ========================================
       # CONNECTIVITY SECTION
