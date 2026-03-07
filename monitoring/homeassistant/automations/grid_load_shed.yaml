@@ -3,7 +3,8 @@
   description: >
     When off-grid and battery drops below 50%, save state and turn off non-essential loads.
     When grid returns and stays for 5 minutes, restore only loads that were on before shedding.
-  mode: restart
+  mode: single
+  max_exceeded: silent
   triggers:
   - trigger: numeric_state
     entity_id: sensor.finca_del_mar_percentage_charged_2
@@ -34,6 +35,39 @@
         - condition: state
           entity_id: sensor.finca_del_mar_grid_status
           state: on_grid
+      # Skip if already shed (all switches off = nothing to save)
+      - condition: or
+        conditions:
+        - condition: state
+          entity_id: switch.finca_del_mar_spa_filter_pump
+          state: 'on'
+        - condition: state
+          entity_id: switch.s4
+          state: 'on'
+        - condition: state
+          entity_id: switch.s4_2
+          state: 'on'
+        - condition: state
+          entity_id: switch.spare_plug
+          state: 'on'
+        - condition: state
+          entity_id: switch.yard_lights
+          state: 'on'
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: climate.casita_kitchen
+            state: 'off'
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: climate.air_conditioner_2
+            state: 'off'
+        - condition: not
+          conditions:
+          - condition: state
+            entity_id: climate.big_ac
+            state: 'off'
       sequence:
       # Save state of each load before turning off
       - action: input_boolean.turn_{{ 'on' if is_state('switch.finca_del_mar_spa_filter_pump', 'on') else 'off' }}
@@ -65,6 +99,7 @@
           - switch.s4
           - switch.s4_2
           - switch.spare_plug
+          - switch.yard_lights
       - action: climate.turn_off
         target:
           entity_id:
@@ -76,7 +111,7 @@
         data:
           title: Load Shed Active
           message: >
-            Grid offline, battery below 50%. Turned off pool pump, dehumidifiers, and casita/big ACs.
+            Grid offline, battery below 50%. Turned off pool pump, dehumidifiers, yard lights, and casita/big ACs.
       - action: media_player.turn_on
         target:
           entity_id: media_player.garage_speaker

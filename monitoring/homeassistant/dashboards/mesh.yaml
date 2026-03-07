@@ -27,6 +27,9 @@ views:
         content: >
           Last updated: {{ as_timestamp(now()) | timestamp_custom('%Y-%m-%d %H:%M') }}
 
+      - type: markdown
+        content: "[deb monitoring](http://deb)"
+
       # ========================================
       # CONNECTIVITY SECTION
       # ========================================
