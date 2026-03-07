@@ -378,6 +378,9 @@
     - binary_sensor.costco_door
     - binary_sensor.bano_abajo_door
     - binary_sensor.casita_door
+    - binary_sensor.front_door
+    - binary_sensor.freezer_door
+    - binary_sensor.balcony_door_door
     to: 'on'
     for:
       minutes: 15
