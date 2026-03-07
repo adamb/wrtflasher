@@ -6,10 +6,12 @@
   - trigger: state
     entity_id: sensor.finca_del_mar_grid_status
     to: off_grid_unintentional
+    not_from: unavailable
     id: grid_off
   - trigger: state
     entity_id: sensor.finca_del_mar_grid_status
     to: on_grid
+    not_from: unavailable
     id: grid_on
   conditions: []
   actions:

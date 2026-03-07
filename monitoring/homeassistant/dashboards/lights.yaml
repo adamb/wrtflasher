@@ -1,0 +1,164 @@
+title: Lights
+views:
+  - title: All Lights
+    path: all-lights
+    cards:
+      # ── Living Room / Kitchen ──
+      - type: entities
+        title: Living Room / Kitchen
+        show_header_toggle: true
+        entities:
+          - entity: light.tv_ceiling_light_1
+            name: TV Ceiling
+          - entity: light.kitchen_light_1
+            name: Kitchen
+          - entity: light.island_light_1
+            name: Island
+          - entity: light.main_doors_light_1
+            name: Main Doors
+          - entity: light.dining
+            name: Dining
+
+      # ── Master Bedroom ──
+      - type: entities
+        title: Master Bedroom
+        show_header_toggle: true
+        entities:
+          - entity: light.master_bedroom
+            name: Master Bedroom
+          - entity: light.master_back_light
+            name: Master Back (Exterior)
+
+      # ── Master Bath ──
+      - type: entities
+        title: Master Bath
+        show_header_toggle: true
+        entities:
+          - entity: light.vanity
+            name: Vanity
+          - entity: light.tub
+            name: Tub
+          - entity: light.smart_wi_fi_dimmer_switch
+            name: Closet
+          - entity: switch.master_toilet
+            name: Toilet
+
+      # ── Kids' Rooms ──
+      - type: entities
+        title: Kids' Rooms
+        show_header_toggle: true
+        entities:
+          - entity: light.jade_light_1
+            name: Jade's Room
+          - entity: light.jared_light_1
+            name: Jared's Room
+          - entity: light.kids_vanity_light_1
+            name: Kids Vanity
+          - entity: switch.kids_bath
+            name: Kids Bath
+
+      # ── Gym ──
+      - type: entities
+        title: Gym
+        show_header_toggle: true
+        entities:
+          - entity: light.gym_light
+            name: Gym
+
+      # ── Ground Floor ──
+      - type: entities
+        title: Ground Floor
+        show_header_toggle: true
+        entities:
+          - entity: light.tesla_room_light
+            name: Tesla Room
+          - entity: switch.freezer_room_light
+            name: Freezer Room
+          - entity: light.costco_light
+            name: Costco
+          - entity: light.laundry_light
+            name: Laundry
+          - entity: light.stairs_light_1
+            name: Step Lights
+
+      # ── Casita ──
+      - type: entities
+        title: Casita
+        show_header_toggle: true
+        entities:
+          - entity: light.cocina_bano
+            name: Cocina Baño
+          - entity: light.cocina_light_1
+            name: Cocina
+          - entity: light.isla_light_1
+            name: Isla (Kitchen)
+          - entity: light.loft_light_1
+            name: Loft
+          - entity: light.loft_bed_light_1
+            name: Loft Bed
+          - entity: light.lamp_light_1
+            name: Lamp
+          - entity: light.porche_light_1
+            name: Porche
+          - entity: light.bano_upstairs
+            name: Baño Upstairs (Cuarito)
+
+      # ── BBQ / Party Zone ──
+      - type: entities
+        title: BBQ / Party Zone
+        show_header_toggle: true
+        entities:
+          - entity: light.bbq_light
+            name: BBQ Light
+          - entity: switch.bar_lights
+            name: Bar Lights (Switch)
+          - entity: light.bar_bulbs
+            name: Bar Bulbs
+          - entity: light.bar1
+            name: Bar 1
+          - entity: light.bar2
+            name: Bar 2
+          - entity: light.bar3
+            name: Bar 3
+          - entity: light.balcony_light_1
+            name: Balcony
+          - entity: switch.column_lights_switch_load_control
+            name: Column Lights
+          - entity: switch.yard_lights
+            name: Yard Lights
+          - entity: light.urchin_bottom_light_1
+            name: Urchin Bottom
+          - entity: light.urchin_top_light_1
+            name: Urchin Top
+
+      # ── Outdoor / Exterior ──
+      - type: entities
+        title: Outdoor / Exterior
+        show_header_toggle: true
+        entities:
+          - entity: light.driveway_light
+            name: Driveway AZ
+          - entity: light.driveway_light_1
+            name: Driveway 1
+          - entity: light.driveway_light_2
+            name: Driveway 2
+          - entity: light.front_light_2
+            name: Front Light
+          - entity: light.tanks_light
+            name: Tanks
+          - entity: light.beach_wall_light
+            name: Beach Wall
+          - entity: light.beach_gate_light
+            name: Beach Gate
+          - entity: light.side_light
+            name: Side
+          - entity: light.side_gate_light
+            name: Side Gate
+          - entity: light.jungle_front_light
+            name: Jungle Front
+          - entity: light.jungle_back_side_light
+            name: Jungle Back Side
+          - entity: light.backyard_light
+            name: Backyard
+          - entity: light.playa_light
+            name: Playa

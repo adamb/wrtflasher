@@ -596,40 +596,46 @@
   max: 5
 - id: master_bathroom_sync_v3
   alias: Master Bathroom Sync V3
-  description: Bidirectional sync for vanity and tub lights
+  description: Bidirectional sync for vanity and tub lights (on/off/dim)
   triggers:
-  - entity_id:
+  - platform: state
+    entity_id:
     - light.vanity
     - light.tub
-    platform: state
+  conditions:
+  - condition: template
+    value_template: >
+      {{ trigger.to_state.state in ['on', 'off'] and
+         trigger.from_state.state in ['on', 'off', 'unavailable'] }}
   actions:
   - variables:
-      target_entity: '{{ ''light.tub'' if trigger.entity_id == ''light.vanity'' else
-        ''light.vanity'' }}'
-  - if:
-    - condition: template
-      value_template: '{{ trigger.to_state.state != states(target_entity) or (trigger.to_state.state
-        == ''on'' and state_attr(trigger.entity_id, ''brightness'') != state_attr(target_entity,
-        ''brightness'')) }}'
-    then:
-    - choose:
-      - conditions:
-        - condition: template
-          value_template: '{{ trigger.to_state.state == ''on'' }}'
-        sequence:
-        - target:
-            entity_id: '{{ target_entity }}'
-          data:
-            brightness: '{{ state_attr(trigger.entity_id, ''brightness'') }}'
-          action: light.turn_on
-      - conditions:
-        - condition: template
-          value_template: '{{ trigger.to_state.state == ''off'' }}'
-        sequence:
-        - target:
-            entity_id: '{{ target_entity }}'
-          action: light.turn_off
-  mode: parallel
+      target: >
+        {{ 'light.tub' if trigger.entity_id == 'light.vanity' else 'light.vanity' }}
+      src_state: '{{ trigger.to_state.state }}'
+      src_bright: '{{ state_attr(trigger.entity_id, "brightness") | default(255, true) | int }}'
+      tgt_bright: '{{ state_attr(target, "brightness") | default(255, true) | int }}'
+  - condition: template
+    value_template: >
+      {{ states(target) != src_state or
+         (src_state == 'on' and src_bright != tgt_bright) }}
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{ src_state == ''on'' }}'
+      sequence:
+      - action: light.turn_on
+        target:
+          entity_id: '{{ target }}'
+        data:
+          brightness: '{{ src_bright }}'
+    default:
+    - action: light.turn_off
+      target:
+        entity_id: '{{ target }}'
+  - delay:
+      milliseconds: 500
+  mode: single
+  max_exceeded: silent
 - id: gym_motion_light
   alias: Gym Light – Motion
   description: Turn on gym light on motion, turn off after 30 min of no motion. Resets timer on each motion event.

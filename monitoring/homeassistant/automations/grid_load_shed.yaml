@@ -16,6 +16,7 @@
   - trigger: state
     entity_id: sensor.finca_del_mar_grid_status
     to: on_grid
+    not_from: unavailable
     for:
       minutes: 5
     id: grid_back
