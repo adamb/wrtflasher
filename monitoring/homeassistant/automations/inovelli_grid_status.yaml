@@ -1,0 +1,51 @@
+- id: inovelli_grid_status
+  alias: Inovelli LEDs - Grid Status
+  description: >
+    Set Inovelli switch LEDs to indicate grid/battery status.
+    Blue/Solid = on grid, Red/Slow Blink = off grid, Red/Fast Siren = off grid + battery < 50%.
+  mode: single
+  max_exceeded: silent
+  triggers:
+  - trigger: state
+    entity_id: sensor.finca_del_mar_grid_status
+  - trigger: numeric_state
+    entity_id: sensor.finca_del_mar_percentage_charged_2
+    below: 50
+  - trigger: numeric_state
+    entity_id: sensor.finca_del_mar_percentage_charged_2
+    above: 50
+  conditions: []
+  actions:
+  - variables:
+      led_color: >
+        {% if is_state('sensor.finca_del_mar_grid_status', 'on_grid') %}
+          Blue
+        {% else %}
+          Red
+        {% endif %}
+      led_effect: >
+        {% if is_state('sensor.finca_del_mar_grid_status', 'on_grid') %}
+          Solid
+        {% elif states('sensor.finca_del_mar_percentage_charged_2') | float < 50 %}
+          Fast Siren
+        {% else %}
+          Slow Blink
+        {% endif %}
+  - action: select.select_option
+    target:
+      entity_id:
+      - select.inovelli_on_off_switch_led_color
+      - select.inovelli_on_off_switch_led_color_2
+      - select.inovelli_on_off_switch_led_color_3
+      - select.column_lights_led_color
+    data:
+      option: "{{ led_color }}"
+  - action: select.select_option
+    target:
+      entity_id:
+      - select.inovelli_on_off_switch_led_effect
+      - select.inovelli_on_off_switch_led_effect_2
+      - select.inovelli_on_off_switch_led_effect_3
+      - select.column_lights_led_effect
+    data:
+      option: "{{ led_effect }}"
