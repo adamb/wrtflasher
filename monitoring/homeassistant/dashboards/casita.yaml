@@ -101,7 +101,7 @@ views:
                 name: Motion
               - entity: switch.casita_motion_detection
                 name: Detection
-              - entity: sensor.casita_door_battery
+              - entity: sensor.myggbett_door_window_sensor_battery_9
                 name: Battery
 
       # Media
@@ -165,9 +165,9 @@ views:
         entities:
           - entity: binary_sensor.casita_door
             name: Door Status
-          - entity: sensor.casita_door_battery
+          - entity: sensor.myggbett_door_window_sensor_battery_9
             name: Battery
-          - entity: sensor.casita_door_battery_voltage
+          - entity: sensor.myggbett_door_window_sensor_battery_voltage_9
             name: Battery Voltage
 
       - type: entities

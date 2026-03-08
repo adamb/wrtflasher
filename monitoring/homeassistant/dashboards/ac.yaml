@@ -9,11 +9,95 @@ views:
     path: overview
     icon: mdi:air-conditioner
     cards:
-      - type: markdown
-        content: |
-          # AC Units
+      # ── Bed AC Climate React ──
+      - type: entities
+        title: Bed AC Climate React
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.bed_ac_climate_react
+            name: Enabled
+          - entity: switch.bed_ac_sensibo_climate_react
+            name: Sensibo React (should be off)
+          - entity: climate.bed_ac_sensibo
+            name: AC Status
+          - type: attribute
+            entity: climate.bed_ac_sensibo
+            attribute: current_temperature
+            name: Current Temp
+            suffix: "°F"
+          - type: attribute
+            entity: climate.bed_ac_sensibo
+            attribute: current_humidity
+            name: Humidity
+            suffix: "%"
+          - entity: input_number.bed_ac_upper_temp
+            name: Turn On Above
+          - entity: input_number.bed_ac_lower_temp
+            name: Turn Off Below
+          - entity: input_number.bed_ac_set_temp
+            name: AC Set Temp
+          - entity: timer.bed_ac_mold_cooldown
+            name: Mold Cooldown
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: input_button.bed_ac_cooler
+            name: Cooler
+            icon: mdi:thermometer-minus
+            tap_action:
+              action: toggle
+          - type: button
+            entity: input_button.bed_ac_warmer
+            name: Warmer
+            icon: mdi:thermometer-plus
+            tap_action:
+              action: toggle
 
-      # Main House
+      # ── Gym AC Climate React ──
+      - type: entities
+        title: Gym AC Climate React
+        show_header_toggle: false
+        entities:
+          - entity: input_boolean.gym_ac_climate_react
+            name: Enabled
+          - entity: switch.gym_ac_sensibo_climate_react
+            name: Sensibo React (should be off)
+          - entity: climate.gym_ac_sensibo
+            name: AC Status
+          - type: attribute
+            entity: climate.gym_ac_sensibo
+            attribute: current_temperature
+            name: Current Temp
+            suffix: "°F"
+          - type: attribute
+            entity: climate.gym_ac_sensibo
+            attribute: current_humidity
+            name: Humidity
+            suffix: "%"
+          - entity: input_number.gym_ac_upper_temp
+            name: Turn On Above
+          - entity: input_number.gym_ac_lower_temp
+            name: Turn Off Below
+          - entity: input_number.gym_ac_set_temp
+            name: AC Set Temp
+          - entity: timer.gym_ac_mold_cooldown
+            name: Mold Cooldown
+      - type: horizontal-stack
+        cards:
+          - type: button
+            entity: input_button.gym_ac_cooler
+            name: Cooler
+            icon: mdi:thermometer-minus
+            tap_action:
+              action: toggle
+          - type: button
+            entity: input_button.gym_ac_warmer
+            name: Warmer
+            icon: mdi:thermometer-plus
+            tap_action:
+              action: toggle
+
+      # ── Main House ──
       - type: markdown
         content: "## Main House"
 
@@ -23,8 +107,17 @@ views:
             entity: climate.master_ac
             name: Master
           - type: thermostat
+            entity: climate.bed_ac_sensibo
+            name: Bed (Sensibo)
+
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
             entity: climate.gym_ac
             name: Gym
+          - type: thermostat
+            entity: climate.gym_ac_sensibo
+            name: Gym (Sensibo)
 
       - type: horizontal-stack
         cards:
@@ -98,6 +191,10 @@ views:
             name: Jared's
           - entity: climate.lnlinkha_4100f2d7bcac0000b90460129f07
             name: Main
+          - entity: climate.bed_ac_sensibo
+            name: Bed
+          - entity: climate.gym_ac_sensibo
+            name: Gym (S)
           - entity: climate.big_ac
             name: Big AC
           - entity: sensor.cocina_ac_setpoint
