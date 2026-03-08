@@ -14,11 +14,18 @@
     entity_id: input_boolean.bed_ac_climate_react
     state: 'on'
   actions:
-  - action: climate.set_temperature
+  - action: timer.cancel
+    target:
+      entity_id: timer.bed_ac_mold_cooldown
+  - action: climate.set_hvac_mode
     target:
       entity_id: climate.bed_ac_sensibo
     data:
       hvac_mode: dry
+  - action: climate.set_temperature
+    target:
+      entity_id: climate.bed_ac_sensibo
+    data:
       temperature: "{{ states('input_number.bed_ac_set_temp') | int }}"
   - action: notify.mobile_app_blue17
     data:

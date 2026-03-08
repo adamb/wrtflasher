@@ -42,13 +42,13 @@ views:
         cards:
           - type: button
             entity: input_button.bed_ac_cooler
-            name: Cooler
+            name: Bed Cooler
             icon: mdi:thermometer-minus
             tap_action:
               action: toggle
           - type: button
             entity: input_button.bed_ac_warmer
-            name: Warmer
+            name: Bed Warmer
             icon: mdi:thermometer-plus
             tap_action:
               action: toggle
@@ -86,13 +86,13 @@ views:
         cards:
           - type: button
             entity: input_button.gym_ac_cooler
-            name: Cooler
+            name: Gym Cooler
             icon: mdi:thermometer-minus
             tap_action:
               action: toggle
           - type: button
             entity: input_button.gym_ac_warmer
-            name: Warmer
+            name: Gym Warmer
             icon: mdi:thermometer-plus
             tap_action:
               action: toggle
