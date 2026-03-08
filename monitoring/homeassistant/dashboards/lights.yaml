@@ -18,6 +18,24 @@ views:
             name: Main Doors
           - entity: light.dining
             name: Dining
+          - entity: light.laundry_light
+            name: Laundry
+          - entity: switch.guest_bath
+            name: Guest Bath
+
+      # ── Entrance ──
+      - type: entities
+        title: Entrance
+        show_header_toggle: true
+        entities:
+          - entity: switch.cube
+            name: Cube
+          - entity: light.stairs_light_1
+            name: Step Lights
+          - entity: switch.front_balcony
+            name: Front Balcony
+          - entity: switch.stairs_ceiling
+            name: Stair Ceiling
 
       # ── Master Bedroom ──
       - type: entities
@@ -28,6 +46,7 @@ views:
             name: Master Bedroom
           - entity: light.master_back_light
             name: Master Back (Exterior)
+            icon: mdi:cctv
 
       # ── Master Bath ──
       - type: entities
@@ -70,16 +89,14 @@ views:
         title: Ground Floor
         show_header_toggle: true
         entities:
-          - entity: light.tesla_room_light
+          - entity: switch.tesla_room_light
             name: Tesla Room
           - entity: switch.freezer_room_light
             name: Freezer Room
-          - entity: light.costco_light
+          - entity: light.costco_light_1
             name: Costco
-          - entity: light.laundry_light
-            name: Laundry
-          - entity: light.stairs_light_1
-            name: Step Lights
+          - entity: switch.bano_abajo
+            name: Baño Abajo
 
       # ── Casita ──
       - type: entities
@@ -102,6 +119,10 @@ views:
             name: Porche
           - entity: light.bano_upstairs
             name: Baño Upstairs (Cuarito)
+          - entity: light.urchin_bottom_light_1
+            name: Urchin Bottom
+          - entity: light.urchin_top_light_1
+            name: Urchin Top
 
       # ── BBQ / Party Zone ──
       - type: entities
@@ -110,55 +131,55 @@ views:
         entities:
           - entity: light.bbq_light
             name: BBQ Light
-          - entity: switch.bar_lights
-            name: Bar Lights (Switch)
+            icon: mdi:cctv
           - entity: light.bar_bulbs
-            name: Bar Bulbs
+            name: Bar Lights
           - entity: light.bar1
             name: Bar 1
           - entity: light.bar2
             name: Bar 2
           - entity: light.bar3
             name: Bar 3
-          - entity: light.balcony_light_1
-            name: Balcony
+          - entity: switch.lounge_fan_switch_load_control
+            name: Lounge Fan
+          - entity: switch.bbq_fan_switch_load_control
+            name: BBQ Fan
+          - entity: switch.inovelli_on_off_switch_switch_load_control_3
+            name: BBQ Center Fan
           - entity: switch.column_lights_switch_load_control
             name: Column Lights
-          - entity: switch.yard_lights
-            name: Yard Lights
-          - entity: light.urchin_bottom_light_1
-            name: Urchin Bottom
-          - entity: light.urchin_top_light_1
-            name: Urchin Top
 
       # ── Outdoor / Exterior ──
       - type: entities
         title: Outdoor / Exterior
         show_header_toggle: true
         entities:
-          - entity: light.driveway_light
-            name: Driveway AZ
+          - entity: light.balcony_light_1
+            name: Balcony
           - entity: light.driveway_light_1
-            name: Driveway 1
+            name: Driveway Ceiling
           - entity: light.driveway_light_2
             name: Driveway 2
+            icon: mdi:cctv
           - entity: light.front_light_2
             name: Front Light
           - entity: light.tanks_light
             name: Tanks
+            icon: mdi:cctv
           - entity: light.beach_wall_light
             name: Beach Wall
-          - entity: light.beach_gate_light
-            name: Beach Gate
+            icon: mdi:cctv
           - entity: light.side_light
             name: Side
-          - entity: light.side_gate_light
-            name: Side Gate
+            icon: mdi:cctv
+          - entity: switch.yard_lights
+            name: Yard Lights
           - entity: light.jungle_front_light
             name: Jungle Front
+            icon: mdi:cctv
           - entity: light.jungle_back_side_light
             name: Jungle Back Side
+            icon: mdi:cctv
           - entity: light.backyard_light
             name: Backyard
-          - entity: light.playa_light
-            name: Playa
+            icon: mdi:cctv
