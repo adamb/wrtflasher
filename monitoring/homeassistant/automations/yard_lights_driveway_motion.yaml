@@ -1,0 +1,23 @@
+- id: 'yard_lights_driveway_motion'
+  alias: Yard lights on when driveway motion
+  description: Turn on yard lights for 10 min when Ring driveway camera detects motion at night. Skip if already on.
+  triggers:
+    - trigger: state
+      entity_id: sensor.driveway_last_activity_2
+  conditions:
+    - condition: sun
+      before: sunrise
+      after: sunset
+    - condition: state
+      entity_id: switch.yard_lights
+      state: 'off'
+  actions:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.yard_lights
+    - delay:
+        minutes: 10
+    - action: switch.turn_off
+      target:
+        entity_id: switch.yard_lights
+  mode: restart

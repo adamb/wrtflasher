@@ -17,29 +17,6 @@
       title: Starlink down
       message: Starlink down for over a minute
   mode: single
-- id: '1765422712040'
-  alias: Yard lights on when driveway motion
-  description: Turn on yard lights for 10 min when Ring driveway camera detects motion at night. Skip if already on.
-  triggers:
-  - trigger: state
-    entity_id: event.driveway_motion_2
-  conditions:
-  - condition: sun
-    before: sunrise
-    after: sunset
-  - condition: state
-    entity_id: switch.yard_lights
-    state: 'off'
-  actions:
-  - action: switch.turn_on
-    target:
-      entity_id: switch.yard_lights
-  - delay:
-      minutes: 10
-  - action: switch.turn_off
-    target:
-      entity_id: switch.yard_lights
-  mode: restart
 - id: '1767147416914'
   alias: Yard & Porche lights on at sunset
   description: Lights on at dusk
@@ -631,23 +608,26 @@
   mode: single
   max_exceeded: silent
 - id: gym_motion_light
-  alias: Gym Light – Motion
-  description: Turn on gym light on motion, turn off after 30 min of no motion. Resets timer on each motion event.
+  alias: Cube Light – Balcony Motion
+  description: Turn on cube light when front balcony motion detected at night, turn off after 30 min of no motion.
   triggers:
   - trigger: state
     entity_id: binary_sensor.gym_motion
     to: 'on'
   conditions:
+  - condition: sun
+    before: sunrise
+    after: sunset
   - condition: numeric_state
     entity_id: sensor.gym_luma
     below: 30
   actions:
-  - action: light.turn_on
+  - action: switch.turn_on
     target:
-      entity_id: light.gym_light
+      entity_id: switch.cube
   - delay:
       minutes: 30
-  - action: light.turn_off
+  - action: switch.turn_off
     target:
-      entity_id: light.gym_light
+      entity_id: switch.cube
   mode: restart
