@@ -342,6 +342,50 @@ Watch ping times in Session 1 while load runs in Session 2. SQM is working if la
 
 ## Future Enhancements / TODO
 
+### OpenWRT 25.12.0 Upgrade (before September 2026)
+
+Upgrade from OpenWRT 24.10.0 to 25.12.0. Current 24.10 goes EOL September 2026.
+
+**Version changes:**
+
+| Component | Current (24.10.0) | New (25.12.0) |
+|-----------|-------------------|---------------|
+| batman-adv | 2024.3 | 2025.4 |
+| Kernel | 6.6.73 | 6.12.71 |
+| hostapd | older | Aug 2025 master |
+| cfg80211/mac80211 | kernel 6.6 | kernel 6.18.7 |
+| Package manager | opkg (.ipk) | apk (.apk) |
+| dnsmasq | older | 2.91 |
+
+**Why upgrade:** Newer hostapd and wireless stack may fix IoT WiFi dropout issues (Gree ACs disconnecting). batman-adv 2025.4 adds jumbo frame support and bug fixes.
+
+**Build system changes required:**
+
+1. Download new ImageBuilder:
+   ```bash
+   cd downloads
+   wget https://downloads.openwrt.org/releases/25.12.0/targets/mediatek/filogic/openwrt-imagebuilder-25.12.0-mediatek-filogic.Linux-x86_64.tar.zst
+   ```
+2. Update version strings `24.10.0` → `25.12.0` in:
+   - `Dockerfile` (2 edits — tarball name, WORKDIR path)
+   - `build.sh` (6 edits — Docker tag, ImageBuilder paths)
+   - `CLAUDE.md` (3 edits — download URL, examples)
+   - `GEMINI.md` (3 edits — download URL, examples)
+   - `README.md` (1 edit — download URL in Quick Start)
+3. No changes needed to: `config.sh`, `generate-config.sh`, `.env`, `templates/`
+4. Device profiles (`openwrt_one`, `glinet_gl-mt3000`) and package names confirmed unchanged in 25.12.0
+
+**Deployment order:**
+
+1. Build firmware for both profiles
+2. Flash ONE AP (ap-jade) first — verify mesh interop with existing 24.10 nodes
+3. Confirm: mesh joins (`batctl o`), SSIDs broadcast, IoT clients connect
+4. Flash remaining 6 APs one at a time, verifying each
+5. Flash gateway LAST (brief network outage ~5 min)
+6. Verify all 8 nodes show batman-adv 2025.4: `cat /sys/module/batman_adv/version`
+
+**Rollback:** Keep 24.10.0 firmware images. APs reflash via sysupgrade. Gateway has dual-boot via serial console.
+
 ### Matter/Thread Entity Cleanup
 
 After the Feb 7, 2026 power outage, all Matter devices were factory reset and re-commissioned. Remaining cleanup:
