@@ -1,0 +1,45 @@
+- id: gym_motion_light
+  alias: Cube Light – Balcony Motion
+  description: >
+    Turn on cube light when front balcony motion detected at night
+    (only if cube is off). Turn off after 15 min of no motion.
+    Respects manual off — waits 5 min before allowing re-trigger.
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.gym_motion
+      to: "on"
+  conditions:
+    - condition: sun
+      before: sunrise
+      after: sunset
+    - condition: numeric_state
+      entity_id: sensor.gym_luma
+      below: 30
+    - condition: state
+      entity_id: switch.cube
+      state: "off"
+      for:
+        minutes: 5
+  actions:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.cube
+    - wait_for_trigger:
+        - trigger: state
+          entity_id: binary_sensor.gym_motion
+          to: "off"
+          for:
+            minutes: 15
+        - trigger: state
+          entity_id: switch.cube
+          to: "off"
+      timeout: "02:00:00"
+      continue_on_timeout: true
+    - condition: state
+      entity_id: switch.cube
+      state: "on"
+    - action: switch.turn_off
+      target:
+        entity_id: switch.cube
+  mode: single
+  max_exceeded: silent

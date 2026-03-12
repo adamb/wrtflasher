@@ -28,6 +28,24 @@ input_boolean:
     name: "Shed: Cuarito AC was on"
   shed_big_ac_was_on:
     name: "Shed: Big AC was on"
+  bedroom_ac_manual_override:
+    name: "Bedroom AC manual override"
+  bedroom_ac_away:
+    name: "Bedroom AC away mode"
+
+input_number:
+  bedroom_ac_last_auto_temp:
+    name: "Bedroom AC last auto temp"
+    min: 61
+    max: 86
+    step: 1
+    unit_of_measurement: "°F"
+
+timer:
+  bedroom_ac_override_timer:
+    name: "Bedroom AC override timer"
+    duration: "08:00:00"
+
 script: !include scripts.yaml
 scene: !include scenes.yaml
 sensor: !include sensors.yaml
@@ -62,6 +80,24 @@ template:
           {% set full = 0.1 %}
           {% set empty = 1.52 %}
           {{ (((empty - depth) / (empty - full)) * 100) | round(1) }}
+
+  - cover:
+      - name: "Front Gate Trigger"
+        unique_id: front_gate_trigger
+        device_class: gate
+        state: "{{ states('cover.remootio_gate') }}"
+        open_cover:
+          - action: cover.open_cover
+            target:
+              entity_id: cover.remootio_gate
+        close_cover:
+          - action: cover.close_cover
+            target:
+              entity_id: cover.remootio_gate
+        stop_cover:
+          - action: cover.open_cover
+            target:
+              entity_id: cover.remootio_gate
 
   - binary_sensor:
       - name: "Freezer Alert"
@@ -144,6 +180,12 @@ lovelace:
       filename: dashboards/ac.yaml
       title: AC Units
       icon: mdi:air-conditioner
+      require_admin: false
+    all-lights:
+      mode: yaml
+      filename: dashboards/lights.yaml
+      title: Lights
+      icon: mdi:lightbulb-group
       require_admin: false
 
       # start working on cloudflared

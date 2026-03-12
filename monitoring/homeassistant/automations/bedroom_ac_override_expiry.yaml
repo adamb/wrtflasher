@@ -1,0 +1,28 @@
+- id: bedroom_ac_override_expiry
+  alias: "Bedroom AC: Clear override after timer"
+  description: "Resume AC schedule after manual override timer expires"
+  trigger:
+    - platform: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.bedroom_ac_override_timer
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.bedroom_ac_manual_override
+    - variables:
+        schedule_temp: >
+          {% if now().hour >= 22 or now().hour < 10 %}73{% else %}78{% endif %}
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.bedroom_ac_last_auto_temp
+      data:
+        value: "{{ schedule_temp }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.master_ac
+      data:
+        temperature: "{{ schedule_temp }}"
+    - service: notify.mobile_app_blue17
+      data:
+        message: "Bedroom AC override expired — resumed schedule ({{ schedule_temp }}°F)"

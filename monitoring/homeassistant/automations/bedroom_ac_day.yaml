@@ -1,0 +1,32 @@
+- id: bedroom_ac_day
+  alias: "Bedroom AC: Day schedule (78°F at 10am)"
+  description: "Set bedroom AC to 78°F at 10am unless manually overridden or away"
+  trigger:
+    - platform: time
+      at: "10:00:00"
+  condition:
+    - condition: state
+      entity_id: input_boolean.bedroom_ac_manual_override
+      state: "off"
+    - condition: state
+      entity_id: input_boolean.bedroom_ac_away
+      state: "off"
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: climate.master_ac
+          state: "off"
+  action:
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.bedroom_ac_last_auto_temp
+      data:
+        value: 78
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.master_ac
+      data:
+        temperature: 78
+    - service: notify.mobile_app_blue17
+      data:
+        message: "Bedroom AC set to 78°F (day schedule)"

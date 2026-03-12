@@ -1,0 +1,31 @@
+- id: bedroom_ac_return
+  alias: "Bedroom AC: Resume schedule on return"
+  description: "Resume AC schedule when motion detected after away mode"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_occupancy
+      to: "on"
+  condition:
+    - condition: state
+      entity_id: input_boolean.bedroom_ac_away
+      state: "on"
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.bedroom_ac_away
+    - variables:
+        schedule_temp: >
+          {% if now().hour >= 22 or now().hour < 10 %}73{% else %}78{% endif %}
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.bedroom_ac_last_auto_temp
+      data:
+        value: "{{ schedule_temp }}"
+    - service: climate.set_temperature
+      target:
+        entity_id: climate.master_ac
+      data:
+        temperature: "{{ schedule_temp }}"
+    - service: notify.mobile_app_blue17
+      data:
+        message: "Bedroom AC resumed schedule ({{ schedule_temp }}°F) — motion detected"

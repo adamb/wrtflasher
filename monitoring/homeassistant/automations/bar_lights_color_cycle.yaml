@@ -1,0 +1,41 @@
+- id: bar_lights_color_cycle
+  alias: "Bar Lights Config Button → Cycle Colors"
+  description: >
+    Press the config button on the Bar Lights Inovelli switch to cycle
+    through colors on the bar bulbs and the switch LED strip.
+  triggers:
+    - trigger: state
+      entity_id: event.inovelli_on_off_switch_button_config_2
+  conditions:
+    - condition: template
+      value_template: "{{ state_attr('event.inovelli_on_off_switch_button_config_2', 'event_type') == 'multi_press_1' }}"
+  actions:
+    - variables:
+        colors:
+          - [30, 30]
+          - [0, 100]
+          - [30, 100]
+          - [55, 100]
+          - [120, 100]
+          - [230, 100]
+          - [270, 100]
+          - [320, 100]
+        idx: "{{ ((states('input_number.bar_lights_color_index') | int) + 1) % 8 }}"
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.bar_lights_color_index
+      data:
+        value: "{{ idx }}"
+    - action: light.turn_on
+      target:
+        entity_id: light.bar_bulbs
+      data:
+        hs_color: "{{ colors[idx | int] }}"
+        brightness: 255
+    - action: light.turn_on
+      target:
+        entity_id: light.inovelli_on_off_switch_light_rgb_indicator_2
+      data:
+        hs_color: "{{ colors[idx | int] }}"
+        brightness: 255
+  mode: restart

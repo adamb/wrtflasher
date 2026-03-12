@@ -1,0 +1,14 @@
+- id: bbq_fan_config_toggle_gate
+  alias: "BBQ Fan Config Button → Toggle Gate"
+  description: "Press the config button on the BBQ Fan Inovelli switch to open/close the front gate"
+  triggers:
+    - trigger: state
+      entity_id: event.inovelli_on_off_switch_button_config
+  conditions:
+    - condition: template
+      value_template: "{{ state_attr('event.inovelli_on_off_switch_button_config', 'event_type') == 'multi_press_1' }}"
+  actions:
+    - action: cover.toggle
+      target:
+        entity_id: cover.front_gate_trigger
+  mode: restart

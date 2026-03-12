@@ -1,0 +1,20 @@
+- id: bedroom_light_off_no_motion
+  alias: "Bedroom: Light off after 45 min no motion"
+  description: "Turn off master bedroom light after 45 minutes of no motion"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.motion_sensor_occupancy
+      to: "off"
+      for:
+        minutes: 45
+  condition:
+    - condition: state
+      entity_id: light.master_bedroom
+      state: "on"
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.master_bedroom
+    - service: notify.mobile_app_blue17
+      data:
+        message: "Bedroom light turned off (no motion for 45 min)"

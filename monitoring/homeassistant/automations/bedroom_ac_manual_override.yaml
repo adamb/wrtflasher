@@ -1,0 +1,26 @@
+- id: bedroom_ac_manual_override
+  alias: "Bedroom AC: Detect manual override"
+  description: "Detect manual temperature changes on bedroom AC and enable override mode"
+  trigger:
+    - platform: state
+      entity_id: climate.master_ac
+      attribute: temperature
+  condition:
+    - condition: template
+      value_template: >
+        {{ trigger.to_state.attributes.temperature | float !=
+           states('input_number.bedroom_ac_last_auto_temp') | float }}
+  action:
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.bedroom_ac_manual_override
+    - service: timer.start
+      target:
+        entity_id: timer.bedroom_ac_override_timer
+      data:
+        duration: "08:00:00"
+    - service: notify.mobile_app_blue17
+      data:
+        message: >
+          Bedroom AC manually set to {{ trigger.to_state.attributes.temperature }}°F
+          — schedule paused for 8 hours
