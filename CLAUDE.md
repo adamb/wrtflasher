@@ -225,6 +225,7 @@ The `monitoring/` directory contains a Python script that polls mesh nodes via S
   - `dashboards/ac.yaml` - AC units dashboard (all 8 units, with Tuya setpoint workarounds)
   - `dashboards/climate.yaml` - Temperature & humidity sensor dashboard
   - `dashboards/thread-devices.yaml` - Thread/Matter device dashboard (lights, plugs, door sensors, batteries)
+  - `dashboards/lights.yaml` - Lights control dashboard
   - `blueprints/` - Automation blueprints
 - **Poll interval**: 60 seconds (configurable in config.yaml)
 
@@ -382,6 +383,90 @@ Current inventory (13 Thread devices + 1 WiFi Matter device):
 - If commissioning fails, try factory resetting the device again
 - The Matter pairing code is often on a sticker on the device itself or on the box/manual
 - IKEA devices: the code is on the box and on a small card inside the packaging
+
+## Inovelli Switch Config Button Automations
+
+The BBQ area has three Inovelli on/off switches with programmable config buttons (small side button). Each switch exposes `event` entities for button presses:
+
+| Switch | Config Button Entity | Function |
+|--------|---------------------|----------|
+| BBQ Fan | `event.inovelli_on_off_switch_button_config` | Toggle front gate (Remootio) |
+| Bar Lights | `event.inovelli_on_off_switch_button_config_2` | Cycle bar bulb colors + LED strip |
+| BBQ Center Fan | `event.inovelli_on_off_switch_button_config_3` | Unassigned |
+
+**Event types**: Inovelli config buttons fire `multi_press_1` (single press), `multi_press_2` (double), etc. — NOT `press`.
+
+**Trigger pattern for Inovelli event entities**: Do NOT use `attribute: event_type to: "multi_press_1"` — consecutive single presses have the same attribute value, so the trigger won't fire after the first press. Instead, trigger on any state change and filter in a condition:
+```yaml
+triggers:
+  - trigger: state
+    entity_id: event.inovelli_on_off_switch_button_config
+conditions:
+  - condition: template
+    value_template: "{{ state_attr('event.inovelli_on_off_switch_button_config', 'event_type') == 'multi_press_1' }}"
+```
+
+### Gate Button (BBQ Fan Config)
+- Automation: `automations/bbq_fan_config_toggle_gate.yaml`
+- Calls `cover.toggle` on `cover.front_gate_trigger` (template cover wrapper)
+
+### Color Cycle (Bar Lights Config)
+- Automation: `automations/bar_lights_color_cycle.yaml`
+- Helper: `input_number.bar_lights_color_index` (tracks current color, wraps via `% 8`)
+- Cycles through 8 colors: warm white, red, orange, yellow, green, blue, purple, pink
+- Sets color on both `light.bar_bulbs` (bar1/bar2/bar3 group) and `light.inovelli_on_off_switch_light_rgb_indicator_2` (LED strip)
+
+## Remootio Gate (Template Cover)
+
+The Remootio (`cover.remootio_gate`) is a single-button relay gate controller. HA's cover entity won't send `open_cover` when already open or `close_cover` when already closed, which breaks toggle behavior.
+
+**Solution**: A template cover `cover.front_gate_trigger` in `configuration.yaml` wraps the Remootio:
+- Reports state from `cover.remootio_gate`
+- `open_cover` → calls `cover.open_cover` on Remootio
+- `close_cover` → calls `cover.close_cover` on Remootio
+- `stop_cover` → calls `cover.open_cover` on Remootio (sends pulse to stop/reverse)
+
+Use `cover.front_gate_trigger` in automations instead of `cover.remootio_gate` directly.
+
+## Bedroom AC Schedule Automations
+
+Automations for `climate.master_ac` with day/night temperature schedules:
+
+| Automation | File | Trigger | Setpoint |
+|-----------|------|---------|----------|
+| Day schedule | `bedroom_ac_day.yaml` | 10:00 AM | 78°F |
+| Night schedule | `bedroom_ac_night.yaml` | 10:00 PM | 73°F |
+| Manual override | `bedroom_ac_manual_override.yaml` | Temperature changed manually | Sets override flag |
+| Override expiry | `bedroom_ac_override_expiry.yaml` | Timer expires | Clears override flag |
+| Away mode | `bedroom_ac_away.yaml` | Away toggle | Turns off AC |
+| Return mode | `bedroom_ac_return.yaml` | Away toggle off | Restores last auto temp |
+
+**Guards**: Day/night schedules only fire if:
+- `input_boolean.bedroom_ac_manual_override` is off
+- `input_boolean.bedroom_ac_away` is off
+- `climate.master_ac` is NOT off (won't turn on an AC that's off)
+
+## Balcony Motion Cube Light
+
+Automation: `automations/balcony_motion_cube_light.yaml` (extracted from `automations.yaml`)
+
+Turns on `switch.cube` when `binary_sensor.gym_motion` detects motion at night (below 30 lux).
+
+**Key behaviors:**
+- **Skip if cube already on** — won't interfere with manual or gate-triggered usage
+- **15-minute no-motion timer** — uses `wait_for_trigger` on motion clearing, not a fixed delay
+- **Manual off respected** — detects cube turned off during wait and stops cleanly
+- **5-minute cooldown** — after cube is turned off (manually or by automation), motion won't re-trigger for 5 minutes (`state: "off" for: 5 minutes` condition)
+- **mode: single** — while waiting, new motion triggers are silently dropped
+
+## HA Assist / Jeeves
+
+The HA Assist menu (top-left of dashboard) has three conversation agents:
+- **Home Assistant** — built-in local command parser
+- **Home Assistant Cloud** — Nabu Casa cloud NLP
+- **Jeeves** — local LLM via **Ollama** integration, running **MiniMax M2.5** model (`conversation.ollama_conversation`)
+
+Configured at: Settings → Voice Assistants (pipeline settings)
 
 ## AC Unit Temperature Fixes (Feb 10, 2026)
 
