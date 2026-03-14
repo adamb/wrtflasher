@@ -67,6 +67,11 @@ Three isolated networks using VLANs over a batman-adv mesh:
 - **Ollama** (port 11434): Qwen3 32B via custom `jeeves` model (thinking disabled), ~19.7GB VRAM
 - **Wyoming Whisper** (port 10300): `medium` model on CUDA, ~1.5GB VRAM at inference
 
+**GPU Power Management:**
+- Power limit capped at 250W (default 450W) — inference is memory-bandwidth bound, not compute bound
+- Persistence mode enabled (`nvidia-smi -pm 1`)
+- Power limit re-applied on boot via `/etc/rc.local`
+
 **SSH from LAN devices:** `ssh adam@192.168.1.163` or `ssh adam@deb`
 
 ### Switch: Zyxel GS1200-8
