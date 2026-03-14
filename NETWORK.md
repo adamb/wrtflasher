@@ -48,6 +48,20 @@ Three isolated networks using VLANs over a batman-adv mesh:
 - `enp1s0.20` - IoT interface (192.168.3.164)
 - Default route via LAN (192.168.1.1)
 
+### Ubuntu Server (roux)
+- **Hostname**: roux
+- **OS**: Ubuntu 24.04 LTS
+- **LAN IP**: 192.168.1.99 (VLAN 10, static via NetworkManager)
+- **IoT IP**: 192.168.3.205 (VLAN 20, DHCP)
+- **WiFi**: Disabled (was on Finca, autoconnect off)
+- **Connection**: Wired via Switch Port 2 (VLANs 10,20 tagged)
+- **Purpose**: Future replacement for deb (AI/home server)
+
+**Network Configuration (NetworkManager):**
+- `eno1.10` - LAN interface (192.168.1.99, static)
+- `eno1.20` - IoT interface (192.168.3.205, DHCP)
+- Default route via LAN (192.168.1.1, DNS 1.1.1.1/1.0.0.1)
+
 **SSH from LAN devices:** `ssh adam@192.168.1.163` or `ssh adam@deb`
 
 ### Switch: Zyxel GS1200-8
@@ -56,7 +70,7 @@ Three isolated networks using VLANs over a batman-adv mesh:
 | Port | Device | VLAN | Mode |
 |------|--------|------|------|
 | 1 | Gateway (eth0) | 10,20,30,99 | Tagged (trunk) |
-| 2 | Spare | - | - |
+| 2 | Ubuntu server (roux) | 10,20 | Tagged |
 | 3 | Debian box | 10,20 | Tagged |
 | 4 | Home Assistant | 10 | Untagged |
 | 5 | Time Capsule | 10 | Untagged |
@@ -487,6 +501,7 @@ Restore AP interfaces, remove TEG config, and remove the firewall zone/forwardin
 | Switch | 192.168.1.3 | - | Zyxel GS1200-8 |
 | Home Assistant | 192.168.1.151 | 20:f8:3b:00:03:e9 | Port 4, VLAN 10 (untagged) |
 | Debian (deb) | 192.168.1.163 | 84:47:09:1c:29:26 | Port 3, VLANs 10,20. Also has 192.168.3.164 (IoT) |
+| Ubuntu (roux) | 192.168.1.99 | 10:7c:61:4a:d9:cc | Port 2, VLANs 10,20. Also has 192.168.3.205 (IoT) |
 | ghn-gw | 192.168.1.241 | 1c:64:99:a1:3c:cb | G.hn GPL 2000S4, gateway side, VLAN 10 via switch port 8 |
 | ghn-prov | 192.168.1.243 | 1c:64:99:a1:3c:cd | G.hn GPL 2000S4, ap-prov side |
 | ghn-news | 192.168.1.220 | - | G.hn GPL 2000PT, ap-news side |

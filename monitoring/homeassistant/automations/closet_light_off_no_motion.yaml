@@ -1,0 +1,25 @@
+- id: closet_light_off_no_motion
+  alias: "Closet No Motion → Light Off"
+  description: >
+    Turn off the closet light if the closet camera detects no motion
+    for 10 minutes.
+  triggers:
+    - trigger: state
+      entity_id: light.smart_wi_fi_dimmer_switch
+      to: "on"
+    - trigger: state
+      entity_id: sensor.closet_last_activity
+  conditions:
+    - condition: state
+      entity_id: light.smart_wi_fi_dimmer_switch
+      state: "on"
+  actions:
+    - delay:
+        minutes: 10
+    - condition: state
+      entity_id: light.smart_wi_fi_dimmer_switch
+      state: "on"
+    - action: light.turn_off
+      target:
+        entity_id: light.smart_wi_fi_dimmer_switch
+  mode: restart

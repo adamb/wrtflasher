@@ -556,6 +556,7 @@ From any device on your Tailscale network (phone, laptop, etc.), use local IPs:
 - Home Assistant: http://192.168.1.151:8123
 - Gateway LuCI: http://192.168.1.1
 - Deb: ssh adam@192.168.1.164
+- Roux: ssh adam@192.168.1.99
 
 **Important:**
 - **MUST use SNAT** (default) - do NOT add `--snat-subnet-routes=false`
