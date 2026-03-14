@@ -61,7 +61,7 @@ ssh:
   user: "root"                       # SSH username (always root on OpenWRT)
 
 settings:
-  poll_interval: 60                  # Seconds between polls (60 = 1 minute)
+  poll_interval: 300                  # Seconds between polls (300 = 5 minutes)
   mesh_interface: "phy1-mesh0"       # 5GHz mesh backhaul interface
   ap_interfaces:                     # Client WiFi interfaces to monitor
     - "phy0-ap0"  # Finca (LAN VLAN 10)

@@ -31,11 +31,12 @@
       - condition: numeric_state
         entity_id: sensor.finca_del_mar_percentage_charged_2
         below: 50
-      - condition: not
-        conditions:
-        - condition: state
-          entity_id: sensor.finca_del_mar_grid_status
-          state: on_grid
+      - condition: state
+        entity_id: sensor.finca_del_mar_grid_status
+        state:
+          - off_grid
+          - off_grid_unintentional
+          - off_grid_intentional
       # Skip if already shed (all switches off = nothing to save)
       - condition: or
         conditions:

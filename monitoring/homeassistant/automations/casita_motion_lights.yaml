@@ -1,0 +1,36 @@
+- id: casita_motion_lights
+  alias: "Casita Motion → Isla & Porche Lights"
+  description: >
+    Turn on isla and porche lights when Casita Ring camera detects motion
+    at night. Turn off after 10 min of no motion.
+  triggers:
+    - trigger: state
+      entity_id: sensor.casita_last_activity
+  conditions:
+    - condition: sun
+      after: sunset
+      before: sunrise
+    - condition: state
+      entity_id: light.isla_light_1
+      state: "off"
+      for:
+        minutes: 2
+    - condition: state
+      entity_id: light.porche_light_1
+      state: "off"
+      for:
+        minutes: 2
+  actions:
+    - action: light.turn_on
+      target:
+        entity_id:
+          - light.isla_light_1
+          - light.porche_light_1
+    - delay:
+        minutes: 10
+    - action: light.turn_off
+      target:
+        entity_id:
+          - light.isla_light_1
+          - light.porche_light_1
+  mode: restart

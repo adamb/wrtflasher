@@ -52,7 +52,7 @@ class MeshMonitor:
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
 
-    def ssh_command(self, node_ip: str, command: str, timeout: int = 5) -> Optional[str]:
+    def ssh_command(self, node_ip: str, command: str, timeout: int = 10) -> Optional[str]:
         """Execute SSH command on remote node"""
         ssh_opts = [
             '-i', self.ssh_key,
@@ -85,41 +85,89 @@ class MeshMonitor:
             logger.error(f"SSH error on {node_ip}: {e}")
             return None
 
-    def collect_mesh_neighbors(self, node_ip: str) -> Dict[str, Any]:
-        """Collect batman-adv mesh neighbor information"""
-        output = self.ssh_command(node_ip, "batctl n")
-        if not output:
-            return {'count': 0, 'neighbors': []}
+    def _build_collection_script(self, node_type: str) -> str:
+        """Build a single shell script that collects all stats for a node"""
+        mesh_iface = self.config['settings']['mesh_interface']
+        ap_ifaces = self.config['settings']['ap_interfaces']
 
-        neighbors = []
-        lines = output.strip().split('\n')[1:]  # Skip header
+        parts = []
+        parts.append("#!/bin/sh")
 
-        for line in lines:
+        # Section: mesh neighbors with signal strengths
+        parts.append("echo '---MESH---'")
+        parts.append("batctl n 2>/dev/null")
+        parts.append("echo '---SIGNALS---'")
+        parts.append(f"for mac in $(batctl n 2>/dev/null | tail -n +2 | awk '{{print $2}}'); do")
+        parts.append(f"  signal=$(iw dev {mesh_iface} station get $mac 2>/dev/null | grep 'signal avg' | awk '{{print $3}}')")
+        parts.append("  echo \"$mac $signal\"")
+        parts.append("done")
+
+        # Section: client counts per interface
+        parts.append("echo '---CLIENTS---'")
+        for iface in ap_ifaces:
+            parts.append(f"echo \"{iface} $(iw dev {iface} station dump 2>/dev/null | grep -c '^Station')\"")
+
+        # Section: system stats
+        parts.append("echo '---SYSTEM---'")
+        parts.append("awk '{print $1}' /proc/uptime")
+        parts.append("awk '{print $1}' /proc/loadavg")
+
+        # Section: gateway-specific stats
+        if node_type == 'gateway':
+            parts.append("echo '---GATEWAY---'")
+            parts.append("mwan3_status=$(ubus call mwan3 status 2>/dev/null)")
+            parts.append("echo \"wan1 $(echo \"$mwan3_status\" | jsonfilter -e '$.interfaces.wan.status' 2>/dev/null)\"")
+            parts.append("echo \"wan2 $(echo \"$mwan3_status\" | jsonfilter -e '$.interfaces.wan2.status' 2>/dev/null)\"")
+            parts.append("echo \"active $(ip route get 8.8.8.8 2>/dev/null | head -1 | awk '{print $5}')\"")
+            parts.append("echo \"batman $(batctl gw 2>/dev/null)\"")
+
+        return "\n".join(parts)
+
+    def _parse_collection_output(self, output: str, node_type: str) -> Dict[str, Any]:
+        """Parse the combined output from the collection script"""
+        sections = {}
+        current_section = None
+        current_lines = []
+
+        for line in output.split('\n'):
+            if line.startswith('---') and line.endswith('---'):
+                if current_section:
+                    sections[current_section] = current_lines
+                current_section = line.strip('-')
+                current_lines = []
+            elif current_section:
+                current_lines.append(line)
+
+        if current_section:
+            sections[current_section] = current_lines
+
+        result = {}
+
+        # Parse mesh neighbors
+        mesh_lines = sections.get('MESH', [])
+        neighbor_macs = []
+        for line in mesh_lines[1:]:  # Skip header
             parts = line.split()
             if len(parts) >= 2:
-                neighbor_mac = parts[1]
-                # Get signal strength using iw
-                mesh_iface = self.config['settings']['mesh_interface']
-                signal_output = self.ssh_command(
-                    node_ip,
-                    f"iw dev {mesh_iface} station get {neighbor_mac} 2>/dev/null | grep 'signal avg' | awk '{{print $3}}'"
-                )
+                neighbor_macs.append(parts[1])
 
+        # Parse signal strengths
+        signal_lines = sections.get('SIGNALS', [])
+        neighbors = []
+        for line in signal_lines:
+            parts = line.split()
+            if len(parts) >= 1:
+                mac = parts[0]
                 signal = None
-                if signal_output:
+                if len(parts) >= 2:
                     try:
-                        signal = int(signal_output.split()[0])
-                    except (ValueError, IndexError):
+                        signal = int(parts[1])
+                    except ValueError:
                         pass
+                neighbors.append({'mac': mac, 'signal': signal})
 
-                neighbors.append({
-                    'mac': neighbor_mac,
-                    'signal': signal
-                })
-
-        # Calculate statistics
         signals = [n['signal'] for n in neighbors if n['signal'] is not None]
-        return {
+        result['mesh'] = {
             'count': len(neighbors),
             'neighbors': neighbors,
             'signal_avg': round(sum(signals) / len(signals), 1) if signals else None,
@@ -127,23 +175,15 @@ class MeshMonitor:
             'signal_max': max(signals) if signals else None
         }
 
-    def collect_client_counts(self, node_ip: str) -> Dict[str, int]:
-        """Collect WiFi client counts per SSID"""
+        # Parse client counts
         clients = {'finca': 0, 'iot': 0, 'guest': 0, 'total': 0}
-
-        for iface in self.config['settings']['ap_interfaces']:
-            # Count stations on this interface
-            count_output = self.ssh_command(
-                node_ip,
-                f"iw dev {iface} station dump 2>/dev/null | grep -c '^Station' || echo 0"
-            )
-
-            if count_output:
+        for line in sections.get('CLIENTS', []):
+            parts = line.split()
+            if len(parts) >= 2:
+                iface = parts[0]
                 try:
-                    count = int(count_output)
+                    count = int(parts[1])
                     clients['total'] += count
-
-                    # Map interface to SSID
                     if 'ap0' in iface:
                         clients['finca'] = count
                     elif 'ap1' in iface:
@@ -152,62 +192,51 @@ class MeshMonitor:
                         clients['guest'] = count
                 except ValueError:
                     pass
+        result['clients'] = clients
 
-        return clients
-
-    def collect_system_stats(self, node_ip: str) -> Dict[str, Any]:
-        """Collect system statistics (uptime, load)"""
-        # Get uptime
-        uptime_output = self.ssh_command(node_ip, "cat /proc/uptime | awk '{print $1}'")
+        # Parse system stats
+        system_lines = sections.get('SYSTEM', [])
         uptime = None
-        if uptime_output:
-            try:
-                uptime = int(float(uptime_output))
-            except ValueError:
-                pass
-
-        # Get load average
-        load_output = self.ssh_command(node_ip, "cat /proc/loadavg | awk '{print $1}'")
         load_avg = None
-        if load_output:
+        if len(system_lines) >= 1:
             try:
-                load_avg = float(load_output)
+                uptime = int(float(system_lines[0]))
             except ValueError:
                 pass
+        if len(system_lines) >= 2:
+            try:
+                load_avg = float(system_lines[1])
+            except ValueError:
+                pass
+        result['system'] = {'uptime': uptime, 'load_avg': load_avg}
 
-        return {
-            'uptime': uptime,
-            'load_avg': load_avg
-        }
+        # Parse gateway stats
+        if node_type == 'gateway':
+            gateway = {}
+            for line in sections.get('GATEWAY', []):
+                parts = line.split(None, 1)
+                if len(parts) >= 2:
+                    key, value = parts[0], parts[1]
+                    if key == 'wan1':
+                        gateway['wan1_status'] = value or 'unknown'
+                    elif key == 'wan2':
+                        gateway['wan2_status'] = value or 'unknown'
+                    elif key == 'active':
+                        gateway['active_wan'] = value or 'unknown'
+                    elif key == 'batman':
+                        if 'server' in value.lower():
+                            gateway['batman_mode'] = 'server'
+                        elif 'client' in value.lower():
+                            gateway['batman_mode'] = 'client'
+                        else:
+                            gateway['batman_mode'] = 'off'
+            gateway.setdefault('wan1_status', 'unknown')
+            gateway.setdefault('wan2_status', 'unknown')
+            gateway.setdefault('active_wan', 'unknown')
+            gateway.setdefault('batman_mode', 'unknown')
+            result['gateway'] = gateway
 
-    def collect_gateway_stats(self, node_ip: str) -> Dict[str, Any]:
-        """Collect gateway-specific stats (WAN status, batman mode)"""
-        stats = {}
-
-        # Check WAN interfaces status via mwan3 (uses actual health checks)
-        wan1_output = self.ssh_command(node_ip, "ubus call mwan3 status | jsonfilter -e '$.interfaces.wan.status' 2>/dev/null")
-        stats['wan1_status'] = wan1_output if wan1_output else 'unknown'
-
-        wan2_output = self.ssh_command(node_ip, "ubus call mwan3 status | jsonfilter -e '$.interfaces.wan2.status' 2>/dev/null")
-        stats['wan2_status'] = wan2_output if wan2_output else 'unknown'
-
-        # Get active WAN interface from routing
-        active_wan = self.ssh_command(node_ip, "ip route get 8.8.8.8 2>/dev/null | head -1 | awk '{print $5}'")
-        stats['active_wan'] = active_wan if active_wan else 'unknown'
-
-        # Get batman-adv gateway mode
-        batman_mode = self.ssh_command(node_ip, "batctl gw 2>/dev/null")
-        if batman_mode:
-            if 'server' in batman_mode.lower():
-                stats['batman_mode'] = 'server'
-            elif 'client' in batman_mode.lower():
-                stats['batman_mode'] = 'client'
-            else:
-                stats['batman_mode'] = 'off'
-        else:
-            stats['batman_mode'] = 'unknown'
-
-        return stats
+        return result
 
     def collect_ghn_stats(self, device: Dict[str, str]) -> Dict[str, Any]:
         """Collect G.hn PLC connection stats from web interface"""
@@ -307,7 +336,7 @@ class MeshMonitor:
             return {'connected': False, 'error': 'parse_error'}
 
     def collect_node_stats(self, node: Dict[str, str]) -> Dict[str, Any]:
-        """Collect all statistics for a single node"""
+        """Collect all statistics for a single node via one SSH call"""
         node_name = node['name']
         node_ip = node['ip']
         node_type = node['type']
@@ -321,22 +350,20 @@ class MeshMonitor:
             'timestamp': int(time.time())
         }
 
-        # Collect mesh neighbor information
-        mesh_data = self.collect_mesh_neighbors(node_ip)
-        stats['mesh'] = mesh_data
+        # Build and run single collection script
+        script = self._build_collection_script(node_type)
+        output = self.ssh_command(node_ip, script, timeout=15)
 
-        # Collect client counts
-        clients = self.collect_client_counts(node_ip)
-        stats['clients'] = clients
+        if not output:
+            stats['mesh'] = {'count': 0, 'neighbors': [], 'signal_avg': None, 'signal_min': None, 'signal_max': None}
+            stats['clients'] = {'finca': 0, 'iot': 0, 'guest': 0, 'total': 0}
+            stats['system'] = {'uptime': None, 'load_avg': None}
+            if node_type == 'gateway':
+                stats['gateway'] = {'wan1_status': 'unknown', 'wan2_status': 'unknown', 'active_wan': 'unknown', 'batman_mode': 'unknown'}
+            return stats
 
-        # Collect system stats
-        system = self.collect_system_stats(node_ip)
-        stats['system'] = system
-
-        # Collect gateway-specific stats
-        if node_type == 'gateway':
-            gateway = self.collect_gateway_stats(node_ip)
-            stats['gateway'] = gateway
+        parsed = self._parse_collection_output(output, node_type)
+        stats.update(parsed)
 
         return stats
 

@@ -167,6 +167,26 @@ To enable USB tethering failover on the gateway:
 
 The mwan3 config uses ping monitoring (8.8.8.8, 1.1.1.1) to detect WAN failures.
 
+### SQM (Smart Queue Management)
+
+SQM uses CAKE (`piece_of_cake.qos`) on both WAN interfaces to manage bufferbloat. Settings are configured directly on the gateway via UCI, not via `generate-config.sh`.
+
+| WAN | Interface | Download | Upload |
+|-----|-----------|----------|--------|
+| Starlink | eth1 | 120 Mbps | 9 Mbps |
+| T-Mobile | eth2 | 65 Mbps | 23 Mbps |
+
+SQM limits should be set to ~85-90% of measured link speed. If Starlink or T-Mobile speeds change significantly, adjust via:
+```bash
+ssh root@192.168.1.1 "uci set sqm.wan.download=120000; uci set sqm.wan.upload=9000; uci commit sqm; /etc/init.d/sqm restart"
+```
+
+### Monitoring Performance
+
+The mesh monitoring script (`monitoring/main.py`) runs on deb and SSHes into all mesh nodes every 5 minutes. It uses a **single batched SSH call per node** to collect all metrics (mesh neighbors, signal strength, client counts, system stats, gateway WAN status) in one shot.
+
+**Important**: The previous implementation used 8-12 separate SSH calls per node per poll cycle, which caused the gateway CPU to run at 100% (load average ~6.0 on 2 cores). This was halving network throughput through the gateway. The batched approach reduced gateway load from 5.9 to 0.1.
+
 ## Key Files
 
 - **config.sh** - Master configuration (VLAN IPs, SSID names, mobility domains, Home Assistant IP)
@@ -227,7 +247,7 @@ The `monitoring/` directory contains a Python script that polls mesh nodes via S
   - `dashboards/thread-devices.yaml` - Thread/Matter device dashboard (lights, plugs, door sensors, batteries)
   - `dashboards/lights.yaml` - Lights control dashboard
   - `blueprints/` - Automation blueprints
-- **Poll interval**: 60 seconds (configurable in config.yaml)
+- **Poll interval**: 300 seconds / 5 minutes (configurable in config.yaml)
 
 ### HA UI Notes
 
