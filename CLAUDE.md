@@ -236,7 +236,7 @@ HA config files (automations, dashboards, sensors, template sensors) are version
 
 The `monitoring/` directory contains a Python script that polls mesh nodes via SSH and publishes stats to Home Assistant via MQTT.
 
-- **monitoring/main.py** - MQTT publisher script (runs on deb)
+- **monitoring/main.py** - MQTT publisher script (runs on deb; may move to roux)
 - **monitoring/homeassistant/** - HA config files from live instance:
   - `automations.yaml`, `configuration.yaml`, `sensors.yaml`, `template_sensors.yaml`
   - `automations/` - Individual automation YAML files (loaded via `!include_dir_merge_list`)
@@ -481,10 +481,45 @@ Turns on `switch.cube` when `binary_sensor.gym_motion` detects motion at night (
 
 ## HA Assist / Jeeves
 
-The HA Assist menu (top-left of dashboard) has three conversation agents:
+The HA Assist voice pipeline runs on **roux** (192.168.1.99), an Ubuntu server with an RTX 4090.
+
+**Voice Pipeline:**
+1. **STT (Speech-to-Text)**: Wyoming Faster Whisper `medium` model on CUDA (roux:10300)
+2. **Conversation Agent**: Ollama `jeeves` model — Qwen3 32B with thinking disabled (roux:11434)
+3. **TTS**: configured in HA pipeline settings
+
+**Conversation Agents:**
 - **Home Assistant** — built-in local command parser
 - **Home Assistant Cloud** — Nabu Casa cloud NLP
-- **Jeeves** — local LLM via **Ollama** integration, running **MiniMax M2.5** model (`conversation.ollama_conversation`)
+- **Jeeves** — local LLM via **Ollama** on roux (`conversation.jeeves`)
+
+**Ollama `jeeves` Model:**
+Custom Ollama model based on Qwen3 32B Q4_K_M with thinking mode disabled. Qwen3's default thinking mode adds a `thinking` field to responses that breaks HA's Ollama integration. The model is created via Modelfile on roux:
+```
+FROM qwen3:32b
+SYSTEM You are Jeeves, a helpful home assistant. Answer concisely. Do not think internally.
+PARAMETER num_ctx 4096
+MESSAGE user Please respond without using your thinking capability.
+MESSAGE assistant OK, I will respond directly without thinking.
+```
+To recreate: `ssh roux 'ollama create jeeves -f /tmp/Modelfile'`
+
+**VRAM Budget (24GB):**
+- Qwen3 32B: ~19.7GB (60-63/65 layers on GPU)
+- Whisper medium: ~1.5GB at inference
+- Whisper large-v3 does NOT fit alongside Qwen3 (OOM error)
+
+**Wyoming Whisper Service Notes:**
+- Systemd service: `/etc/systemd/system/wyoming-whisper.service`
+- Requires `LD_LIBRARY_PATH=/usr/local/lib/ollama/cuda_v12` for CUDA libs (libcublas)
+- Requires `HF_HUB_DISABLE_XET=1` (xet download protocol hangs on roux)
+- First model download happens on service start; service shows "Ready" when done
+
+**Ollama Service Notes:**
+- Systemd service: `/etc/systemd/system/ollama.service`
+- Requires `HOME=/root` environment variable (panics without it)
+- `OLLAMA_HOST=0.0.0.0` for network access from HA
+- First request after reboot takes ~4-30s (cold model load into GPU), subsequent requests ~1s
 
 Configured at: Settings → Voice Assistants (pipeline settings)
 

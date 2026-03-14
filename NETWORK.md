@@ -51,16 +51,21 @@ Three isolated networks using VLANs over a batman-adv mesh:
 ### Ubuntu Server (roux)
 - **Hostname**: roux
 - **OS**: Ubuntu 24.04 LTS
+- **Hardware**: Intel i9-13900K, NVIDIA RTX 4090 (24GB VRAM), 64GB RAM, 1.8TB NVMe
 - **LAN IP**: 192.168.1.99 (VLAN 10, static via NetworkManager)
 - **IoT IP**: 192.168.3.205 (VLAN 20, DHCP)
 - **WiFi**: Disabled (was on Finca, autoconnect off)
 - **Connection**: Wired via Switch Port 2 (VLANs 10,20 tagged)
-- **Purpose**: Future replacement for deb (AI/home server)
+- **Purpose**: AI/home server — runs Ollama (LLM) and Wyoming Whisper (STT) for HA voice pipeline
 
 **Network Configuration (NetworkManager):**
 - `eno1.10` - LAN interface (192.168.1.99, static)
 - `eno1.20` - IoT interface (192.168.3.205, DHCP)
 - Default route via LAN (192.168.1.1, DNS 1.1.1.1/1.0.0.1)
+
+**Services:**
+- **Ollama** (port 11434): Qwen3 32B via custom `jeeves` model (thinking disabled), ~19.7GB VRAM
+- **Wyoming Whisper** (port 10300): `medium` model on CUDA, ~1.5GB VRAM at inference
 
 **SSH from LAN devices:** `ssh adam@192.168.1.163` or `ssh adam@deb`
 
